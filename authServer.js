@@ -50,15 +50,12 @@ app.delete("/logout", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
-  console.log("HERE");
   const { errors, isValid } = validateRegisterInput(req.body);
-  console.log(req.body);
   if (!isValid) {
     return res.status(400).json(errors);
   }
 
   const { email, fullName, password } = req.body;
-  console.log(email, fullName, password);
   User.findOne({ email }).then((user) => {
     if (user) {
       return res.status(400).json({
@@ -90,7 +87,6 @@ app.post("/register", (req, res) => {
 
 app.post("/login", (req, res) => {
   // Authenticate user
-  console.log(req.body);
   const { errors, isValid } = validateLoginInput(req.body);
   if (!isValid) {
     return res.status(400).json(errors);
