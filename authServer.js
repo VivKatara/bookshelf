@@ -13,7 +13,8 @@ const validateRegisterInput = require("./validation/register");
 const User = require("./models/User");
 
 const app = express();
-const port = process.env.AUTH_PORT || 4000;
+// const port = process.env.AUTH_PORT || 4000;
+const port = 4000;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
