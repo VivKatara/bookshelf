@@ -1,27 +1,33 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
+import { useHistory } from "react-router-dom";
 import axios from "axios";
 import styled from "@emotion/styled";
 
-class Register extends Component {
-  constructor() {
-    super();
-    this.state = {
-      email: "",
-      fullName: "",
-      password: "",
-      passwordConfirm: "",
-    };
-  }
+function Register() {
+  const [email, setEmail] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordConfirm, setPasswordConfirm] = useState("");
+  const history = useHistory();
 
-  handleChange = (e) => {
-    this.setState({
-      [e.target.id]: e.target.value,
-    });
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
   };
 
-  handleSubmit = async (e) => {
+  const handleFullNameChange = (e) => {
+    setFullName(e.target.value);
+  };
+
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+  };
+
+  const handlePasswordConfirmChange = (e) => {
+    setPasswordConfirm(e.target.value);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const { email, fullName, password, passwordConfirm } = this.state;
     try {
       const response = await axios.post("http://localhost:4000/register", {
         email,
@@ -30,67 +36,66 @@ class Register extends Component {
         passwordConfirm,
       });
       console.log(response);
+      history.push("/");
     } catch (e) {
       console.log(e);
     }
   };
 
-  render() {
-    return (
-      <MainContainer>
-        <CentralDiv>
-          <Form onSubmit={this.handleSubmit}>
-            <FormDiv>
-              <h3>Create your Bookshelf account</h3>
-            </FormDiv>
-            <FormDiv>
-              <label>Email</label>
-              <Input
-                type="text"
-                name="email"
-                id="email"
-                onChange={this.handleChange}
-                required
-              />
-            </FormDiv>
-            <FormDiv>
-              <label>Full Name</label>
-              <Input
-                type="text"
-                name="fullName"
-                id="fullName"
-                onChange={this.handleChange}
-                required
-              />
-            </FormDiv>
-            <FormDiv>
-              <label>Password</label>
-              <Input
-                type="text"
-                name="password"
-                id="password"
-                onChange={this.handleChange}
-                required
-              />
-            </FormDiv>
-            <FormDiv>
-              <label>Confirm Password</label>
-              <Input
-                type="text"
-                name="passwordConfirm"
-                id="passwordConfirm"
-                onChange={this.handleChange}
-                required
-              />
-            </FormDiv>
-            <FormDiv>
-              <RegisterButton type="Submit">Sign Up</RegisterButton>
-            </FormDiv>
-          </Form>
-        </CentralDiv>
-      </MainContainer>
-    );
-  }
+  return (
+    <MainContainer>
+      <CentralDiv>
+        <Form onSubmit={handleSubmit}>
+          <FormDiv>
+            <h3>Create your Bookshelf account</h3>
+          </FormDiv>
+          <FormDiv>
+            <label>Email</label>
+            <Input
+              type="text"
+              name="email"
+              id="email"
+              onChange={handleEmailChange}
+              required
+            />
+          </FormDiv>
+          <FormDiv>
+            <label>Full Name</label>
+            <Input
+              type="text"
+              name="fullName"
+              id="fullName"
+              onChange={handleFullNameChange}
+              required
+            />
+          </FormDiv>
+          <FormDiv>
+            <label>Password</label>
+            <Input
+              type="text"
+              name="password"
+              id="password"
+              onChange={handlePasswordChange}
+              required
+            />
+          </FormDiv>
+          <FormDiv>
+            <label>Confirm Password</label>
+            <Input
+              type="text"
+              name="passwordConfirm"
+              id="passwordConfirm"
+              onChange={handlePasswordConfirmChange}
+              required
+            />
+          </FormDiv>
+          <FormDiv>
+            <RegisterButton type="Submit">Sign Up</RegisterButton>
+          </FormDiv>
+        </Form>
+      </CentralDiv>
+    </MainContainer>
+  );
 }
 
 export default Register;

@@ -1,73 +1,137 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
+import { useHistory } from "react-router-dom";
 import axios from "axios";
 import styled from "@emotion/styled";
 
-class Login extends Component {
-  constructor() {
-    super();
-    this.state = {
-      email: "",
-      password: "",
-    };
-  }
+function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const history = useHistory();
 
-  handleChange = (e) => {
-    this.setState({
-      [e.target.id]: e.target.value,
-    });
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
   };
 
-  handleSubmit = async (e) => {
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const { email, password } = this.state;
     try {
       const response = await axios.post("http://localhost:4000/login", {
         email,
         password,
       });
       console.log(response);
+      history.push("/");
     } catch (e) {
       console.log(e);
     }
   };
 
-  render() {
-    return (
-      <MainContainer>
-        <CentralDiv>
-          <Form onSubmit={this.handleSubmit}>
-            <FormDiv>
-              <h3>Sign into your Bookshelf account</h3>
-            </FormDiv>
-            <FormDiv>
-              <label>Email</label>
-              <Input
-                type="text"
-                name="email"
-                id="email"
-                onChange={this.handleChange}
-                required
-              />
-            </FormDiv>
-            <FormDiv>
-              <label>Password</label>
-              <Input
-                type="text"
-                name="password"
-                id="password"
-                onChange={this.handleChange}
-                required
-              />
-            </FormDiv>
-            <FormDiv>
-              <LoginButton type="Submit">Continue</LoginButton>
-            </FormDiv>
-          </Form>
-        </CentralDiv>
-      </MainContainer>
-    );
-  }
+  return (
+    <MainContainer>
+      <CentralDiv>
+        <Form onSubmit={handleSubmit}>
+          <FormDiv>
+            <h3>Sign into your Bookshelf account</h3>
+          </FormDiv>
+          <FormDiv>
+            <label>Email</label>
+            <Input
+              type="text"
+              name="email"
+              id="email"
+              onChange={handleEmailChange}
+              required
+            />
+          </FormDiv>
+          <FormDiv>
+            <label>Password</label>
+            <Input
+              type="text"
+              name="password"
+              id="password"
+              onChange={handlePasswordChange}
+              required
+            />
+          </FormDiv>
+          <FormDiv>
+            <LoginButton type="Submit">Continue</LoginButton>
+          </FormDiv>
+        </Form>
+      </CentralDiv>
+    </MainContainer>
+  );
 }
+
+// class Login extends Component {
+//   constructor() {
+//     super();
+//     this.state = {
+//       email: "",
+//       password: "",
+//     };
+//   }
+
+//   handleChange = (e) => {
+//     this.setState({
+//       [e.target.id]: e.target.value,
+//     });
+//   };
+
+//   handleSubmit = async (e) => {
+//     e.preventDefault();
+//     const { email, password } = this.state;
+//     try {
+//       const response = await axios.post("http://localhost:4000/login", {
+//         email,
+//         password,
+//       });
+//       console.log(response);
+//     } catch (e) {
+//       console.log(e);
+//     }
+//   };
+
+//   render() {
+//     return (
+//       <MainContainer>
+//         <CentralDiv>
+//           <Form onSubmit={this.handleSubmit}>
+//             <FormDiv>
+//               <h3>Sign into your Bookshelf account</h3>
+//             </FormDiv>
+//             <FormDiv>
+//               <label>Email</label>
+//               <Input
+//                 type="text"
+//                 name="email"
+//                 id="email"
+//                 onChange={this.handleChange}
+//                 required
+//               />
+//             </FormDiv>
+//             <FormDiv>
+//               <label>Password</label>
+//               <Input
+//                 type="text"
+//                 name="password"
+//                 id="password"
+//                 onChange={this.handleChange}
+//                 required
+//               />
+//             </FormDiv>
+//             <FormDiv>
+//               <LoginButton type="Submit">Continue</LoginButton>
+//             </FormDiv>
+//           </Form>
+//         </CentralDiv>
+//       </MainContainer>
+//     );
+//   }
+// }
 
 export default Login;
 
