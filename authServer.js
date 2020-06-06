@@ -42,14 +42,19 @@ mongoose
 let refreshTokens = [];
 
 // For creating a new token
-app.post("/token", (req, res) => {
-  const refreshToken = req.body.token;
+app.get("/refresh", (req, res) => {
+  const refreshToken = req.cookies["refreshToken"];
+  console.log(req.cookies);
   if (refreshToken == null) return res.sendStatus(401);
   if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403);
   jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
     if (err) return res.sendStatus(403);
     const accessToken = generateAccessToken({ name: user.fullName });
-    return res.json({ accessToken });
+    res.cookie("accessToken", `Bearer ${accessToken}`, {
+      maxAge: 24 * 60 * 60 * 1000,
+      httpOnly: false,
+    });
+    return res.json({ success: true });
   });
 });
 
@@ -142,7 +147,7 @@ app.get("/", (req, res) => {
 });
 
 function generateAccessToken(user) {
-  return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "15s" });
+  return jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "5s" });
 }
 
 app.listen(port, () => {
