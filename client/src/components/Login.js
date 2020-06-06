@@ -1,23 +1,38 @@
-import React, { useState } from "react";
+import React, { useReducer } from "react";
 import { useHistory } from "react-router-dom";
 import axios from "axios";
 import styled from "@emotion/styled";
 
 function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const initialState = {
+    email: "",
+    password: "",
+  };
+
+  const reducer = (state, action) => {
+    switch (action.type) {
+      case "EMAIL_CHANGE":
+        return {
+          ...state,
+          email: action.payload,
+        };
+      case "PASSWORD_CHANGE":
+        return {
+          ...state,
+          password: action.payload,
+        };
+      default:
+        return state;
+    }
+  };
+
+  const [loginState, dispatch] = useReducer(reducer, initialState);
   const history = useHistory();
-
-  const handleEmailChange = (e) => {
-    setEmail(e.target.value);
-  };
-
-  const handlePasswordChange = (e) => {
-    setPassword(e.target.value);
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const { email, password } = loginState;
+    console.log(email, password);
     try {
       const response = await axios.post("http://localhost:4000/login", {
         email,
@@ -43,7 +58,10 @@ function Login() {
               type="text"
               name="email"
               id="email"
-              onChange={handleEmailChange}
+              value={loginState.email}
+              onChange={(e) =>
+                dispatch({ type: "EMAIL_CHANGE", payload: e.target.value })
+              }
               required
             />
           </FormDiv>
@@ -53,7 +71,10 @@ function Login() {
               type="text"
               name="password"
               id="password"
-              onChange={handlePasswordChange}
+              value={loginState.password}
+              onChange={(e) =>
+                dispatch({ type: "PASSWORD_CHANGE", payload: e.target.value })
+              }
               required
             />
           </FormDiv>
@@ -65,73 +86,6 @@ function Login() {
     </MainContainer>
   );
 }
-
-// class Login extends Component {
-//   constructor() {
-//     super();
-//     this.state = {
-//       email: "",
-//       password: "",
-//     };
-//   }
-
-//   handleChange = (e) => {
-//     this.setState({
-//       [e.target.id]: e.target.value,
-//     });
-//   };
-
-//   handleSubmit = async (e) => {
-//     e.preventDefault();
-//     const { email, password } = this.state;
-//     try {
-//       const response = await axios.post("http://localhost:4000/login", {
-//         email,
-//         password,
-//       });
-//       console.log(response);
-//     } catch (e) {
-//       console.log(e);
-//     }
-//   };
-
-//   render() {
-//     return (
-//       <MainContainer>
-//         <CentralDiv>
-//           <Form onSubmit={this.handleSubmit}>
-//             <FormDiv>
-//               <h3>Sign into your Bookshelf account</h3>
-//             </FormDiv>
-//             <FormDiv>
-//               <label>Email</label>
-//               <Input
-//                 type="text"
-//                 name="email"
-//                 id="email"
-//                 onChange={this.handleChange}
-//                 required
-//               />
-//             </FormDiv>
-//             <FormDiv>
-//               <label>Password</label>
-//               <Input
-//                 type="text"
-//                 name="password"
-//                 id="password"
-//                 onChange={this.handleChange}
-//                 required
-//               />
-//             </FormDiv>
-//             <FormDiv>
-//               <LoginButton type="Submit">Continue</LoginButton>
-//             </FormDiv>
-//           </Form>
-//         </CentralDiv>
-//       </MainContainer>
-//     );
-//   }
-// }
 
 export default Login;
 
