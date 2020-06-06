@@ -6,13 +6,26 @@ import axios from "axios";
 
 function Homepage() {
   const testRoute = async () => {
-    axios
-      .get("http://localhost:5000/testCookies", { withCredentials: true })
-      .then((data) => console.log(data))
-      .catch((err) => {
-        console.log("IN HERE");
-        axios.get("http://localhost:4000/refresh", { withCredentails: true });
+    const response = await axios.get("http://localhost:5000/testCookies", {
+      withCredentials: true,
+    });
+    console.log(response);
+    if (response.status === 403) {
+      const secondResonse = await axios.get("http://localhost:4000/refresh");
+      console.log("Successful refresh");
+      const newResponse = await axios.get("http://localhost:5000/testCookies", {
+        withCredentials: true,
       });
+      console.log(newResponse);
+    }
+    console.log(response);
+    // axios
+    //   .get("http://localhost:5000/testCookies", { withCredentials: true })
+    //   .then((data) => console.log(data))
+    //   .catch((err) => {
+    //     console.log("IN HERE");
+    //     axios.get("http://localhost:4000/refresh", { withCredentails: true });
+    //   });
 
     // try {
     //   const firstResponse = await axios.get(

@@ -38,21 +38,34 @@ mongoose
 app.use(function (req, res, next) {
   const accessCookie = req.cookies["accessToken"];
   const accessToken = accessCookie && accessCookie.split(" ")[1];
+  // console.log(accessToken);
   if (accessToken == null) return res.sendStatus(401); // Unauthorized request
 
   jwt.verify(
     accessToken,
     process.env.ACCESS_TOKEN_SECRET,
     async (err, user) => {
-      if (err) {
-        console.log("Trying to refresh");
-        const response = await axios.post("http://localhost:4000/refresh", {
-          token: req.cookies["refreshToken"],
-        });
-        return res.status(403).json({ success: false });
-      } // Here we must try and use the refresh token!
+      if (err) return res.status(403).json({ success: false });
+      // if (err) {
+      //   const response = await axios.post("http://localhost:4000/refresh", {
+      //     token: req.cookies["refreshToken"],
+      //   });
+      //   if (response.data.success) {
+      //     res.clearCookie("accessToken");
+      //     res.cookie("accessToken", response.data.accessToken, {
+      //       maxAge: 24 * 60 * 60 * 1000,
+      //       httpOnly: false,
+      //     });
+      //     req.user = response.data.user;
+      //     console.log("Successful refresh");
+      //     console.log(response.data.accessToken);
+      //     next();
+      //   } else {
+      //     console.log("Somehow made it here instead sad");
+      //     return res.status(403).json({ success: false });
+      //   }
+      // } // Here we must try and use the refresh token!
       req.user = user;
-      console.log(user);
       next();
     }
   );
@@ -62,8 +75,9 @@ app.use(function (req, res, next) {
 app.use("/", routes);
 
 app.get("/testCookies", (req, res) => {
-  console.log(req.cookies["accessToken"]);
-  console.log(req.cookies["refreshToken"]);
+  console.log("HERE");
+  // console.log(req.cookies["accessToken"]);
+  // console.log(req.cookies["refreshToken"]);
   res.status(200).json({ success: true });
 });
 
