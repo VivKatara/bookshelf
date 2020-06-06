@@ -42,9 +42,9 @@ mongoose
 let refreshTokens = [];
 
 // For creating a new token
-app.get("/refresh", (req, res) => {
-  const refreshToken = req.cookies["refreshToken"];
-  console.log(req.cookies);
+app.post("/refresh", (req, res) => {
+  const refreshToken = req.body.token;
+  console.log(refreshToken);
   if (refreshToken == null) return res.sendStatus(401);
   if (!refreshTokens.includes(refreshToken)) return res.sendStatus(403);
   jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {

@@ -40,18 +40,22 @@ app.use(function (req, res, next) {
   const accessToken = accessCookie && accessCookie.split(" ")[1];
   if (accessToken == null) return res.sendStatus(401); // Unauthorized request
 
-  jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-    if (err) {
-      console.log("Trying to refresh");
-      axios.post("http://localhost:4000/refresh", {
-        token: res.cookies["refreshToken"],
-      });
-      return res.status(403).json({ success: false });
-    } // Here we must try and use the refresh token!
-    req.user = user;
-    console.log(user);
-    next();
-  });
+  jwt.verify(
+    accessToken,
+    process.env.ACCESS_TOKEN_SECRET,
+    async (err, user) => {
+      if (err) {
+        console.log("Trying to refresh");
+        const response = await axios.post("http://localhost:4000/refresh", {
+          token: req.cookies["refreshToken"],
+        });
+        return res.status(403).json({ success: false });
+      } // Here we must try and use the refresh token!
+      req.user = user;
+      console.log(user);
+      next();
+    }
+  );
 });
 
 // Routes
