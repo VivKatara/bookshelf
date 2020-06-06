@@ -37,7 +37,8 @@ function Login() {
         email,
         password,
       });
-      history.push("/");
+      console.log(response);
+      history.push("/home");
     } catch (e) {
       console.log(e);
     }

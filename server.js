@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const mongoose = require("mongoose");
+const cookieParser = require("cookie-parser");
 const routes = require("./routes");
 require("dotenv").config();
 
@@ -12,6 +13,7 @@ const port = 5000;
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors());
+app.use(cookieParser());
 
 // Connect to DB
 mongoose
@@ -24,6 +26,20 @@ mongoose
 
 // Routes
 app.use("/", routes);
+
+app.get("/testCookies", (req, res) => {
+  const username = req.cookie["username"];
+  if (username) {
+    return res.send(username);
+  } else {
+    return res.send("No cookie found");
+  }
+});
+
+app.get("/setCookies", (req, res) => {
+  res.cookie("username", "john doe", { maxAge: 900000, httpOnly: true });
+  return res.send("Success");
+});
 
 app.listen(port, () => {
   console.log(`Server up on port ${port}`);

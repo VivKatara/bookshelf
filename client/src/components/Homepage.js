@@ -2,14 +2,22 @@ import React from "react";
 import styled from "@emotion/styled";
 import Header from "./Header";
 import Shelf from "./Shelf";
+import axios from "axios";
 
 function Homepage() {
+  const testRoute = async () => {
+    const firstResponse = await axios.get("http://localhost:5000/setCookies");
+    console.log(firstResponse);
+    const secondResponse = await axios.get("http://localhost:5000/testCookies");
+    console.log(secondResponse);
+  };
   return (
     <MainContainer>
       <Header />
       <Shelf />
       <Shelf />
       <Shelf />
+      <button onClick={testRoute}>Click Me to test route</button>
     </MainContainer>
   );
 }

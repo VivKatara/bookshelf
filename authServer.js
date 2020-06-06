@@ -4,6 +4,7 @@ const cors = require("cors");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
+const cookieParser = require("cookie-parser");
 require("dotenv").config();
 
 const validateLoginInput = require("./validation/login");
@@ -19,6 +20,7 @@ const port = 4000;
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors());
+app.use(cookieParser());
 
 // Connect to DB
 mongoose
@@ -111,7 +113,16 @@ app.post("/login", (req, res) => {
             process.env.REFRESH_TOKEN_SECRET
           );
           refreshTokens.push(refreshToken); // Store these in a database or Redis Cache
-          return res.json({ accessToken, refreshToken });
+          res.cookie("accessToken", accessToken, {
+            maxAge: 24 * 60 * 60 * 1000,
+            httpOnly: true,
+          });
+          res.cookie("refreshToken", refreshToken, {
+            maxAge: 24 * 60 * 60 * 1000,
+            httpOnly: true,
+          });
+          return res.status(200).json({ success: true });
+          // return res.json({ accessToken, refreshToken });
         } else {
           res.status(400).json({ passwordIncorrect: "Password is incorrect" });
         }
