@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
 const routes = require("./routes");
 require("dotenv").config();
 
@@ -12,8 +13,16 @@ const port = 5000;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(cors());
 app.use(cookieParser());
+
+const corsOptions = {
+  origin: "http://localhost:3000",
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+
+const authenticateToken = require("./validation/authenticateToken");
 
 // Connect to DB
 mongoose
@@ -24,11 +33,17 @@ mongoose
   .then(() => console.log("MongoDB successfully connected to server"))
   .catch((err) => console.log(err));
 
-// Cors middleware - eventually, change the localhost to the actual domain of the website (or have different setting for dev and prod)
 app.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "http://localhost:3000");
-  res.header("Access-Control-Allow-Credentials", true);
-  next();
+  const accessCookie = req.cookies["accessToken"];
+  const accessToken = accessCookie && accessCookie.split(" ")[1];
+  if (accessToken == null) return res.sendStatus(401); // Unauthorized request
+
+  jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    console.log(user);
+    next();
+  });
 });
 
 // Routes

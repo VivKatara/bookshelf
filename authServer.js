@@ -19,8 +19,14 @@ const port = 4000;
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(cors());
 app.use(cookieParser());
+
+const corsOptions = {
+  origin: "http://localhost:3000", //There will be a different origin for production so keep that in mind
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 
 // Connect to DB
 mongoose
@@ -34,26 +40,6 @@ mongoose
 // Don't do this in production. Store your refresh tokens in a database or Redis Cache
 // Note that this isn't good for production because every time your server restarts, this will be emptied out
 let refreshTokens = [];
-
-// Essential Cors middleware - change origin to actual domain name (or have a different setting for dev and prod)
-app.use(function (req, res, next) {
-  if (req.method === "OPTIONS") {
-    const headers = {};
-    headers["Access-Control-Allow-Origin"] = "http://localhost:3000";
-    headers["Access-Control-Allow-Methods"] = "POST, GET, PUT, DELETE, OPTIONS";
-    headers["Access-Control-Allow-Credentials"] = true;
-    res.writeHead(200, headers);
-    res.end();
-  } else {
-    res.header("Access-Control-Allow-Origin", "http://localhost:3000");
-    res.header("Access-Control-Allow-Credentials", true);
-    res.header(
-      "Access-Control-Allow-Methods",
-      "POST, GET, PUT, DELETE, OPTIONS"
-    );
-    next();
-  }
-});
 
 // For creating a new token
 app.post("/token", (req, res) => {
@@ -133,7 +119,7 @@ app.post("/login", (req, res) => {
             process.env.REFRESH_TOKEN_SECRET
           );
           refreshTokens.push(refreshToken); // Store these in a database or Redis Cache
-          res.cookie("accessToken", accessToken, {
+          res.cookie("accessToken", `Bearer ${accessToken}`, {
             maxAge: 24 * 60 * 60 * 1000,
             httpOnly: false,
           });
