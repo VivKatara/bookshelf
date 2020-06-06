@@ -6,9 +6,14 @@ import axios from "axios";
 
 function Homepage() {
   const testRoute = async () => {
-    const firstResponse = await axios.get("http://localhost:5000/setCookies");
+    const firstResponse = await axios.get("http://localhost:5000/setCookies", {
+      withCredentials: true,
+    });
     console.log(firstResponse);
-    const secondResponse = await axios.get("http://localhost:5000/testCookies");
+    const secondResponse = await axios.get(
+      "http://localhost:5000/testCookies",
+      { withCredentials: true }
+    );
     console.log(secondResponse);
   };
   return (

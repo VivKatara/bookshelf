@@ -24,20 +24,25 @@ mongoose
   .then(() => console.log("MongoDB successfully connected to server"))
   .catch((err) => console.log(err));
 
+// Cors middleware - eventually, change the localhost to the actual domain of the website
+app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+  res.header("Access-Control-Allow-Credentials", true);
+  next();
+});
+
 // Routes
 app.use("/", routes);
 
 app.get("/testCookies", (req, res) => {
-  const username = req.cookie["username"];
-  if (username) {
-    return res.send(username);
-  } else {
-    return res.send("No cookie found");
-  }
+  console.log(req.cookies["username"]);
+  console.log(req.cookies["password"]);
+  res.send("Success");
 });
 
-app.get("/setCookies", (req, res) => {
+app.get("/setCookies", async (req, res) => {
   res.cookie("username", "john doe", { maxAge: 900000, httpOnly: true });
+  res.cookie("password", "yeet", { maxAge: 900000, httpOnly: true });
   return res.send("Success");
 });
 
