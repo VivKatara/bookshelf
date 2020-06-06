@@ -32,13 +32,11 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { email, password } = loginState;
-    console.log(email, password);
     try {
       const response = await axios.post("http://localhost:4000/login", {
         email,
         password,
       });
-      console.log(response);
       history.push("/");
     } catch (e) {
       console.log(e);
