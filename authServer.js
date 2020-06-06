@@ -35,6 +35,26 @@ mongoose
 // Note that this isn't good for production because every time your server restarts, this will be emptied out
 let refreshTokens = [];
 
+// Essential Cors middleware - change origin to actual domain name (or have a different setting for dev and prod)
+app.use(function (req, res, next) {
+  if (req.method === "OPTIONS") {
+    const headers = {};
+    headers["Access-Control-Allow-Origin"] = "http://localhost:3000";
+    headers["Access-Control-Allow-Methods"] = "POST, GET, PUT, DELETE, OPTIONS";
+    headers["Access-Control-Allow-Credentials"] = true;
+    res.writeHead(200, headers);
+    res.end();
+  } else {
+    res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+    res.header("Access-Control-Allow-Credentials", true);
+    res.header(
+      "Access-Control-Allow-Methods",
+      "POST, GET, PUT, DELETE, OPTIONS"
+    );
+    next();
+  }
+});
+
 // For creating a new token
 app.post("/token", (req, res) => {
   const refreshToken = req.body.token;
@@ -115,14 +135,13 @@ app.post("/login", (req, res) => {
           refreshTokens.push(refreshToken); // Store these in a database or Redis Cache
           res.cookie("accessToken", accessToken, {
             maxAge: 24 * 60 * 60 * 1000,
-            httpOnly: true,
+            httpOnly: false,
           });
           res.cookie("refreshToken", refreshToken, {
             maxAge: 24 * 60 * 60 * 1000,
-            httpOnly: true,
+            httpOnly: false,
           });
           return res.status(200).json({ success: true });
-          // return res.json({ accessToken, refreshToken });
         } else {
           res.status(400).json({ passwordIncorrect: "Password is incorrect" });
         }

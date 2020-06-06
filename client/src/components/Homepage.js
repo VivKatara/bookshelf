@@ -10,8 +10,11 @@ function Homepage() {
       withCredentials: true,
     });
     console.log(firstResponse);
-    const secondResponse = await axios.get(
+    const secondResponse = await axios.post(
       "http://localhost:5000/testCookies",
+      {
+        email: "YES",
+      },
       { withCredentials: true }
     );
     console.log(secondResponse);
