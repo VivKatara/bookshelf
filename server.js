@@ -23,7 +23,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-const authenticateToken = require("./validation/authenticateToken");
+// const authenticateToken = require("./validation/authenticateToken");
 
 // Connect to DB
 mongoose
