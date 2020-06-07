@@ -33,17 +33,22 @@ function Login() {
     e.preventDefault();
     const { email, password } = loginState;
     try {
-      console.log("HERE");
-      const response = await axios.post(
-        "http://localhost:4000/login",
-        {
-          email,
-          password,
-        },
-        { withCredentials: true }
-      );
+      const response = await axios.post("http://localhost:5000/login", {
+        email,
+        password,
+      });
       console.log(response);
-      history.push("/home");
+      // console.log("HERE");
+      // const response = await axios.post(
+      //   "http://localhost:4000/login",
+      //   {
+      //     email,
+      //     password,
+      //   },
+      //   { withCredentials: true }
+      // );
+      // console.log(response);
+      // history.push("/home");
     } catch (e) {
       console.log(e);
     }

@@ -6,7 +6,10 @@ const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
 const axios = require("axios");
 const routes = require("./routes");
+const passport = require("passport");
 require("dotenv").config();
+
+const validateLoginInput = require("./validation/login");
 
 const app = express();
 // const port = process.env.PORT || 5000;
@@ -15,6 +18,8 @@ const port = 5000;
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
+app.use(passport.initialize());
+require("./authentication/passport");
 
 const corsOptions = {
   origin: "http://localhost:3000",
@@ -35,31 +40,41 @@ mongoose
   .catch((err) => console.log(err));
 
 // Authenticate token middleware - see if you can place this elsewhere
-app.use(function (req, res, next) {
-  const accessCookie = req.cookies["accessToken"];
-  const accessToken = accessCookie && accessCookie.split(" ")[1];
-  if (accessToken == null) {
-    console.log("Attempt to access without access token");
-    return res.status(401).json({ msg: "Forbidden. Please try logging in." });
-  }
+// app.use(function (req, res, next) {
+//   const accessCookie = req.cookies["accessToken"];
+//   const accessToken = accessCookie && accessCookie.split(" ")[1];
+//   if (accessToken == null) {
+//     console.log("Attempt to access without access token");
+//     return res.status(401).json({ msg: "Forbidden. Please try logging in." });
+//   }
 
-  // Verify the token
-  jwt.verify(
-    accessToken,
-    process.env.ACCESS_TOKEN_SECRET,
-    async (err, user) => {
-      if (err) {
-        console.log("Failed to correctly sign access token");
-        return res.status(403).json({ msg: "Invalid token" });
-      }
-      req.user = user;
-      next();
-    }
-  );
-});
+//   // Verify the token
+//   jwt.verify(
+//     accessToken,
+//     process.env.ACCESS_TOKEN_SECRET,
+//     async (err, user) => {
+//       if (err) {
+//         console.log("Failed to correctly sign access token");
+//         return res.status(403).json({ msg: "Invalid token" });
+//       }
+//       req.user = user;
+//       next();
+//     }
+//   );
+// });
 
 // Routes
-app.use("/", routes);
+// app.use("/", routes);
+
+// app.post("/login", (req, res) => {
+//   const { errors, isValid } = validateLoginInput(req.body);
+//   if (!isValid) {
+//     return res.status(400).json(errors);
+//   }
+//   passport.authenticate('local')
+
+// })
+app.post("/login", passport.authenticate("local"));
 
 app.get("/testCookie", (req, res) => {
   console.log(req.cookies["accessToken"]);
