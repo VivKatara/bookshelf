@@ -6,49 +6,34 @@ import axios from "axios";
 
 function Homepage() {
   const testRoute = async () => {
-    const response = await axios.get("http://localhost:5000/testCookies", {
-      withCredentials: true,
-    });
-    console.log(response);
-    if (response.status === 403) {
-      const secondResonse = await axios.get("http://localhost:4000/refresh");
-      console.log("Successful refresh");
-      const newResponse = await axios.get("http://localhost:5000/testCookies", {
+    try {
+      // Validate Status False means that axios won't automatically throw an error for status codes outside of the [200, 300) range
+      let response = await axios.get("http://localhost:5000/testCookie", {
         withCredentials: true,
+        validateStatus: false,
       });
-      console.log(newResponse);
-    }
-    console.log(response);
-    // axios
-    //   .get("http://localhost:5000/testCookies", { withCredentials: true })
-    //   .then((data) => console.log(data))
-    //   .catch((err) => {
-    //     console.log("IN HERE");
-    //     axios.get("http://localhost:4000/refresh", { withCredentails: true });
-    //   });
+      if (response.status === 403 && response.data.msg === "Invalid token") {
+        // Refreshing token
+        // Note that we haven't manually set validateStatus here, meaning that if there's a refresh token error, it will be immediately thrown
+        // This is a good thing because there should never be a refresh token error for a genuine client
+        await axios.get("http://localhost:4000/token", {
+          withCredentials: true,
+        });
 
-    // try {
-    //   const firstResponse = await axios.get(
-    //     "http://localhost:5000/testCookies",
-    //     {
-    //       withCredentials: true,
-    //     }
-    //   );
-    //   console.log(firstResponse.data.success);
-    // } catch (e) {
-    //   console.log("HERE");
-    //   console.log(e);
-    // }
-    // if (!firstResponse.data.success) {
-    //   console.log("HERE");
-    //   const changeCookies = await axios.get("http://localhost:4000/refresh", {
-    //     withCredentials: true,
-    //   });
-    //   // const secondResponse = await axios.get(
-    //   //   "http://localhost:5000/testCookies",
-    //   //   { withCredentials: true }
-    //   // );
-    // }
+        // Retrying the request with the updated token
+        response = await axios.get("http://localhost:5000/testCookie", {
+          withCredentials: true,
+          validateStatus: false,
+        });
+      }
+
+      // This should catch an error on the retried request, or any non Invalid Token error on first request
+      if (!(response.status >= 200 && response.status < 300)) {
+        throw response.data.msg;
+      }
+    } catch (e) {
+      console.log(e);
+    }
   };
   return (
     <MainContainer>

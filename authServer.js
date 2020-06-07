@@ -39,29 +39,48 @@ mongoose
 
 // Don't do this in production. Store your refresh tokens in a database or Redis Cache
 // Note that this isn't good for production because every time your server restarts, this will be emptied out
+// TODO
 let refreshTokens = [];
 
-// For creating a new token
-app.get("/refresh", (req, res) => {
-  // const refreshToken = req.body.token;
+// For creating a new token based on refreshToken
+app.get("/token", (req, res) => {
   const refreshToken = req.cookies["refreshToken"];
-  console.log("Refreshing");
-  if (refreshToken == null) return res.status(401).json({ success: false });
-  if (!refreshTokens.includes(refreshToken))
-    return res.status(403).json({ success: false });
+  if (refreshToken == null) {
+    console.log("Attempt to refresh access token without refresh token");
+    return res
+      .status(401)
+      .json({ msg: "Invalid. Please try logging in again" });
+  }
+  if (!refreshTokens.includes(refreshToken)) {
+    console.log("Provided refresh token not in database");
+    return res
+      .status(403)
+      .json({ msg: "Invalid. Please try logging in again." });
+  }
   jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
-    if (err) return res.status(403).json({ success: false });
-    const accessToken = generateAccessToken({ name: user.fullName });
-    res.clearCookie("accessToken");
+    if (err) {
+      console.log("Error when trying to verify refresh token");
+      return res
+        .status(403)
+        .json({ msg: "Invalid. Please try logging in again." });
+    }
+    // Preserve original user data when recreating access token
+    const accessToken = generateAccessToken({
+      id: user.id,
+      email: user.email,
+      name: user.name,
+    });
+    // Rewrite the access token
     res.cookie("accessToken", `Bearer ${accessToken}`, {
       maxAge: 24 * 60 * 60 * 1000,
-      httpOnly: false,
+      httpOnly: true,
     });
-    console.log("Refresh success");
-    return res.json({ success: true, accessToken, user });
+    return res.sendStatus(200);
   });
 });
 
+// TODO
+// Also clear cookies here
 app.delete("/logout", (req, res) => {
   refreshTokens = refreshTokens.filter((token) => token !== req.body.token);
   return res.sendStatus(204);
@@ -130,11 +149,11 @@ app.post("/login", (req, res) => {
           refreshTokens.push(refreshToken); // Store these in a database or Redis Cache
           res.cookie("accessToken", `Bearer ${accessToken}`, {
             maxAge: 24 * 60 * 60 * 1000,
-            httpOnly: false,
+            httpOnly: true,
           });
           res.cookie("refreshToken", refreshToken, {
             maxAge: 24 * 60 * 60 * 1000,
-            httpOnly: false,
+            httpOnly: true,
           });
           return res.status(200).json({ success: true });
         } else {

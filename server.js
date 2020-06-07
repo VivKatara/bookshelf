@@ -34,37 +34,24 @@ mongoose
   .then(() => console.log("MongoDB successfully connected to server"))
   .catch((err) => console.log(err));
 
-// HERE, working on an authenticateToken type middleware (also don't forget to eventually make the tokens HTTP Only)
+// Authenticate token middleware - see if you can place this elsewhere
 app.use(function (req, res, next) {
   const accessCookie = req.cookies["accessToken"];
   const accessToken = accessCookie && accessCookie.split(" ")[1];
-  // console.log(accessToken);
-  if (accessToken == null) return res.sendStatus(401); // Unauthorized request
+  if (accessToken == null) {
+    console.log("Attempt to access without access token");
+    return res.status(401).json({ msg: "Forbidden. Please try logging in." });
+  }
 
+  // Verify the token
   jwt.verify(
     accessToken,
     process.env.ACCESS_TOKEN_SECRET,
     async (err, user) => {
-      if (err) return res.status(403).json({ success: false });
-      // if (err) {
-      //   const response = await axios.post("http://localhost:4000/refresh", {
-      //     token: req.cookies["refreshToken"],
-      //   });
-      //   if (response.data.success) {
-      //     res.clearCookie("accessToken");
-      //     res.cookie("accessToken", response.data.accessToken, {
-      //       maxAge: 24 * 60 * 60 * 1000,
-      //       httpOnly: false,
-      //     });
-      //     req.user = response.data.user;
-      //     console.log("Successful refresh");
-      //     console.log(response.data.accessToken);
-      //     next();
-      //   } else {
-      //     console.log("Somehow made it here instead sad");
-      //     return res.status(403).json({ success: false });
-      //   }
-      // } // Here we must try and use the refresh token!
+      if (err) {
+        console.log("Failed to correctly sign access token");
+        return res.status(403).json({ msg: "Invalid token" });
+      }
       req.user = user;
       next();
     }
@@ -74,17 +61,16 @@ app.use(function (req, res, next) {
 // Routes
 app.use("/", routes);
 
-app.get("/testCookies", (req, res) => {
-  console.log("HERE");
-  // console.log(req.cookies["accessToken"]);
-  // console.log(req.cookies["refreshToken"]);
+app.get("/testCookie", (req, res) => {
+  console.log(req.cookies["accessToken"]);
+  console.log(req.cookies["refreshToken"]);
   res.status(200).json({ success: true });
 });
 
 app.get("/setCookies", async (req, res) => {
   res.cookie("username", "john doe", { maxAge: 900000, httpOnly: true });
   res.cookie("password", "yeet", { maxAge: 900000, httpOnly: true });
-  return res.send("Success");
+  return res.status(200).send("Success");
 });
 
 app.listen(port, () => {
