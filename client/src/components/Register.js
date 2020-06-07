@@ -46,7 +46,7 @@ function Register() {
     e.preventDefault();
     const { email, fullName, password, passwordConfirm } = userState;
     try {
-      const response = await axios.post("http://localhost:4000/register", {
+      const response = await axios.post("http://localhost:5000/auth/register", {
         email,
         fullName,
         password,

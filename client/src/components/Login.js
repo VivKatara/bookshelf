@@ -33,11 +33,17 @@ function Login() {
     e.preventDefault();
     const { email, password } = loginState;
     try {
-      const response = await axios.post("http://localhost:5000/login", {
-        email,
-        password,
-      });
+      const response = await axios.post(
+        "http://localhost:5000/auth/login",
+        {
+          email,
+          password,
+        },
+        { withCredentials: true }
+      );
       console.log(response);
+      history.push("/home");
+
       // console.log("HERE");
       // const response = await axios.post(
       //   "http://localhost:4000/login",
