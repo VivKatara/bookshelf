@@ -1,22 +1,21 @@
 import React, { useEffect } from "react";
 import PropTypes from "prop-types";
+import axios from "axios";
 import { connect } from "react-redux";
 import styled from "@emotion/styled";
 import Header from "./Header";
 import Shelf from "./Shelf";
-import axios from "axios";
 import { getUser } from "../actions/getUserActions";
 
 function Homepage(props) {
   useEffect(() => {
     props.getUser();
-    // console.log(props);
-    // async function getUserData() {
-    //   await props.getUser();
-    //   console.log(props.userName);
-    // }
-    // getUserData();
-
+    axios.get("http://localhost:5000/add", {
+      params: {
+        title: "Zero to One",
+        author: "Peter Thiel",
+      },
+    });
     // This is where you want to use Redux to dispatch an action to udpate the state of the application
     // async function fetchProfileData() {
     //   try {
@@ -49,7 +48,6 @@ function Homepage(props) {
     // }
     // fetchProfileData();
   }, []);
-  console.log(props.userName);
   return (
     <MainContainer>
       <Header />

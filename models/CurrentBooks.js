@@ -7,15 +7,15 @@ const CurrentBookSchema = new Schema({
     type: String,
     required: true,
   },
-  author: {
-    type: String,
+  authors: {
+    type: [String],
     required: true,
   },
   isbn: {
     type: String,
     required: true,
   },
-  cover: {
+  coverImage: {
     type: String,
     required: true,
   },

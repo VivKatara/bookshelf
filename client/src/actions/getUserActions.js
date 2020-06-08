@@ -5,6 +5,7 @@ export const getUser = () => (dispatch) => {
   axios
     .get("http://localhost:5000/profile", {
       withCredentials: true,
+      // Don't forget to pass validateStatus as false as you refactor in the middleware
     })
     .then((res) => {
       const action = {
