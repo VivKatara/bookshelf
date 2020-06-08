@@ -43,18 +43,6 @@ function Login() {
       );
       console.log(response);
       history.push("/home");
-
-      // console.log("HERE");
-      // const response = await axios.post(
-      //   "http://localhost:4000/login",
-      //   {
-      //     email,
-      //     password,
-      //   },
-      //   { withCredentials: true }
-      // );
-      // console.log(response);
-      // history.push("/home");
     } catch (e) {
       console.log(e);
     }

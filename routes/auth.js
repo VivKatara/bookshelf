@@ -1,9 +1,12 @@
 // When the project gets bigger, ideally this should be moved to its own authentication server
 const express = require("express");
 const passport = require("passport");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
 const router = express.Router();
 
 const User = require("../models/User");
+const Token = require("../models/Token");
 
 const validateLoginInput = require("../validation/login");
 const validateRegisterInput = require("../validation/register");
@@ -15,7 +18,6 @@ router.post("/register", (req, res) => {
       .status(400)
       .json({ msg: errors[Object.keys(errors)[0]], success: false });
   }
-
   const { email, fullName, password } = req.body;
   User.findOne({ email }).then((user) => {
     if (user) {
@@ -39,7 +41,13 @@ router.post("/register", (req, res) => {
           newUser.password = hash;
           newUser
             .save()
-            .then((savedUser) => res.json(savedUser))
+            .then((savedUser) =>
+              res.status(200).json({
+                user: { email: savedUser.email, name: savedUser.fullName },
+                msg: "Successful register",
+                success: true,
+              })
+            )
             .catch((err) => console.log(err));
         });
       });
@@ -64,19 +72,106 @@ router.post("/login", (req, res) => {
       console.log(info.message);
       return res.status(401).json({ msg: info.message, success: false });
     } else {
-      req.login(user, (err) => {
-        //TODO Generate and return access tokens
-        console.log(req.session.passport.user);
+      req.logIn(user, (err) => {
+        const payload = {
+          id: user.id,
+          email: user.email,
+          name: user.fullName,
+        };
+        const accessToken = generateAccessToken(
+          payload,
+          process.env.ACCESS_TOKEN_SECRET,
+          "1d"
+        );
+        const refreshToken = generateAccessToken(
+          payload,
+          process.env.REFRESH_TOKEN_SECRET,
+          "7d"
+        );
+        // Save the refreshToken in database
+        // TODO Make this more safe with encryption in case the db were to ever be compromised
+        const newRefreshToken = new Token({
+          refreshToken,
+        });
+        newRefreshToken.save();
+
+        // Lifetime is a year, is this too long?
+        res.cookie("accessToken", `Bearer ${accessToken}`, {
+          maxAge: 365 * 24 * 60 * 60 * 1000,
+          httpOnly: true,
+        });
+
+        res.cookie("refreshToken", refreshToken, {
+          maxAge: 365 * 24 * 60 * 60 * 1000,
+          httpOnly: true,
+        });
         res.status(200).json({ msg: "Logged In Successfully", success: true });
       });
     }
   })(req, res);
 });
 
+router.get("/token", (req, res) => {
+  const refreshToken = req.cookies["refreshToken"];
+  if (refreshToken == null) {
+    console.log("Attempt to refresh access token without refresh token");
+    return res
+      .status(401)
+      .json({ msg: "Invalid. Please try logging in again.", success: false });
+  }
+  Token.findOne({ refreshToken }).then((foundToken) => {
+    if (foundToken) {
+      jwt.verify(
+        refreshToken,
+        process.env.REFRESH_TOKEN_SECRET,
+        (err, user) => {
+          if (err) {
+            console.log("Error when trying to verify refresh token");
+            return res.status(403).json({
+              msg: "Invalid. Please try logging in again.",
+              success: false,
+            });
+          }
+          // Preserve original user data when recreating access token
+          const payload = {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+          };
+          const accessToken = generateAccessToken(
+            payload,
+            process.env.ACCESS_TOKEN_SECRET,
+            "1d"
+          );
+          // Rewrite the access token
+          res.cookie("accessToken", `Bearer ${accessToken}`, {
+            maxAge: 365 * 24 * 60 * 60 * 1000,
+            httpOnly: true,
+          });
+          return res.sendStatus(200);
+        }
+      );
+    } else {
+      console.log("Provided refresh token not in database");
+      return res
+        .status(403)
+        .json({ msg: "Invalid. Please try logging in again.", success: false });
+    }
+  });
+});
+
 // Logout - do we get rid of all browser cookies, and all session data? Must this be checked?
-router.get("/logout", (req, res) => {
-  req.logout();
+router.delete("/logout", (req, res) => {
+  const refreshToken = req.cookies["refreshToken"];
+  Token.remove({ refreshToken });
+  res.clearCookie("accessToken");
+  res.clearCookie("refreshToken");
+  req.logout(); // Is this needed? Check Passport documentation
   res.status(200).json({ msg: "Successful logout", success: true });
 });
+
+function generateAccessToken(payload, secret, expires) {
+  return jwt.sign(payload, secret, { expiresIn: expires });
+}
 
 module.exports = router;
