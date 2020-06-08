@@ -10,12 +10,15 @@ import { getUser } from "../actions/getUserActions";
 function Homepage(props) {
   useEffect(() => {
     props.getUser();
-    axios.get("http://localhost:5000/add", {
-      params: {
-        title: "Zero to One",
-        author: "Peter Thiel",
-      },
-    });
+    axios
+      .get("http://localhost:5000/add", {
+        params: {
+          title: "Zero to One",
+          author: "Peter Thiel",
+        },
+      })
+      .then((res) => console.log(res))
+      .catch((err) => console.log(err));
     // This is where you want to use Redux to dispatch an action to udpate the state of the application
     // async function fetchProfileData() {
     //   try {

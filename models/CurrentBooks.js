@@ -3,6 +3,10 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const CurrentBookSchema = new Schema({
+  email: {
+    type: String,
+    required: true,
+  },
   title: {
     type: String,
     required: true,
