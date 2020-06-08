@@ -13,9 +13,10 @@ function Homepage(props) {
     axios
       .get("http://localhost:5000/add", {
         params: {
-          title: "Zero to One",
-          author: "Peter Thiel",
+          title: "Becoming",
+          author: "Michelle Obama",
         },
+        withCredentials: true,
       })
       .then((res) => console.log(res))
       .catch((err) => console.log(err));

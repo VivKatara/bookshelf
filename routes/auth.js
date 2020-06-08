@@ -41,13 +41,13 @@ router.post("/register", (req, res) => {
           newUser.password = hash;
           newUser
             .save()
-            .then((savedUser) =>
-              res.status(200).json({
+            .then((savedUser) => {
+              return res.status(200).json({
                 user: { email: savedUser.email, name: savedUser.fullName },
                 msg: "Successful register",
                 success: true,
-              })
-            )
+              });
+            })
             .catch((err) => console.log(err));
         });
       });
@@ -105,7 +105,9 @@ router.post("/login", (req, res) => {
           maxAge: 365 * 24 * 60 * 60 * 1000,
           httpOnly: true,
         });
-        res.status(200).json({ msg: "Logged In Successfully", success: true });
+        return res
+          .status(200)
+          .json({ msg: "Logged In Successfully", success: true });
       });
     }
   })(req, res);
@@ -167,7 +169,7 @@ router.delete("/logout", (req, res) => {
   res.clearCookie("accessToken");
   res.clearCookie("refreshToken");
   req.logout(); // Is this needed? Check Passport documentation
-  res.status(200).json({ msg: "Successful logout", success: true });
+  return res.status(200).json({ msg: "Successful logout", success: true });
 });
 
 function generateAccessToken(payload, secret, expires) {

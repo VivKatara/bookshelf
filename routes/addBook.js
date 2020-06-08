@@ -6,7 +6,7 @@ const CurrentBook = require("../models/CurrentBooks");
 
 const authenticateToken = require("../validation/authenticateToken");
 
-router.get("/", (req, res) => {
+router.get("/", authenticateToken, (req, res) => {
   const title = req.query.title;
   const author = req.query.author;
   // const shelf = req.query.shelf;
@@ -30,7 +30,7 @@ router.get("/", (req, res) => {
       });
       if (newItems.length) {
         const finalItem = newItems[0];
-        const email = process.env.EMAIL;
+        const email = req.user.email;
         const finalTitle = finalItem.volumeInfo.title;
         const finalAuthors = finalItem.volumeInfo.authors;
         const industryIdentifiers = finalItem.volumeInfo.industryIdentifiers;
@@ -50,7 +50,7 @@ router.get("/", (req, res) => {
         })
           .then((book) => {
             if (book) {
-              res.status(200).json({
+              return res.status(200).json({
                 msg: "This book already exists on your shelf!",
                 success: true,
               });
@@ -66,10 +66,12 @@ router.get("/", (req, res) => {
                 .save()
                 .then((savedBook) => {
                   // Let them know that it was successful save
-                  res.status(200).json({
+                  console.log("Before save");
+                  return res.status(200).json({
                     msg: "This book has been successfully saved to your shelf.",
                     success: true,
                   });
+                  console.log("after save");
                 })
                 .catch((err) => console.log(err));
             }
