@@ -1,20 +1,30 @@
 import React from "react";
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
 import styled from "@emotion/styled";
 
-function Header() {
+function Header(props) {
   return (
     <HeaderContainer>
       <HyperLink href="/home">
         <p>Bookshelf</p>
       </HyperLink>
       <User>
-        <p>Vivek Katara</p>
+        <p>{props.userName}</p>
       </User>
     </HeaderContainer>
   );
 }
 
-export default Header;
+Header.propTypes = {
+  userName: PropTypes.string.isRequired,
+};
+
+const mapStateToProps = (state) => ({
+  userName: state.userState.userName,
+});
+
+export default connect(mapStateToProps, {})(Header);
 
 const HeaderContainer = styled.div`
   width: 100%;
