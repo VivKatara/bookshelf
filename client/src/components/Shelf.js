@@ -3,6 +3,11 @@ import styled from "@emotion/styled";
 import Book from "./Book";
 
 function Shelf(props) {
+  const addBook = () => {
+    // Note that you have props.shelfType to send as a query string parameter
+    // But first, onClick we have to open up an addBook modal!
+    console.log("Hi");
+  };
   return (
     <ShelfContainer>
       <ShelfTitle>
@@ -17,8 +22,8 @@ function Shelf(props) {
         <Book />
         <Book />
         <Links>
-          <Add>Add</Add>
-          <SeeAll>See All</SeeAll>
+          <Add onClick={addBook}>Add</Add>
+          <SeeAll onClick={() => console.log("Yes")}>See All</SeeAll>
         </Links>
       </ShelfItems>
     </ShelfContainer>
@@ -53,14 +58,23 @@ const ShelfItems = styled.div`
 `;
 const Links = styled.div`
   width: 10%;
+  display: flex;
+  flex-direction: column;
   margin-left: 10%;
   color: #287bf8;
   text-align: center;
   // background-color: white;
 `;
 
-const Add = styled.p``;
+const Add = styled.a`
+  &:hover {
+    cursor: pointer;
+  }
+`;
 
-const SeeAll = styled.p`
-  margin-top: 110px;
+const SeeAll = styled.a`
+  margin-top: 120px;
+  &:hover {
+    cursor: pointer;
+  }
 `;
