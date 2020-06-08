@@ -10,7 +10,7 @@ export default Book;
 const BookContainer = styled.div`
   width: 120px;
   height: 150px;
-  margin-top: 40px;
+  margin-top: 20px;
   margin-left: 25px;
   background-color: blue;
 `;

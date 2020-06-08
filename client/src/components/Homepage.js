@@ -55,9 +55,9 @@ function Homepage(props) {
   return (
     <MainContainer>
       <Header />
-      <Shelf />
-      <Shelf />
-      <Shelf />
+      <Shelf shelfName="Currently Reading" />
+      <Shelf shelfName="Have Read" />
+      <Shelf shelfName="Want to Read" />
     </MainContainer>
   );
 }

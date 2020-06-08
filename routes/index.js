@@ -9,7 +9,7 @@ const authenticateToken = require("../validation/authenticateToken");
 router.use("/auth", authRoutes);
 router.use("/add", addBookRoutes);
 router.get("/profile", authenticateToken, (req, res) => {
-  res.status(200).json({
+  return res.status(200).json({
     user: { email: req.user.email, name: req.user.name },
     msg: "Returning user",
     success: true,
