@@ -1,13 +1,15 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
 import { connect } from "react-redux";
 import styled from "@emotion/styled";
 import Header from "./Header";
 import Shelf from "./Shelf";
+import AddBookModal from "./AddBookModal";
 import { getUser } from "../actions/getUserActions";
 
 function Homepage(props) {
+  const [show, setModal] = useState(false);
   useEffect(() => {
     props.getUser();
     axios
@@ -52,9 +54,18 @@ function Homepage(props) {
     // }
     // fetchProfileData();
   }, []);
+
+  const showModal = () => {
+    setModal(true);
+  };
+  const hideModal = () => {
+    setModal(false);
+  };
   return (
     <MainContainer>
       <Header />
+      <AddBookModal show={true} handleClose={hideModal} />
+      <Add onClick={showModal}>Add Book to Shelf</Add>
       <Shelf shelfName="Currently Reading" shelfType="Current" />
       <Shelf shelfName="Have Read" shelfType="Past" />
       <Shelf shelfName="Want to Read" shelfType="Future" />
@@ -79,4 +90,14 @@ export const MainContainer = styled.div`
   display: flex;
   flex-direction: column;
   background-color: #222222;
+`;
+
+export const Add = styled.a`
+  margin-top: 20px;
+  margin-left: 80%;
+  color: #287bf8;
+  &:hover {
+    cursor: pointer;
+    text-decoration: underline;
+  }
 `;

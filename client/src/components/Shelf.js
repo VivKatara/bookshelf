@@ -22,7 +22,7 @@ function Shelf(props) {
         <Book />
         <Book />
         <Links>
-          <Add onClick={addBook}>Add</Add>
+          {/* <Add onClick={addBook}>Add</Add> */}
           <SeeAll onClick={() => console.log("Yes")}>See All</SeeAll>
         </Links>
       </ShelfItems>
@@ -35,7 +35,7 @@ export default Shelf;
 const ShelfContainer = styled.div`
   width: 80%;
   height: 235px;
-  margin-top: 10px;
+  // margin-top: 20px;
   margin-left: 10%;
   display: flex;
   flex-direction: column;
@@ -44,7 +44,7 @@ const ShelfContainer = styled.div`
 `;
 
 const ShelfTitle = styled.div`
-  margin-top: 20px;
+  // margin-top: 20px;
   font-size: 14px;
   color: #ffffff;
   // background-color: black;
@@ -73,7 +73,7 @@ const Add = styled.a`
 `;
 
 const SeeAll = styled.a`
-  margin-top: 120px;
+  margin-top: 140px;
   &:hover {
     cursor: pointer;
   }

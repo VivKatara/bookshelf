@@ -111,7 +111,7 @@ const CentralDiv = styled.div`
   color: white;
 `;
 
-const Form = styled.form`
+export const Form = styled.form`
   display: flex;
   flex-direction: column;
 `;
@@ -124,7 +124,7 @@ const FormDiv = styled.div`
   text-align: left;
 `;
 
-const Input = styled.input`
+export const Input = styled.input`
   height: 20px;
   width: 290px;
   border: none;
