@@ -3,34 +3,35 @@ import axios from "axios";
 import styled from "@emotion/styled";
 import { Form, Input } from "./Login";
 
+const initialState = {
+  title: "",
+  author: "",
+  shelf: "currentBooks",
+};
+const reducer = (state, action) => {
+  switch (action.type) {
+    case "UPDATE_TITLE":
+      return {
+        ...state,
+        title: action.payload,
+      };
+    case "UPDATE_AUTHOR":
+      return {
+        ...state,
+        author: action.payload,
+      };
+    case "UPDATE_SHELF":
+      return {
+        ...state,
+        shelf: action.payload,
+      };
+    default:
+      return state;
+  }
+};
+
 function AddBookModal(props) {
-  const { show, handleClose } = props;
-  const initialState = {
-    title: "",
-    author: "",
-    shelf: "currentBooks",
-  };
-  const reducer = (state, action) => {
-    switch (action.type) {
-      case "UPDATE_TITLE":
-        return {
-          ...state,
-          title: action.payload,
-        };
-      case "UPDATE_AUTHOR":
-        return {
-          ...state,
-          author: action.payload,
-        };
-      case "UPDATE_SHELF":
-        return {
-          ...state,
-          shelf: action.payload,
-        };
-      default:
-        return state;
-    }
-  };
+  const { show, handleClose, shelfUpdate } = props;
   const handleSubmit = (e) => {
     e.preventDefault();
     // Going to need the middleware to essentially check if token is expired and replace the token if so
@@ -43,7 +44,10 @@ function AddBookModal(props) {
         },
         withCredentials: true,
       })
-      .then((res) => console.log(res))
+      .then((res) => {
+        shelfUpdate(newBookState.shelf);
+        return console.log(res);
+      })
       .catch((err) => console.log(err));
   };
 

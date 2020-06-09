@@ -5,16 +5,21 @@ import Book from "./Book";
 
 function Shelf(props) {
   const [isbns, setIsbns] = useState([]);
+  const { updates } = props;
   useEffect(() => {
     async function getIsbns() {
-      const response = await axios.get("http://localhost:5000/book/getBooks", {
-        params: { shelf: props.shelfType },
-        withCredentials: true,
-      });
+      const response = await axios.get(
+        "http://localhost:5000/book/getBooks",
+        {
+          params: { shelf: props.shelfType },
+          withCredentials: true,
+        },
+        []
+      );
       setIsbns(response.data.isbn);
     }
     getIsbns();
-  }, []);
+  }, [updates]);
 
   const books = isbns.map((isbn) => <Book key={isbn} isbn={isbn} />);
   return (
@@ -32,7 +37,7 @@ function Shelf(props) {
   );
 }
 
-export default Shelf;
+export default React.memo(Shelf);
 
 const ShelfContainer = styled.div`
   width: 80%;

@@ -10,6 +10,22 @@ import { getUser } from "../actions/getUserActions";
 
 function Homepage(props) {
   const [show, setModal] = useState(false);
+  const [currentUpdates, setCurrentUpdates] = useState(0);
+  const [pastUpdates, setPastUpdates] = useState(0);
+  const [futureUpdates, setFutureUpdates] = useState(0);
+
+  const handleShelfUpdate = (shelf) => {
+    if (shelf === "currentBooks") {
+      setCurrentUpdates((prev) => prev + 1);
+    }
+    if (shelf === "pastBooks") {
+      setPastUpdates((prev) => prev + 1);
+    }
+    if (shelf === "futureBooks") {
+      setFutureUpdates((prev) => prev + 1);
+    }
+  };
+
   useEffect(() => {
     props.getUser();
     // This is where you want to use Redux to dispatch an action to udpate the state of the application
@@ -54,11 +70,29 @@ function Homepage(props) {
   return (
     <MainContainer>
       <Header />
-      <AddBookModal show={show} handleClose={hideModal} />
+      {show && (
+        <AddBookModal
+          show={show}
+          handleClose={hideModal}
+          shelfUpdate={handleShelfUpdate}
+        />
+      )}
       <Add onClick={showModal}>Add Book to Shelf</Add>
-      <Shelf shelfName="Currently Reading" shelfType="currentBooks" />
-      <Shelf shelfName="Have Read" shelfType="pastBooks" />
-      <Shelf shelfName="Want to Read" shelfType="futureBooks" />
+      <Shelf
+        shelfName="Currently Reading"
+        shelfType="currentBooks"
+        updates={currentUpdates}
+      />
+      <Shelf
+        shelfName="Have Read"
+        shelfType="pastBooks"
+        updates={pastUpdates}
+      />
+      <Shelf
+        shelfName="Want to Read"
+        shelfType="futureBooks"
+        updates={futureUpdates}
+      />
     </MainContainer>
   );
 }

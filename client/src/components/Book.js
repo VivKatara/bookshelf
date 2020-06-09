@@ -1,11 +1,28 @@
-import React, { useState, useEffect } from "react";
+import React, { useReducer, useEffect } from "react";
 import axios from "axios";
 import styled from "@emotion/styled";
 
+const initialState = {
+  foundBook: false,
+  coverImage: "",
+  title: "",
+};
+
+const reducer = (state, action) => {
+  switch (action.type) {
+    case "FOUND_BOOK": {
+      return {
+        ...state,
+        foundBook: action.payload.foundBook,
+        coverImage: action.payload.coverImage,
+        title: action.payload.title,
+      };
+    }
+  }
+};
+
 function Book(props) {
-  const [foundBook, setFoundBook] = useState(false);
-  const [coverImage, setCoverImage] = useState("");
-  const [title, setTitle] = useState("");
+  const [bookState, dispatch] = useReducer(reducer, initialState);
 
   useEffect(() => {
     async function getImage() {
@@ -14,23 +31,33 @@ function Book(props) {
         withCredentials: true,
       });
       if (response.status === 200) {
-        setFoundBook(true);
-        setCoverImage(response.data.coverImage);
-        setTitle(response.data.title);
+        dispatch({
+          type: "FOUND_BOOK",
+          payload: {
+            foundBook: true,
+            coverImage: response.data.coverImage,
+            title: response.data.title,
+          },
+        });
       }
     }
     getImage();
   }, []);
   return (
     <BookContainer>
-      {foundBook && (
-        <img src={coverImage} alt={title} width="120" height="160"></img>
+      {bookState.foundBook && (
+        <img
+          src={bookState.coverImage}
+          alt={bookState.title}
+          width="120"
+          height="160"
+        ></img>
       )}
     </BookContainer>
   );
 }
 
-export default Book;
+export default React.memo(Book);
 
 const BookContainer = styled.div`
   width: 120px;

@@ -3,32 +3,31 @@ import { useHistory } from "react-router-dom";
 import axios from "axios";
 import styled from "@emotion/styled";
 
-function Login() {
-  const initialState = {
-    email: "",
-    password: "",
-  };
+const initialState = {
+  email: "",
+  password: "",
+};
 
-  const reducer = (state, action) => {
-    switch (action.type) {
-      case "EMAIL_CHANGE":
-        return {
-          ...state,
-          email: action.payload,
-        };
-      case "PASSWORD_CHANGE":
-        return {
-          ...state,
-          password: action.payload,
-        };
-      default:
-        return state;
-    }
-  };
+const reducer = (state, action) => {
+  switch (action.type) {
+    case "EMAIL_CHANGE":
+      return {
+        ...state,
+        email: action.payload,
+      };
+    case "PASSWORD_CHANGE":
+      return {
+        ...state,
+        password: action.payload,
+      };
+    default:
+      return state;
+  }
+};
 
+const Login = () => {
   const [loginState, dispatch] = useReducer(reducer, initialState);
   const history = useHistory();
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { email, password } = loginState;
@@ -88,7 +87,7 @@ function Login() {
       </CentralDiv>
     </MainContainer>
   );
-}
+};
 
 export default Login;
 

@@ -3,42 +3,42 @@ import { useHistory } from "react-router-dom";
 import axios from "axios";
 import styled from "@emotion/styled";
 
-function Register() {
-  const initialState = {
-    email: "",
-    fullName: "",
-    password: "",
-    passwordConfirm: "",
-  };
+const initialState = {
+  email: "",
+  fullName: "",
+  password: "",
+  passwordConfirm: "",
+};
 
-  const reducer = (state, action) => {
-    switch (action.type) {
-      case "EMAIL_CHANGE":
-        return {
-          ...state,
-          email: action.payload,
-        };
-      case "FULLNAME_CHANGE":
-        return {
-          ...state,
-          fullName: action.payload,
-        };
+const reducer = (state = initialState, action) => {
+  switch (action.type) {
+    case "EMAIL_CHANGE":
+      return {
+        ...state,
+        email: action.payload,
+      };
+    case "FULLNAME_CHANGE":
+      return {
+        ...state,
+        fullName: action.payload,
+      };
 
-      case "PASSWORD_CHANGE":
-        return {
-          ...state,
-          password: action.payload,
-        };
-      case "PASSWORD_CONFIRM_CHANGE":
-        return {
-          ...state,
-          passwordConfirm: action.payload,
-        };
-      default:
-        return state;
-    }
-  };
+    case "PASSWORD_CHANGE":
+      return {
+        ...state,
+        password: action.payload,
+      };
+    case "PASSWORD_CONFIRM_CHANGE":
+      return {
+        ...state,
+        passwordConfirm: action.payload,
+      };
+    default:
+      return state;
+  }
+};
 
+const Register = () => {
   const [userState, dispatch] = useReducer(reducer, initialState);
   const history = useHistory();
 
@@ -58,7 +58,6 @@ function Register() {
       console.log(e);
     }
   };
-
   return (
     <MainContainer>
       <CentralDiv>
@@ -128,7 +127,7 @@ function Register() {
       </CentralDiv>
     </MainContainer>
   );
-}
+};
 
 export default Register;
 
