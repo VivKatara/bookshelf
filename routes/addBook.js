@@ -62,6 +62,19 @@ router.get("/", authenticateToken, (req, res) => {
           // Some crazy error because UserBook has to be made upon Register
         } else {
           // const shelf variable has the name of the key that must be udpated in UserBook schema
+          const books = foundUserBook[`${shelf}`];
+          const found = false;
+          for (const isbn of books) {
+            if (isbn === finalIsbn) {
+              found = true;
+              break;
+            }
+          }
+          if (!found) {
+            books.push(finalIsbn);
+            // UserBook.update({email}, {`${shelf}`: books})
+            // Update the shelf with the new books
+          }
         }
 
         // if (shelf === "current") {
