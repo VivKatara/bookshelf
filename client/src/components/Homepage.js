@@ -56,9 +56,9 @@ function Homepage(props) {
       <Header />
       <AddBookModal show={show} handleClose={hideModal} />
       <Add onClick={showModal}>Add Book to Shelf</Add>
-      <Shelf shelfName="Currently Reading" shelfType="Current" />
-      <Shelf shelfName="Have Read" shelfType="Past" />
-      <Shelf shelfName="Want to Read" shelfType="Future" />
+      <Shelf shelfName="Currently Reading" shelfType="currentBooks" />
+      <Shelf shelfName="Have Read" shelfType="pastBooks" />
+      <Shelf shelfName="Want to Read" shelfType="futureBooks" />
     </MainContainer>
   );
 }

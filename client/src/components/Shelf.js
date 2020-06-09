@@ -1,28 +1,30 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import styled from "@emotion/styled";
 import Book from "./Book";
 
 function Shelf(props) {
-  const addBook = () => {
-    // Note that you have props.shelfType to send as a query string parameter
-    // But first, onClick we have to open up an addBook modal!
-    console.log("Hi");
-  };
+  const [isbns, setIsbns] = useState([]);
+  useEffect(() => {
+    async function getIsbns() {
+      const response = await axios.get("http://localhost:5000/book/getBooks", {
+        params: { shelf: props.shelfType },
+        withCredentials: true,
+      });
+      setIsbns(response.data.isbn);
+    }
+    getIsbns();
+  }, []);
+
+  const books = isbns.map((isbn) => <Book key={isbn} isbn={isbn} />);
   return (
     <ShelfContainer>
       <ShelfTitle>
         <p>{props.shelfName}</p>
       </ShelfTitle>
       <ShelfItems>
-        <Book />
-        <Book />
-        <Book />
-        <Book />
-        <Book />
-        <Book />
-        <Book />
+        {books}
         <Links>
-          {/* <Add onClick={addBook}>Add</Add> */}
           <SeeAll onClick={() => console.log("Yes")}>See All</SeeAll>
         </Links>
       </ShelfItems>

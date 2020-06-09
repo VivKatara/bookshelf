@@ -11,7 +11,7 @@ const FutureBook = require("../models/FutureBooks");
 
 const authenticateToken = require("../validation/authenticateToken");
 
-router.get("/", authenticateToken, async (req, res) => {
+router.get("/add", authenticateToken, async (req, res) => {
   const title = req.query.title;
   const author = req.query.author;
   const shelf = req.query.shelf;
@@ -71,6 +71,25 @@ router.get("/", authenticateToken, async (req, res) => {
   return res
     .status(200)
     .json({ msg: "Successful addition of book", success: true });
+});
+
+router.get("/getBooks", authenticateToken, async (req, res) => {
+  const email = req.user.email;
+  const shelf = req.query.shelf;
+  const userBooks = await UserBook.findOne({ email });
+  const desiredShelf = userBooks[shelf];
+  return res.status(200).json({ isbn: desiredShelf });
+});
+
+router.get("/getCover", authenticateToken, async (req, res) => {
+  const isbn = req.query.isbn;
+  const book = await Book.findOne({ isbn });
+  if (book) {
+    const { title, coverImage } = book;
+    return res.status(200).json({ coverImage, title });
+  } else {
+    return res.status(400).json({ msg: "Book not found", success: false });
+  }
 });
 
 module.exports = router;
