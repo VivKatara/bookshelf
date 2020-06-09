@@ -6,6 +6,7 @@ const bcrypt = require("bcryptjs");
 const router = express.Router();
 
 const User = require("../models/User");
+const UserBooks = require("../models/UserBooks");
 const Token = require("../models/Token");
 
 const validateLoginInput = require("../validation/login");
@@ -32,6 +33,12 @@ router.post("/register", (req, res) => {
         fullName,
         password,
       });
+      const newUserBooks = new UserBooks({
+        email,
+        currentBooks: [],
+        pastBooks: [],
+        futureBooks: [],
+      });
 
       // Hash the password before saving it in the database
       bcrypt.genSalt(10, (err, salt) => {
@@ -41,7 +48,8 @@ router.post("/register", (req, res) => {
           newUser.password = hash;
           newUser
             .save()
-            .then((savedUser) => {
+            .then(async (savedUser) => {
+              await newUserBooks.save(); // Must I do then and catch here too?
               return res.status(200).json({
                 user: { email: savedUser.email, name: savedUser.fullName },
                 msg: "Successful register",

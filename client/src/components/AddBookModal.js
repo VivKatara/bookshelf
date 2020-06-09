@@ -1,6 +1,7 @@
 import React, { useReducer } from "react";
-import { Form, Input } from "./Login";
+import axios from "axios";
 import styled from "@emotion/styled";
+import { Form, Input } from "./Login";
 
 function AddBookModal(props) {
   const { show, handleClose } = props;
@@ -10,34 +11,40 @@ function AddBookModal(props) {
     shelf: "current",
   };
   const reducer = (state, action) => {
-    console.log("Being called");
     switch (action.type) {
       case "UPDATE_TITLE":
-        console.log("title");
         return {
           ...state,
           title: action.payload,
         };
       case "UPDATE_AUTHOR":
-        console.log("Author");
         return {
           ...state,
           author: action.payload,
         };
       case "UPDATE_SHELF":
-        console.log("Shelf");
         return {
           ...state,
           shelf: action.payload,
         };
       default:
-        console.log("Default");
         return state;
     }
   };
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(newBookState);
+    // Going to need the middleware to essentially check if token is expired and replace the token if so
+    axios
+      .get("http://localhost://localhost:5000/add", {
+        params: {
+          title: newBookState.title,
+          author: newBookState.author,
+          shelf: newBookState.shelf,
+        },
+        withCredentials: true,
+      })
+      .then((res) => console.log(res))
+      .catch((err) => console.log(err));
   };
 
   const [newBookState, dispatch] = useReducer(reducer, initialState);
@@ -84,9 +91,9 @@ function AddBookModal(props) {
                 dispatch({ type: "UPDATE_SHELF", payload: e.target.value })
               }
             >
-              <option value="current">Currently Reading</option>
-              <option value="past">Have Read</option>
-              <option value="future">Want to Read</option>
+              <option value="currentBooks">Currently Reading</option>
+              <option value="pastBooks">Have Read</option>
+              <option value="futureBooks">Want to Read</option>
             </Select>
           </FormDiv>
           <FormDiv>
@@ -150,6 +157,7 @@ const SubmitButton = styled.button`
 const CloseButton = styled.button`
   position: fixed;
   width: 5%;
+  margin-top: 5px;
   margin-left: 95%;
   border: none;
   outline: none;
@@ -160,12 +168,3 @@ const CloseButton = styled.button`
     color: #287bf8;
   }
 `;
-
-// const Input = styled.input`
-//   height: 20px;
-//   width: 290px;
-//   border: none;
-//   border-radius: 5px;
-//   padding: 2px;
-//   margin-top: 10px;
-// `;
