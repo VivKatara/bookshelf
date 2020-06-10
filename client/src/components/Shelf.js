@@ -4,24 +4,9 @@ import styled from "@emotion/styled";
 import Book from "./Book";
 
 function Shelf(props) {
-  const { updates } = props;
-  const [isbns, setIsbns] = useState([]);
-  useEffect(() => {
-    async function getIsbns() {
-      const response = await axios.get(
-        "http://localhost:5000/book/getBooks",
-        {
-          params: { shelf: props.shelfType },
-          withCredentials: true,
-        },
-        []
-      );
-      setIsbns(response.data.isbn);
-    }
-    getIsbns();
-  }, [updates]);
-
+  const { isbns, children } = props;
   const books = isbns.map((isbn) => <Book key={isbn} isbn={isbn} />);
+
   return (
     <ShelfContainer>
       <ShelfTitle>
@@ -29,9 +14,7 @@ function Shelf(props) {
       </ShelfTitle>
       <ShelfItems>
         {books}
-        <Links>
-          <SeeAll onClick={() => console.log("Yes")}>See All</SeeAll>
-        </Links>
+        {children}
       </ShelfItems>
     </ShelfContainer>
   );

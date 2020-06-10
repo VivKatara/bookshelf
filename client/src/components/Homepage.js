@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useReducer } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
 import { connect } from "react-redux";
@@ -8,11 +8,90 @@ import Shelf from "./Shelf";
 import AddBookModal from "./AddBookModal";
 import { getUser } from "../actions/getUserActions";
 
+const initialState = {
+  currentIsbns: [],
+  pastIsbns: [],
+  futureIsbns: [],
+};
+
+const reducer = (state, action) => {
+  switch (action.type) {
+    case "UPDATE_CURRENT":
+      return {
+        ...state,
+        currentIsbns: action.payload,
+      };
+    case "UPDATE_PAST":
+      return {
+        ...state,
+        pastIsbns: action.payload,
+      };
+    case "UPDATE_FUTURE":
+      return {
+        ...state,
+        futureIsbns: action.payload,
+      };
+    default:
+      return state;
+  }
+};
+
 function Homepage(props) {
   const [show, setModal] = useState(false);
+  const [isbnState, dispatch] = useReducer(reducer, initialState);
   const [currentUpdates, setCurrentUpdates] = useState(0);
   const [pastUpdates, setPastUpdates] = useState(0);
   const [futureUpdates, setFutureUpdates] = useState(0);
+
+  useEffect(() => {
+    props.getUser();
+  }, []);
+
+  useEffect(() => {
+    async function getCurrentBookIsbns() {
+      const response = await axios.get("http://localhost:5000/book/getBooks", {
+        params: { shelf: "currentBooks" },
+        withCredentials: true,
+      });
+      if (response.status === 200) {
+        dispatch({ type: "UPDATE_CURRENT", payload: response.data.isbn });
+      }
+    }
+    getCurrentBookIsbns();
+  }, [currentUpdates]);
+
+  useEffect(() => {
+    async function getPastBookIsbns() {
+      const response = await axios.get("http://localhost:5000/book/getBooks", {
+        params: { shelf: "pastBooks" },
+        withCredentials: true,
+      });
+      if (response.status === 200) {
+        dispatch({ type: "UPDATE_PAST", payload: response.data.isbn });
+      }
+    }
+    getPastBookIsbns();
+  }, [pastUpdates]);
+
+  useEffect(() => {
+    async function getFutureBookIsbns() {
+      const response = await axios.get("http://localhost:5000/book/getBooks", {
+        params: { shelf: "futureBooks" },
+        withCredentials: true,
+      });
+      if (response.status === 200) {
+        dispatch({ type: "UPDATE_FUTURE", payload: response.data.isbn });
+      }
+    }
+    getFutureBookIsbns();
+  }, [futureUpdates]);
+
+  const showModal = () => {
+    setModal(true);
+  };
+  const hideModal = () => {
+    setModal(false);
+  };
 
   const handleShelfUpdate = (shelf) => {
     if (shelf === "currentBooks") {
@@ -26,47 +105,6 @@ function Homepage(props) {
     }
   };
 
-  useEffect(() => {
-    props.getUser();
-    // This is where you want to use Redux to dispatch an action to udpate the state of the application
-    // async function fetchProfileData() {
-    //   try {
-    //     let response = await axios.get("http://localhost:5000/profile", {
-    //       withCredentials: true,
-    //       validateStatus: false,
-    //     });
-    //     if (response.status === 200) {
-    //       console.log(response.data.user);
-    //       return { success: true, data: response.data.user };
-    //     }
-    //     if (response.status === 403 && response.data.msg === "Invalid token") {
-    //       // Reset the access token based on refresh token
-    //       await axios.get("http://localhost:5000/auth/token", {
-    //         withCredentials: true,
-    //       });
-    //       response = await axios.get("http://localhost:5000/profile", {
-    //         withCredentials: true,
-    //         validateStatus: false,
-    //       });
-    //       if (response.status === 200) {
-    //         console.log(response.data.user);
-    //         return { success: true, data: response.data.user };
-    //       } else throw response.data.msg;
-    //     } else throw response.data.msg;
-    //   } catch (e) {
-    //     console.log(e);
-    //     return { success: false, error: e };
-    //   }
-    // }
-    // fetchProfileData();
-  }, []);
-
-  const showModal = () => {
-    setModal(true);
-  };
-  const hideModal = () => {
-    setModal(false);
-  };
   return (
     <MainContainer>
       <Header />
@@ -78,21 +116,26 @@ function Homepage(props) {
         />
       )}
       <Add onClick={showModal}>Add Book to Shelf</Add>
-      <Shelf
-        shelfName="Currently Reading"
-        shelfType="currentBooks"
-        updates={currentUpdates}
-      />
-      <Shelf
-        shelfName="Have Read"
-        shelfType="pastBooks"
-        updates={pastUpdates}
-      />
-      <Shelf
-        shelfName="Want to Read"
-        shelfType="futureBooks"
-        updates={futureUpdates}
-      />
+      <Shelf shelfName="Currently Reading" isbns={isbnState.currentIsbns}>
+        <Links>
+          <SeeAll
+            href={`${props.match.path}/currentBooks`}
+            onClick={() => console.log("Yes")}
+          >
+            See All
+          </SeeAll>
+        </Links>
+      </Shelf>
+      <Shelf shelfName="Have Read" isbns={isbnState.pastIsbns}>
+        <Links>
+          <SeeAll onClick={() => console.log("Yes")}>See All</SeeAll>
+        </Links>
+      </Shelf>
+      <Shelf shelfName="Want to Read" isbns={isbnState.futureIsbns}>
+        <Links>
+          <SeeAll onClick={() => console.log("Yes")}>See All</SeeAll>
+        </Links>
+      </Shelf>
     </MainContainer>
   );
 }
@@ -125,3 +168,56 @@ export const Add = styled.a`
     text-decoration: underline;
   }
 `;
+
+const Links = styled.div`
+  position: absolute;
+  width: 10%;
+  display: flex;
+  flex-direction: column;
+  margin-left: 70%;
+  margin-top: 20px;
+  color: #287bf8;
+  text-align: center;
+  // background-color: white;
+`;
+
+const SeeAll = styled.a`
+  margin-top: 140px;
+  text-decoration: none;
+  color: #287bf8;
+  &:hover {
+    cursor: pointer;
+  }
+`;
+
+// This is where you want to use Redux to dispatch an action to udpate the state of the application
+// async function fetchProfileData() {
+//   try {
+//     let response = await axios.get("http://localhost:5000/profile", {
+//       withCredentials: true,
+//       validateStatus: false,
+//     });
+//     if (response.status === 200) {
+//       console.log(response.data.user);
+//       return { success: true, data: response.data.user };
+//     }
+//     if (response.status === 403 && response.data.msg === "Invalid token") {
+//       // Reset the access token based on refresh token
+//       await axios.get("http://localhost:5000/auth/token", {
+//         withCredentials: true,
+//       });
+//       response = await axios.get("http://localhost:5000/profile", {
+//         withCredentials: true,
+//         validateStatus: false,
+//       });
+//       if (response.status === 200) {
+//         console.log(response.data.user);
+//         return { success: true, data: response.data.user };
+//       } else throw response.data.msg;
+//     } else throw response.data.msg;
+//   } catch (e) {
+//     console.log(e);
+//     return { success: false, error: e };
+//   }
+// }
+// fetchProfileData();

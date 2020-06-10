@@ -22,12 +22,13 @@ const reducer = (state, action) => {
 };
 
 function Book(props) {
+  const { isbn } = props;
   const [bookState, dispatch] = useReducer(reducer, initialState);
 
   useEffect(() => {
     async function getImage() {
       const response = await axios.get("http://localhost:5000/book/getCover", {
-        params: { isbn: props.isbn },
+        params: { isbn },
         withCredentials: true,
       });
       if (response.status === 200) {
@@ -42,7 +43,7 @@ function Book(props) {
       }
     }
     getImage();
-  }, []);
+  }, [isbn]);
   return (
     <BookContainer>
       {bookState.foundBook && (
