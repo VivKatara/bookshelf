@@ -4,6 +4,8 @@ import { connect } from "react-redux";
 import styled from "@emotion/styled";
 
 function Header(props) {
+  console.log("Header mounting");
+  console.log(props);
   return (
     <HeaderContainer>
       <HyperLink href="/home">
@@ -34,6 +36,8 @@ const HeaderContainer = styled.div`
   flex-direction: row;
   color: #ffffff;
   font-size: 20px;
+  background-color: #222222;
+  // background-color: blue;
 `;
 
 const HyperLink = styled.a`

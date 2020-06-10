@@ -1,15 +1,18 @@
-import { GET_USER } from "../actions/types";
+import { SET_USER } from "../actions/types";
 
 const initialState = {
   userName: "",
+  isLoggedIn: false,
 };
 
 export default function userReducer(state = initialState, action) {
   switch (action.type) {
-    case GET_USER:
+    case SET_USER:
+      const { userName, isLoggedIn } = action.payload;
       return {
         ...state,
-        userName: action.payload.userName,
+        userName,
+        isLoggedIn,
       };
     default:
       return state;

@@ -1,12 +1,14 @@
 import React, { useEffect, useState, useReducer } from "react";
+import { Route } from "react-router-dom";
 import PropTypes from "prop-types";
 import axios from "axios";
 import { connect } from "react-redux";
 import styled from "@emotion/styled";
 import Header from "./Header";
 import Shelf from "./Shelf";
+import FullShelf from "./FullShelf";
 import AddBookModal from "./AddBookModal";
-import { getUser } from "../actions/getUserActions";
+import { setUser } from "../actions/setUser";
 
 const initialState = {
   currentIsbns: [],
@@ -44,7 +46,7 @@ function Homepage(props) {
   const [futureUpdates, setFutureUpdates] = useState(0);
 
   useEffect(() => {
-    props.getUser();
+    // props.getUser();
   }, []);
 
   useEffect(() => {
@@ -107,7 +109,6 @@ function Homepage(props) {
 
   return (
     <MainContainer>
-      <Header />
       {show && (
         <AddBookModal
           show={show}
@@ -136,12 +137,13 @@ function Homepage(props) {
           <SeeAll onClick={() => console.log("Yes")}>See All</SeeAll>
         </Links>
       </Shelf>
+      <Route path={`${props.match.path}/currentBooks`} component={FullShelf} />
     </MainContainer>
   );
 }
 
 Homepage.propTypes = {
-  getUser: PropTypes.func.isRequired,
+  setUser: PropTypes.func.isRequired,
   userName: PropTypes.string.isRequired,
 };
 
@@ -149,7 +151,7 @@ const mapStateToProps = (state) => ({
   userName: state.userState.userName,
 });
 
-export default connect(mapStateToProps, { getUser })(Homepage);
+export default connect(mapStateToProps, { setUser })(Homepage);
 
 export const MainContainer = styled.div`
   width: 100vw;
