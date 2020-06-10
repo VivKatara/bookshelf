@@ -4,8 +4,8 @@ import styled from "@emotion/styled";
 import Book from "./Book";
 
 function Shelf(props) {
-  const [isbns, setIsbns] = useState([]);
   const { updates } = props;
+  const [isbns, setIsbns] = useState([]);
   useEffect(() => {
     async function getIsbns() {
       const response = await axios.get(
@@ -64,10 +64,12 @@ const ShelfItems = styled.div`
   // background-color: yellow;
 `;
 const Links = styled.div`
+  position: absolute;
   width: 10%;
   display: flex;
   flex-direction: column;
-  margin-left: 10%;
+  margin-left: 70%;
+  margin-top: 20px;
   color: #287bf8;
   text-align: center;
   // background-color: white;
