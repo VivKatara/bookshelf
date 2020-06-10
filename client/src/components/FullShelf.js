@@ -4,9 +4,10 @@ import styled from "@emotion/styled";
 import Header from "./Header";
 import Shelf from "./Shelf";
 
-function FullShelf() {
+function FullShelf(props) {
   const [isbns, setIsbns] = useState([]);
-  const shelf = "currentBooks";
+  const shelf = `${props.match.params.type}Books`;
+
   useEffect(() => {
     async function getIsbns() {
       const response = await axios.get("http://localhost:5000/book/getBooks", {
@@ -16,7 +17,7 @@ function FullShelf() {
       setIsbns(response.data.isbn);
     }
     getIsbns();
-  });
+  }, []);
   return (
     <MainContainer>
       <Shelf isbns={isbns} />

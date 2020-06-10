@@ -7,9 +7,9 @@ import store from "./store";
 const App = () => {
   return (
     <Provider store={store}>
-      {/* <AppContainer> */}
-      <Routes />
-      {/* </AppContainer> */}
+      <AppContainer>
+        <Routes />
+      </AppContainer>
     </Provider>
   );
 };

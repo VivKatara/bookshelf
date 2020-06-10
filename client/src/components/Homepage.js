@@ -1,14 +1,10 @@
 import React, { useEffect, useState, useReducer } from "react";
-import { Route } from "react-router-dom";
 import PropTypes from "prop-types";
 import axios from "axios";
 import { connect } from "react-redux";
 import styled from "@emotion/styled";
-import Header from "./Header";
 import Shelf from "./Shelf";
-import FullShelf from "./FullShelf";
 import AddBookModal from "./AddBookModal";
-import { setUser } from "../actions/setUser";
 
 const initialState = {
   currentIsbns: [],
@@ -44,10 +40,6 @@ function Homepage(props) {
   const [currentUpdates, setCurrentUpdates] = useState(0);
   const [pastUpdates, setPastUpdates] = useState(0);
   const [futureUpdates, setFutureUpdates] = useState(0);
-
-  useEffect(() => {
-    // props.getUser();
-  }, []);
 
   useEffect(() => {
     async function getCurrentBookIsbns() {
@@ -119,31 +111,30 @@ function Homepage(props) {
       <Add onClick={showModal}>Add Book to Shelf</Add>
       <Shelf shelfName="Currently Reading" isbns={isbnState.currentIsbns}>
         <Links>
-          <SeeAll
-            href={`${props.match.path}/currentBooks`}
-            onClick={() => console.log("Yes")}
-          >
+          <SeeAll href="/shelf/current" onClick={() => console.log("Yes")}>
             See All
           </SeeAll>
         </Links>
       </Shelf>
       <Shelf shelfName="Have Read" isbns={isbnState.pastIsbns}>
         <Links>
-          <SeeAll onClick={() => console.log("Yes")}>See All</SeeAll>
+          <SeeAll href="/shelf/past" onClick={() => console.log("Yes")}>
+            See All
+          </SeeAll>
         </Links>
       </Shelf>
       <Shelf shelfName="Want to Read" isbns={isbnState.futureIsbns}>
         <Links>
-          <SeeAll onClick={() => console.log("Yes")}>See All</SeeAll>
+          <SeeAll href="/shelf/future" onClick={() => console.log("Yes")}>
+            See All
+          </SeeAll>
         </Links>
       </Shelf>
-      <Route path={`${props.match.path}/currentBooks`} component={FullShelf} />
     </MainContainer>
   );
 }
 
 Homepage.propTypes = {
-  setUser: PropTypes.func.isRequired,
   userName: PropTypes.string.isRequired,
 };
 
@@ -151,14 +142,15 @@ const mapStateToProps = (state) => ({
   userName: state.userState.userName,
 });
 
-export default connect(mapStateToProps, { setUser })(Homepage);
+export default connect(mapStateToProps, {})(Homepage);
 
 export const MainContainer = styled.div`
   width: 100vw;
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #222222;
+  // background-color: #222222;
+  // background-color: yellow;
 `;
 
 export const Add = styled.a`

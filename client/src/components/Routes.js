@@ -43,7 +43,7 @@ const PrivateRoutes = () => {
         <Redirect exact from="/login" to="/home" />
         <Redirect exact from="/register" to="/home" />
         <Route exact path={"/home"} component={Homepage} />
-        <Route exact path="/shelf" component={FullShelf} />
+        <Route exact path="/shelf/:type" component={FullShelf} />
         {/* <Route path="*" component={NotFoundPage} /> */}
       </Switch>
     </>
