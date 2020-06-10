@@ -32,8 +32,9 @@ const reducer = (state, action) => {
 
 function AddBookModal(props) {
   const { show, handleClose, shelfUpdate, shelf } = props;
-  console.log(shelf);
   const [shelfTitle, setShelfTitle] = useState("");
+  const [newBookState, dispatch] = useReducer(reducer, initialState);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     // Going to need the middleware to essentially check if token is expired and replace the token if so
@@ -55,6 +56,7 @@ function AddBookModal(props) {
 
   useEffect(() => {
     if (shelf) {
+      dispatch({ type: "UPDATE_SHELF", payload: shelf });
       if (shelf === "currentBooks") {
         setShelfTitle("Currently Reading");
       } else if (shelf === "pastBooks") {
@@ -64,8 +66,6 @@ function AddBookModal(props) {
       }
     }
   }, []);
-
-  const [newBookState, dispatch] = useReducer(reducer, initialState);
 
   // Note that shelf prop isn't passed down from Homepage, only from Full Shelf view
   const shelfOptions = shelf ? (
