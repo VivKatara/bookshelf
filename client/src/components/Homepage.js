@@ -118,17 +118,20 @@ function Homepage(props) {
         />
       )}
       <Add onClick={showModal}>Add Book to Shelf</Add>
-      <Shelf shelfName="Currently Reading" isbns={isbnState.currentIsbns}>
+      <CurrentTitle>Currently Reading</CurrentTitle>
+      <Shelf isbns={isbnState.currentIsbns}>
         <Links>
           <SeeAll href="/shelf/current">See All</SeeAll>
         </Links>
       </Shelf>
-      <Shelf shelfName="Have Read" isbns={isbnState.pastIsbns}>
+      <PastTitle>Have Read</PastTitle>
+      <Shelf isbns={isbnState.pastIsbns}>
         <Links>
           <SeeAll href="/shelf/past">See All</SeeAll>
         </Links>
       </Shelf>
-      <Shelf shelfName="Want to Read" isbns={isbnState.futureIsbns}>
+      <FutureTitle>Want to Read</FutureTitle>
+      <Shelf isbns={isbnState.futureIsbns}>
         <Links>
           <SeeAll href="/shelf/future">See All</SeeAll>
         </Links>
@@ -176,6 +179,30 @@ const Links = styled.div`
   color: #287bf8;
   text-align: center;
   // background-color: white;
+`;
+
+const CurrentTitle = styled.p`
+  position: absolute;
+  color: white;
+  font-size: 14px;
+  margin-left: 10%;
+  margin-top: 50px;
+`;
+
+const PastTitle = styled.p`
+  position: absolute;
+  color: white;
+  font-size: 14px;
+  margin-left: 10%;
+  margin-top: 300px;
+`;
+
+const FutureTitle = styled.p`
+  position: absolute;
+  color: white;
+  font-size: 14px;
+  margin-left: 10%;
+  margin-top: 530px;
 `;
 
 const SeeAll = styled.a`

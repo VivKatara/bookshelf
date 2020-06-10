@@ -9,9 +9,6 @@ function Shelf(props) {
 
   return (
     <ShelfContainer>
-      <ShelfTitle>
-        <p>{props.shelfName}</p>
-      </ShelfTitle>
       <ShelfItems>
         {books}
         {children}
@@ -44,6 +41,7 @@ const ShelfItems = styled.div`
   width: 100%;
   display: flex;
   flex-direction: row;
+  margin-top: 50px;
   // background-color: yellow;
 `;
 const Links = styled.div`
