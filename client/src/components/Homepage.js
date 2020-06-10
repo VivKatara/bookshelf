@@ -120,23 +120,17 @@ function Homepage(props) {
       <Add onClick={showModal}>Add Book to Shelf</Add>
       <Shelf shelfName="Currently Reading" isbns={isbnState.currentIsbns}>
         <Links>
-          <SeeAll href="/shelf/current" onClick={() => console.log("Yes")}>
-            See All
-          </SeeAll>
+          <SeeAll href="/shelf/current">See All</SeeAll>
         </Links>
       </Shelf>
       <Shelf shelfName="Have Read" isbns={isbnState.pastIsbns}>
         <Links>
-          <SeeAll href="/shelf/past" onClick={() => console.log("Yes")}>
-            See All
-          </SeeAll>
+          <SeeAll href="/shelf/past">See All</SeeAll>
         </Links>
       </Shelf>
       <Shelf shelfName="Want to Read" isbns={isbnState.futureIsbns}>
         <Links>
-          <SeeAll href="/shelf/future" onClick={() => console.log("Yes")}>
-            See All
-          </SeeAll>
+          <SeeAll href="/shelf/future">See All</SeeAll>
         </Links>
       </Shelf>
     </MainContainer>

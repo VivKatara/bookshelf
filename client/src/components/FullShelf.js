@@ -1,6 +1,7 @@
-import React, { useReducer, useEffect } from "react";
+import React, { useState, useReducer, useEffect } from "react";
 import axios from "axios";
 import styled from "@emotion/styled";
+import AddBookModal from "./AddBookModal";
 import Shelf from "./Shelf";
 
 const initialState = {
@@ -38,7 +39,23 @@ const reducer = (state, action) => {
 
 function FullShelf(props) {
   const shelf = `${props.match.params.type}Books`;
+  console.log(shelf);
+  const [show, setModal] = useState(false);
+  const [shelfUpdates, setShelfUpdates] = useState(0);
   const [shelfState, dispatch] = useReducer(reducer, initialState);
+
+  const showModal = () => {
+    console.log("Firing");
+    setModal(true);
+  };
+
+  const hideModal = () => {
+    setModal(false);
+  };
+
+  const handleShelfUpdate = (shelf) => {
+    setShelfUpdates((prev) => prev + 1);
+  };
 
   useEffect(() => {
     async function getIsbns() {
@@ -75,9 +92,19 @@ function FullShelf(props) {
       }
     }
     getIsbns();
-  }, []);
+  }, [shelfUpdates]);
+
   return (
     <MainContainer>
+      {show && (
+        <AddBookModal
+          show={show}
+          handleClose={hideModal}
+          shelfUpdate={handleShelfUpdate}
+          shelf={shelf}
+        />
+      )}
+      <Add onClick={showModal}>Add Book to Shelf</Add>
       <Shelf isbns={shelfState.firstShelfIsbn} />
       <Shelf isbns={shelfState.secondShelfIsbn} />
       <Shelf isbns={shelfState.thirdShelfIsbn} />
@@ -93,4 +120,14 @@ export const MainContainer = styled.div`
   display: flex;
   flex-direction: column;
   background-color: #222222;
+`;
+
+export const Add = styled.a`
+  margin-top: 20px;
+  margin-left: 80%;
+  color: #287bf8;
+  &:hover {
+    cursor: pointer;
+    text-decoration: underline;
+  }
 `;

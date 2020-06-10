@@ -1,4 +1,4 @@
-import React, { useReducer } from "react";
+import React, { useState, useReducer, useEffect } from "react";
 import axios from "axios";
 import styled from "@emotion/styled";
 import { Form, Input } from "./Login";
@@ -31,7 +31,9 @@ const reducer = (state, action) => {
 };
 
 function AddBookModal(props) {
-  const { show, handleClose, shelfUpdate } = props;
+  const { show, handleClose, shelfUpdate, shelf } = props;
+  console.log(shelf);
+  const [shelfTitle, setShelfTitle] = useState("");
   const handleSubmit = (e) => {
     e.preventDefault();
     // Going to need the middleware to essentially check if token is expired and replace the token if so
@@ -51,7 +53,30 @@ function AddBookModal(props) {
       .catch((err) => console.log(err));
   };
 
+  useEffect(() => {
+    if (shelf) {
+      if (shelf === "currentBooks") {
+        setShelfTitle("Currently Reading");
+      } else if (shelf === "pastBooks") {
+        setShelfTitle("Have Read");
+      } else {
+        setShelfTitle("Want to Read");
+      }
+    }
+  }, []);
+
   const [newBookState, dispatch] = useReducer(reducer, initialState);
+
+  // Note that shelf prop isn't passed down from Homepage, only from Full Shelf view
+  const shelfOptions = shelf ? (
+    <option value={shelf}>{shelfTitle}</option>
+  ) : (
+    <>
+      <option value="currentBooks">Currently Reading</option>
+      <option value="pastBooks">Have Read</option>
+      <option value="futureBooks">Want to Read</option>
+    </>
+  );
 
   return (
     show && (
@@ -95,9 +120,10 @@ function AddBookModal(props) {
                 dispatch({ type: "UPDATE_SHELF", payload: e.target.value })
               }
             >
-              <option value="currentBooks">Currently Reading</option>
+              {shelfOptions}
+              {/* <option value="currentBooks">Currently Reading</option>
               <option value="pastBooks">Have Read</option>
-              <option value="futureBooks">Want to Read</option>
+              <option value="futureBooks">Want to Read</option> */}
             </Select>
           </FormDiv>
           <FormDiv>
