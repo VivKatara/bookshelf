@@ -48,7 +48,10 @@ function Homepage(props) {
         withCredentials: true,
       });
       if (response.status === 200) {
-        dispatch({ type: "UPDATE_CURRENT", payload: response.data.isbn });
+        dispatch({
+          type: "UPDATE_CURRENT",
+          payload: response.data.isbn.slice(0, 6),
+        });
       }
     }
     getCurrentBookIsbns();
@@ -61,7 +64,10 @@ function Homepage(props) {
         withCredentials: true,
       });
       if (response.status === 200) {
-        dispatch({ type: "UPDATE_PAST", payload: response.data.isbn });
+        dispatch({
+          type: "UPDATE_PAST",
+          payload: response.data.isbn.slice(0, 6),
+        });
       }
     }
     getPastBookIsbns();
@@ -74,7 +80,10 @@ function Homepage(props) {
         withCredentials: true,
       });
       if (response.status === 200) {
-        dispatch({ type: "UPDATE_FUTURE", payload: response.data.isbn });
+        dispatch({
+          type: "UPDATE_FUTURE",
+          payload: response.data.isbn.slice(0, 6),
+        });
       }
     }
     getFutureBookIsbns();
