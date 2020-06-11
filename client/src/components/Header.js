@@ -4,8 +4,6 @@ import { connect } from "react-redux";
 import styled from "@emotion/styled";
 
 function Header(props) {
-  console.log("Header mounting");
-  console.log(props);
   return (
     <HeaderContainer>
       <HyperLink href="/home">
