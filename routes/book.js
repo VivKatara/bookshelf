@@ -4,15 +4,20 @@ const router = express.Router();
 
 const Book = require("../models/Books");
 const UserBook = require("../models/UserBooks");
+const NewUserBook = require("../models/NewUserBooks");
 
 const CurrentBook = require("../models/CurrentBooks");
 const PastBook = require("../models/PastBooks");
 const FutureBook = require("../models/FutureBooks");
 
 const authenticateToken = require("../validation/authenticateToken");
+const extractBookFields = require("../utils/extractBookFields");
 const paginate = require("../utils/paginate");
+const addBook = require("../database/addBook");
+const addUserBook = require("../database/addUserBook");
 
 router.get("/add", authenticateToken, async (req, res) => {
+  const email = req.user.email;
   const title = req.query.title;
   const author = req.query.author;
   const shelf = req.query.shelf;
@@ -29,46 +34,33 @@ router.get("/add", authenticateToken, async (req, res) => {
     // Throw an error that the request failed
   }
   const items = bookApiResponse.data.items;
-  const newItems = items.filter((item) => {
-    return item.volumeInfo.title.toUpperCase() === title.toUpperCase();
-  });
-  if (!newItems.length) {
-    // Throw an error that there were no matches
-  }
-  const finalItem = newItems[0];
-  const email = req.user.email;
-  const finalTitle = finalItem.volumeInfo.title;
-  const finalAuthors = finalItem.volumeInfo.authors;
-  const industryIdentifiers = finalItem.volumeInfo.industryIdentifiers;
-  const filteredIsbn = industryIdentifiers.filter((identifer) => {
-    return identifer.type === "ISBN_13";
-  });
-  const finalIsbn = filteredIsbn[0].identifier;
-  const finalImageLink = finalItem.volumeInfo.imageLinks.thumbnail
-    ? finalItem.volumeInfo.imageLinks.thumbnail
-    : finalItem.volumeInfo.imageLinks.smallThumbnail;
-
-  // Add to the book database, and then aslo add by user
-  const foundBook = await Book.findOne({ isbn: finalIsbn });
-  if (!foundBook) {
-    const newBook = new Book({
-      title: finalTitle,
-      authors: finalAuthors,
-      isbn: finalIsbn,
-      coverImage: finalImageLink,
-    });
-    await newBook.save();
+  // Takes in API response and gets the requisite book fields
+  const [
+    finalTitle,
+    finalAuthors,
+    finalIsbn,
+    finalImageLink,
+    matchFound,
+  ] = extractBookFields(items, title, author);
+  if (!matchFound) {
+    // Return an error becasue no match was found on the API
   }
 
-  const userBook = await UserBook.findOne({ email }); // This has to exist from register
-  if (!userBook) {
-    // Some crazy error
-  }
-  const desiredShelf = userBook[shelf];
-  if (!desiredShelf.includes(finalIsbn)) {
-    desiredShelf.push(finalIsbn);
-    await UserBook.updateOne({ email }, { $push: { [shelf]: finalIsbn } });
-  }
+  // Add to the book database
+  await addBook(finalTitle, finalAuthors, finalIsbn, finalImageLink);
+
+  // Add book to the user's UserBook document if necessary
+  await addUserBook(email, shelf, finalIsbn);
+
+  // const userBook = await UserBook.findOne({ email }); // This has to exist from register
+  // if (!userBook) {
+  //   // Some crazy error
+  // }
+  // const desiredShelf = userBook[shelf];
+  // if (!desiredShelf.includes(finalIsbn)) {
+  //   desiredShelf.push(finalIsbn);
+  //   await UserBook.updateOne({ email }, { $push: { [shelf]: finalIsbn } });
+  // }
   return res
     .status(200)
     .json({ msg: "Successful addition of book", success: true });

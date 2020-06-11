@@ -7,7 +7,7 @@ const router = express.Router();
 
 const User = require("../models/User");
 const UserBooks = require("../models/UserBooks");
-// const NewUserBooks = require("../models/NewUserBooks");
+const NewUserBooks = require("../models/NewUserBooks");
 const Token = require("../models/Token");
 
 const validateLoginInput = require("../validation/login");
@@ -40,18 +40,18 @@ router.post("/register", (req, res) => {
         pastBooks: [],
         futureBooks: [],
       });
-      // const newUserBooks = new NewUserBooks({
-      //   email,
-      //   currentBooks: [],
-      //   currentBooksCount: 0,
-      //   currentBooksDisplayCount: 0,
-      //   pastBooks: [],
-      //   pastBooksCount: 0,
-      //   pastBooksDisplayCount: 0,
-      //   futureBooks: [],
-      //   futureBooksCount: 0,
-      //   futureBooksDisplayCount: 0,
-      // });
+      const newUserBooks = new NewUserBooks({
+        email,
+        currentBooks: [],
+        currentBooksCount: 0,
+        currentBooksDisplayCount: 0,
+        pastBooks: [],
+        pastBooksCount: 0,
+        pastBooksDisplayCount: 0,
+        futureBooks: [],
+        futureBooksCount: 0,
+        futureBooksDisplayCount: 0,
+      });
 
       // Hash the password before saving it in the database
       bcrypt.genSalt(10, (err, salt) => {
@@ -63,7 +63,7 @@ router.post("/register", (req, res) => {
             .save()
             .then(async (savedUser) => {
               await userBooks.save(); // Must I do then and catch here too?
-              // await newUserBooks.save();
+              await newUserBooks.save();
               return res.status(200).json({
                 user: { email: savedUser.email, name: savedUser.fullName },
                 msg: "Successful register",

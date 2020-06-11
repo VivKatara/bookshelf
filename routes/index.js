@@ -1,13 +1,13 @@
 const express = require("express");
 const authRoutes = require("./auth");
-const addBookRoutes = require("./addBook");
+const bookRoutes = require("./book");
 
 const router = express.Router();
 
 const authenticateToken = require("../validation/authenticateToken");
 
 router.use("/auth", authRoutes);
-router.use("/book", addBookRoutes);
+router.use("/book", bookRoutes);
 router.get("/profile", authenticateToken, (req, res) => {
   // If it gets here, it must have been a successful request, so return the user
   return res.status(200).json({
