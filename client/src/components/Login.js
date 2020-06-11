@@ -1,7 +1,10 @@
 import React, { useReducer } from "react";
+import PropTypes from "prop-types";
 import { useHistory } from "react-router-dom";
+import { connect } from "react-redux";
 import axios from "axios";
 import styled from "@emotion/styled";
+import { setUser } from "../actions/setUser";
 
 const initialState = {
   email: "",
@@ -25,7 +28,7 @@ const reducer = (state, action) => {
   }
 };
 
-const Login = () => {
+const Login = (props) => {
   const [loginState, dispatch] = useReducer(reducer, initialState);
   const history = useHistory();
   const handleSubmit = async (e) => {
@@ -40,7 +43,7 @@ const Login = () => {
         },
         { withCredentials: true }
       );
-      console.log(response);
+      await props.setUser();
       history.push("/home");
     } catch (e) {
       console.log(e);
@@ -89,7 +92,13 @@ const Login = () => {
   );
 };
 
-export default Login;
+const mapStateToProps = (state) => ({});
+
+Login.propTypes = {
+  setUser: PropTypes.func.isRequired,
+};
+
+export default connect(mapStateToProps, { setUser })(Login);
 
 const MainContainer = styled.div`
   width: 100vw;

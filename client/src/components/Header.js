@@ -1,19 +1,29 @@
-import React from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import styled from "@emotion/styled";
+import ProfileModal from "./ProfileModal";
 
 function Header(props) {
+  const [show, setShowModal] = useState(false);
+
+  const changeModal = () => {
+    setShowModal((current) => !current);
+  };
+
   return (
-    <HeaderContainer>
-      <HyperLink href="/home">
-        <p>Bookshelf</p>
-      </HyperLink>
-      <User>
-        <p>{props.userName}</p>
-        <Profile>{props.userName[0]}</Profile>
-      </User>
-    </HeaderContainer>
+    <>
+      <HeaderContainer>
+        <HyperLink href="/home">
+          <p>Bookshelf</p>
+        </HyperLink>
+        <User>
+          <p>{props.userName}</p>
+          <Profile onClick={changeModal}>{props.userName[0]}</Profile>
+        </User>
+      </HeaderContainer>
+      {show && <ProfileModal />}
+    </>
   );
 }
 
@@ -47,7 +57,7 @@ const HyperLink = styled.a`
   &:hover {
     color: #287bf8;
   }
-  background-color: blue;
+  // background-color: blue;
 `;
 
 const User = styled.div`

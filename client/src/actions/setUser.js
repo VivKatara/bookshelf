@@ -1,5 +1,5 @@
 import axios from "axios";
-import { SET_USER } from "./types";
+import { SET_USER, LOG_OFF_USER } from "./types";
 
 export const setUser = () => async (dispatch) => {
   try {
@@ -29,20 +29,15 @@ export const setUser = () => async (dispatch) => {
     };
     dispatch(action);
   }
+};
 
-  // axios
-  //   .get("http://localhost:5000/profile", {
-  //     withCredentials: true,
-  //     // Don't forget to pass validateStatus as false as you refactor in the middleware
-  //   })
-  //   .then((res) => {
-  //     const action = {
-  //       type: GET_USER,
-  //       payload: {
-  //         userName: res.data.user.name,
-  //       },
-  //     };
-  //     dispatch(action);
-  //   })
-  //   .catch((err) => console.log(err));
+export const logOffUser = () => async (dispatch) => {
+  // Call the backend logout
+  await axios.delete("http://localhost:5000/auth/logout", {
+    withCredentials: true,
+  });
+  const action = {
+    type: LOG_OFF_USER,
+  };
+  dispatch(action);
 };

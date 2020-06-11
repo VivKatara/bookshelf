@@ -137,6 +137,7 @@ router.post("/login", (req, res) => {
 
 router.get("/token", (req, res) => {
   const refreshToken = req.cookies["refreshToken"];
+  console.log(refreshToken);
   if (refreshToken == null) {
     console.log("Attempt to refresh access token without refresh token");
     return res
