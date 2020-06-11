@@ -11,6 +11,7 @@ function Header(props) {
       </HyperLink>
       <User>
         <p>{props.userName}</p>
+        <Profile>{props.userName[0]}</Profile>
       </User>
     </HeaderContainer>
   );
@@ -46,10 +47,34 @@ const HyperLink = styled.a`
   &:hover {
     color: #287bf8;
   }
+  background-color: blue;
 `;
 
 const User = styled.div`
+  width: 15%;
+  display: flex;
+  flex-direction: row;
   margin-left: auto;
   margin-right: 10%;
-  //   background-color: green;
+  // background-color: green;
+`;
+
+const Profile = styled.button`
+  margin-left: 20%;
+  margin-top: 10px;
+  color: white;
+  height: 40px;
+  width: 40px;
+  background: none;
+  border: 1px solid white;
+  border-radius: 50%;
+  &:hover {
+    cursor: pointer;
+  }
+  &:active,
+  &:focus {
+    text-decoration: none;
+    outline: none;
+  }
+  font-size: 20px;
 `;
