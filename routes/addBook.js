@@ -10,6 +10,7 @@ const PastBook = require("../models/PastBooks");
 const FutureBook = require("../models/FutureBooks");
 
 const authenticateToken = require("../validation/authenticateToken");
+const paginate = require("../utils/paginate");
 
 router.get("/add", authenticateToken, async (req, res) => {
   const title = req.query.title;
@@ -73,12 +74,39 @@ router.get("/add", authenticateToken, async (req, res) => {
     .json({ msg: "Successful addition of book", success: true });
 });
 
-router.get("/getBooks", authenticateToken, async (req, res) => {
+router.get("/getDisplayBooks", authenticateToken, async (req, res) => {
   const email = req.user.email;
   const shelf = req.query.shelf;
   const userBooks = await UserBook.findOne({ email });
   const desiredShelf = userBooks[shelf];
   return res.status(200).json({ isbn: desiredShelf });
+});
+
+router.get("/getBooks", authenticateToken, async (req, res) => {
+  const email = req.user.email;
+  const { shelf } = req.query;
+  const page = parseInt(req.query.page);
+  const pageSize = parseInt(req.query.pageSize);
+  const userBooks = await UserBook.findOne({ email });
+  const desiredShelf = userBooks[shelf];
+  const desiredBooks = paginate(
+    desiredShelf,
+    desiredShelf.length,
+    page,
+    pageSize
+  );
+  // This assumes that empty list is not returned
+  // If empty list is returned, then there must have been an out of range page number
+  return res.status(200).json({ isbn: desiredBooks });
+});
+
+router.get("/getTotalPages", authenticateToken, async (req, res) => {
+  const email = req.user.email;
+  const { shelf, pageSize } = req.query;
+  const userBooks = await UserBook.findOne({ email });
+  const desiredShelf = userBooks[shelf];
+  const totalPages = Math.ceil(desiredShelf.length / pageSize);
+  return res.status(200).json({ totalPages });
 });
 
 router.get("/getCover", authenticateToken, async (req, res) => {

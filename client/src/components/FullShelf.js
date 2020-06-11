@@ -12,26 +12,13 @@ const initialState = {
 
 const reducer = (state, action) => {
   switch (action.type) {
-    case "UPDATE_FIRST":
-      return {
-        ...state,
-        firstShelfIsbn: action.payload.firstShelf,
-      };
-    case "UPDATE_FIRST_TWO": {
-      return {
-        ...state,
-        firstShelfIsbn: action.payload.firstShelf,
-        secondShelfIsbn: action.payload.secondShelf,
-      };
-    }
-    case "UPDATE_ALL_THREE": {
+    case "UPDATE_ISBN":
       return {
         ...state,
         firstShelfIsbn: action.payload.firstShelf,
         secondShelfIsbn: action.payload.secondShelf,
         thirdShelfIsbn: action.payload.thirdShelf,
       };
-    }
     default:
       return state;
   }
@@ -39,6 +26,17 @@ const reducer = (state, action) => {
 
 function FullShelf(props) {
   const shelf = `${props.match.params.type}Books`;
+  const [shelfTitle, setShelfTitle] = useState("");
+
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(21);
+
+  const [showPrevious, setShowPrevious] = useState(false);
+  const [showNext, setShowNext] = useState(false);
+  const [showPageCount, setShowPageCount] = useState(false);
+
+  const [totalPages, setTotalPages] = useState(1);
+
   const [show, setModal] = useState(false);
   const [shelfUpdates, setShelfUpdates] = useState(0);
   const [shelfState, dispatch] = useReducer(reducer, initialState);
@@ -57,44 +55,92 @@ function FullShelf(props) {
   };
 
   useEffect(() => {
+    if (shelf === "currentBooks") {
+      setShelfTitle("Currently Reading");
+    } else if (shelf === "pastBooks") {
+      setShelfTitle("Have Read");
+    } else {
+      setShelfTitle("Want to Read");
+    }
+  }, [shelf]);
+
+  useEffect(() => {
+    async function getTotalPages() {
+      const response = await axios.get(
+        "http://localhost:5000/book/getTotalPages",
+        { params: { shelf, pageSize }, withCredentials: true }
+      );
+      setTotalPages(response.data.totalPages);
+    }
+    getTotalPages();
+  }, []);
+
+  useEffect(() => {
     async function getIsbns() {
       const response = await axios.get("http://localhost:5000/book/getBooks", {
-        params: { shelf },
+        params: { shelf, page, pageSize },
         withCredentials: true,
       });
-      if (response.data.isbn.length <= 7) {
-        const firstShelfIsbn = response.data.isbn;
-        dispatch({
-          type: "UPDATE_FIRST",
-          payload: { firstShelf: firstShelfIsbn },
-        });
-      } else if (response.data.isbn.length <= 14) {
-        const firstShelfIsbn = response.data.isbn.slice(0, 7);
-        const secondShelfIsbn = response.data.isbn.slice(7);
-        dispatch({
-          type: "UPDATE_FIRST_TWO",
-          payload: { firstShelf: firstShelfIsbn, secondShelf: secondShelfIsbn },
-        });
-      } else {
-        // Assuming pagination on server of up to 18 returned books at once, it must be the case that the response has greater than 12 and <= 18 items
-        const firstShelfIsbn = response.data.isbn.slice(0, 7);
-        const secondShelfIsbn = response.data.isbn.slice(7, 14);
-        const thirdShelfIsbn = response.data.isbn.slice(14);
-        dispatch({
-          type: "UPDATE_ALL_THREE",
-          payload: {
-            firstShelf: firstShelfIsbn,
-            secondShelf: secondShelfIsbn,
-            thirdShelf: thirdShelfIsbn,
-          },
-        });
-      }
+      const firstShelfIsbn = response.data.isbn.slice(0, pageSize / 3);
+      const secondShelfIsbn = response.data.isbn.slice(
+        pageSize / 3,
+        (pageSize * 2) / 3
+      );
+      const thirdShelfIsbn = response.data.isbn.slice((pageSize * 2) / 3);
+      const action = {
+        type: "UPDATE_ISBN",
+        payload: {
+          firstShelf: firstShelfIsbn,
+          secondShelf: secondShelfIsbn,
+          thirdShelf: thirdShelfIsbn,
+        },
+      };
+      dispatch(action);
     }
     getIsbns();
-  }, [shelfUpdates]);
+  }, [page, shelfUpdates]);
+
+  useEffect(() => {
+    if (page === 1) {
+      setShowPrevious(false);
+    } else {
+      setShowPrevious(true);
+    }
+
+    if (page < totalPages) {
+      setShowNext(true);
+    } else {
+      setShowNext(false);
+    }
+  }, [page, totalPages]);
+
+  useEffect(() => {
+    if (totalPages > 1) {
+      setShowPageCount(true);
+    } else {
+      setShowPageCount(false);
+    }
+  }, [totalPages]);
+
+  const handleNext = () => {
+    if (page < totalPages) {
+      setPage((page) => page + 1);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (page > 1) {
+      setPage((page) => page - 1);
+    }
+  };
 
   return (
     <MainContainer>
+      {showPageCount && (
+        <PageCount>
+          Page {page} of {totalPages}
+        </PageCount>
+      )}
       {show && (
         <AddBookModal
           show={show}
@@ -104,9 +150,13 @@ function FullShelf(props) {
         />
       )}
       <Add onClick={showModal}>Add Book to Shelf</Add>
-      <Title>Currently Reading</Title>
+      <Title>{shelfTitle}</Title>
       <Shelf isbns={shelfState.firstShelfIsbn} />
+      {showPrevious && (
+        <PreviousButton onClick={handlePrevious}>Previous</PreviousButton>
+      )}
       <Shelf isbns={shelfState.secondShelfIsbn} />
+      {showNext && <NextButton onClick={handleNext}>Next</NextButton>}
       <Shelf isbns={shelfState.thirdShelfIsbn} />
     </MainContainer>
   );
@@ -120,6 +170,12 @@ export const MainContainer = styled.div`
   display: flex;
   flex-direction: column;
   background-color: #222222;
+`;
+
+const PageCount = styled.p`
+  position: absolute;
+  margin-left: 5%;
+  color: #287bf8;
 `;
 
 export const Add = styled.a`
@@ -138,4 +194,40 @@ const Title = styled.p`
   font-size: 14px;
   margin-left: 10%;
   margin-top: 50px;
+`;
+
+const PreviousButton = styled.button`
+  position: absolute;
+  margin-left: 2%;
+  margin-top: 450px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #287bf8;
+  font-size: 16px;
+  &:hover {
+    text-decoration: underline;
+  }
+  &:focus {
+    outline: none;
+    box-shadow: none;
+  }
+`;
+
+const NextButton = styled.button`
+  position: absolute;
+  margin-left: 95%;
+  margin-top: 450px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #287bf8;
+  font-size: 16px;
+  &:hover {
+    text-decoration: underline;
+  }
+  &:focus {
+    outline: none;
+    box-shadow: none;
+  }
 `;

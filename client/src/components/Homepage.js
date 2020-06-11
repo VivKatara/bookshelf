@@ -43,10 +43,13 @@ function Homepage(props) {
 
   useEffect(() => {
     async function getCurrentBookIsbns() {
-      const response = await axios.get("http://localhost:5000/book/getBooks", {
-        params: { shelf: "currentBooks" },
-        withCredentials: true,
-      });
+      const response = await axios.get(
+        "http://localhost:5000/book/getDisplayBooks",
+        {
+          params: { shelf: "currentBooks" },
+          withCredentials: true,
+        }
+      );
       if (response.status === 200) {
         dispatch({
           type: "UPDATE_CURRENT",
@@ -59,10 +62,13 @@ function Homepage(props) {
 
   useEffect(() => {
     async function getPastBookIsbns() {
-      const response = await axios.get("http://localhost:5000/book/getBooks", {
-        params: { shelf: "pastBooks" },
-        withCredentials: true,
-      });
+      const response = await axios.get(
+        "http://localhost:5000/book/getDisplayBooks",
+        {
+          params: { shelf: "pastBooks" },
+          withCredentials: true,
+        }
+      );
       if (response.status === 200) {
         dispatch({
           type: "UPDATE_PAST",
@@ -75,10 +81,13 @@ function Homepage(props) {
 
   useEffect(() => {
     async function getFutureBookIsbns() {
-      const response = await axios.get("http://localhost:5000/book/getBooks", {
-        params: { shelf: "futureBooks" },
-        withCredentials: true,
-      });
+      const response = await axios.get(
+        "http://localhost:5000/book/getDisplayBooks",
+        {
+          params: { shelf: "futureBooks" },
+          withCredentials: true,
+        }
+      );
       if (response.status === 200) {
         dispatch({
           type: "UPDATE_FUTURE",
