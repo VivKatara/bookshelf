@@ -1,5 +1,4 @@
 import React from "react";
-import { useHistory } from "react-router-dom";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import styled from "@emotion/styled";
@@ -7,10 +6,8 @@ import styled from "@emotion/styled";
 import { logOffUser } from "../actions/setUser";
 
 function ProfileModal(props) {
-  const history = useHistory();
   const logOut = async () => {
     await props.logOffUser();
-    // history.push("/");
   };
   return (
     <ModalContainer>
