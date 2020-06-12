@@ -1,5 +1,6 @@
-import React, { useState, useReducer, useEffect } from "react";
+import React, { useState, useReducer, useEffect, useRef } from "react";
 import axios from "axios";
+import { useOutsideClick } from "../hooks/useOutsideClick";
 import styled from "@emotion/styled";
 import { Form, Input } from "./Login";
 
@@ -31,9 +32,11 @@ const reducer = (state, action) => {
 };
 
 function AddBookModal(props) {
-  const { show, handleClose, shelfUpdate, shelf } = props;
+  const { show, buttonRef, handleClose, shelfUpdate, shelf } = props;
   const [shelfTitle, setShelfTitle] = useState("");
   const [newBookState, dispatch] = useReducer(reducer, initialState);
+  const modalRef = useRef(null);
+  useOutsideClick(modalRef, buttonRef, handleClose);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -80,7 +83,7 @@ function AddBookModal(props) {
 
   return (
     show && (
-      <MainModal>
+      <MainModal ref={modalRef}>
         <CloseButton onClick={handleClose}>X</CloseButton>
         <Form onSubmit={handleSubmit}>
           <FormDiv>

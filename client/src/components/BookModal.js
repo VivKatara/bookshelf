@@ -3,10 +3,11 @@ import { useOutsideClick } from "../hooks/useOutsideClick";
 import styled from "@emotion/styled";
 
 function BookModal(props) {
-  const { title, authors, handleClose } = props;
+  const { title, authors, buttonRef, handleClose } = props;
   const [displayAuthors, setDisplayAuthors] = useState("");
-  const wrapperRef = useRef(null);
-  useOutsideClick(wrapperRef, handleClose);
+  const modalRef = useRef(null);
+
+  useOutsideClick(modalRef, buttonRef, handleClose);
 
   useEffect(() => {
     if (authors.length > 1) {
@@ -18,7 +19,7 @@ function BookModal(props) {
   }, [authors]);
 
   return (
-    <ModalContainer ref={wrapperRef}>
+    <ModalContainer ref={modalRef}>
       <p>Title: {title}</p>
       <p>Authors: {displayAuthors}</p>
     </ModalContainer>

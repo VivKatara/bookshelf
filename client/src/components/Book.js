@@ -1,4 +1,4 @@
-import React, { useState, useReducer, useEffect } from "react";
+import React, { useState, useReducer, useEffect, useRef } from "react";
 import axios from "axios";
 import styled from "@emotion/styled";
 import BookModal from "./BookModal";
@@ -28,6 +28,7 @@ function Book(props) {
   const { isbn } = props;
   const [bookState, dispatch] = useReducer(reducer, initialState);
   const [show, setShowModal] = useState(false);
+  const buttonRef = useRef(null);
 
   useEffect(() => {
     async function getImage() {
@@ -62,11 +63,12 @@ function Book(props) {
   };
 
   return (
-    <BookContainer onClick={showModal}>
+    <BookContainer ref={buttonRef} onClick={showModal}>
       {bookState.foundBook && show && (
         <BookModal
           title={bookState.title}
           authors={bookState.authors}
+          buttonRef={buttonRef}
           handleClose={hideModal}
         />
       )}

@@ -1,16 +1,21 @@
-import React from "react";
+import React, { useRef } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
+import { useOutsideClick } from "../hooks/useOutsideClick";
 import styled from "@emotion/styled";
 
 import { logOffUser } from "../actions/setUser";
 
 function ProfileModal(props) {
+  const { buttonRef, handleClose } = props;
+  const modalRef = useRef(null);
+  useOutsideClick(modalRef, buttonRef, handleClose);
+
   const logOut = async () => {
     await props.logOffUser();
   };
   return (
-    <ModalContainer>
+    <ModalContainer ref={modalRef}>
       <Profile>Profile</Profile>
       <hr />
       <LogOutButton onClick={logOut}>Sign Out</LogOutButton>

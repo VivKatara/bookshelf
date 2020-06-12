@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useReducer } from "react";
+import React, { useEffect, useState, useReducer, useRef } from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
 import { connect } from "react-redux";
@@ -40,6 +40,7 @@ function Homepage(props) {
   const [currentUpdates, setCurrentUpdates] = useState(0);
   const [pastUpdates, setPastUpdates] = useState(0);
   const [futureUpdates, setFutureUpdates] = useState(0);
+  const buttonRef = useRef(null);
 
   useEffect(() => {
     async function getCurrentBookIsbns() {
@@ -98,11 +99,8 @@ function Homepage(props) {
     getFutureBookIsbns();
   }, [futureUpdates]);
 
-  const showModal = () => {
-    setModal(true);
-  };
-  const hideModal = () => {
-    setModal(false);
+  const changeModal = () => {
+    setModal((prev) => !prev);
   };
 
   const handleShelfUpdate = (shelf) => {
@@ -122,11 +120,14 @@ function Homepage(props) {
       {show && (
         <AddBookModal
           show={show}
-          handleClose={hideModal}
+          buttonRef={buttonRef}
+          handleClose={changeModal}
           shelfUpdate={handleShelfUpdate}
         />
       )}
-      <Add onClick={showModal}>Add Book to Shelf</Add>
+      <Add ref={buttonRef} onClick={changeModal}>
+        Add Book to Shelf
+      </Add>
       <CurrentTitle>Currently Reading</CurrentTitle>
       <Shelf isbns={isbnState.currentIsbns}>
         <Links>
