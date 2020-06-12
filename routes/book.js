@@ -3,12 +3,7 @@ const axios = require("axios");
 const router = express.Router();
 
 const Book = require("../models/Books");
-const UserBook = require("../models/UserBooks");
-const NewUserBook = require("../models/NewUserBooks");
-
-const CurrentBook = require("../models/CurrentBooks");
-const PastBook = require("../models/PastBooks");
-const FutureBook = require("../models/FutureBooks");
+const UserBooks = require("../models/UserBooks");
 
 const authenticateToken = require("../validation/authenticateToken");
 const extractBookFields = require("../utils/extractBookFields");
@@ -44,34 +39,36 @@ router.get("/add", authenticateToken, async (req, res) => {
   ] = extractBookFields(items, title, author);
   if (!matchFound) {
     // Return an error becasue no match was found on the API
+    return res.status(404).json({ msg: "Could not find book", success: false });
   }
 
   // Add to the book database
   await addBook(finalTitle, finalAuthors, finalIsbn, finalImageLink);
 
   // Add book to the user's UserBook document if necessary
-  await addUserBook(email, shelf, finalIsbn);
+  const addedBook = await addUserBook(email, shelf, finalIsbn);
 
-  // const userBook = await UserBook.findOne({ email }); // This has to exist from register
-  // if (!userBook) {
-  //   // Some crazy error
-  // }
-  // const desiredShelf = userBook[shelf];
-  // if (!desiredShelf.includes(finalIsbn)) {
-  //   desiredShelf.push(finalIsbn);
-  //   await UserBook.updateOne({ email }, { $push: { [shelf]: finalIsbn } });
-  // }
-  return res
-    .status(200)
-    .json({ msg: "Successful addition of book", success: true });
+  if (!addedBook.success) {
+    return res.status(400).json({ msg: addedBook.msg, success: false });
+  } else {
+    return res
+      .status(200)
+      .json({ msg: "Successfully added book to shelf", success: true });
+  }
 });
 
 router.get("/getDisplayBooks", authenticateToken, async (req, res) => {
   const email = req.user.email;
   const shelf = req.query.shelf;
-  const userBooks = await UserBook.findOne({ email });
+  const userBooks = await UserBooks.findOne({ email });
   const desiredShelf = userBooks[shelf];
-  return res.status(200).json({ isbn: desiredShelf });
+  const displayBooks = desiredShelf.filter((book) => {
+    if (book.display) {
+      return book;
+    }
+  });
+  const displayBooksIsbn = displayBooks.map((displayBook) => displayBook.isbn);
+  return res.status(200).json({ isbn: displayBooksIsbn });
 });
 
 router.get("/getBooks", authenticateToken, async (req, res) => {
@@ -79,25 +76,28 @@ router.get("/getBooks", authenticateToken, async (req, res) => {
   const { shelf } = req.query;
   const page = parseInt(req.query.page);
   const pageSize = parseInt(req.query.pageSize);
-  const userBooks = await UserBook.findOne({ email });
+  const userBooks = await UserBooks.findOne({ email });
   const desiredShelf = userBooks[shelf];
+  const desiredShelfLength = userBooks[`${shelf}Count`];
   const desiredBooks = paginate(
     desiredShelf,
-    desiredShelf.length,
+    desiredShelfLength,
     page,
     pageSize
   );
+  const desiredIsbns = desiredBooks.map((book) => book.isbn);
   // This assumes that empty list is not returned
   // If empty list is returned, then there must have been an out of range page number
-  return res.status(200).json({ isbn: desiredBooks });
+  return res.status(200).json({ isbn: desiredIsbns });
 });
 
 router.get("/getTotalPages", authenticateToken, async (req, res) => {
   const email = req.user.email;
   const { shelf, pageSize } = req.query;
-  const userBooks = await UserBook.findOne({ email });
+  const userBooks = await UserBooks.findOne({ email });
   const desiredShelf = userBooks[shelf];
-  const totalPages = Math.ceil(desiredShelf.length / pageSize);
+  const desiredShelfLength = userBooks[`${shelf}Count`];
+  const totalPages = Math.ceil(desiredShelfLength / pageSize);
   return res.status(200).json({ totalPages });
 });
 

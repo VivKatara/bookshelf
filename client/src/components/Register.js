@@ -53,7 +53,7 @@ const Register = () => {
         passwordConfirm,
       });
       console.log(response);
-      history.push("/");
+      history.push("/login");
     } catch (e) {
       console.log(e);
     }

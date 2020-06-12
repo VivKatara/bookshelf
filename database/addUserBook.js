@@ -1,4 +1,4 @@
-const NewUserBook = require("../models/NewUserBooks");
+const UserBooks = require("../models/UserBooks");
 
 module.exports = async function addUserBook(email, shelf, finalIsbn) {
   const mongoShelf = `${shelf}`;
@@ -7,13 +7,13 @@ module.exports = async function addUserBook(email, shelf, finalIsbn) {
 
   let displayBook = false;
   let foundIsbn = false;
-  const newUserBook = await NewUserBook.findOne({ email });
-  if (!newUserBook) {
+  const userBooks = await UserBooks.findOne({ email });
+  if (!userBooks) {
     // Return some crazy error here, becasue this should never happen
-    return;
+    return { msg: "Something unexpected occurred", success: false };
   }
   // Search if the book already exists in database
-  const desiredShelf = newUserBook[mongoShelf];
+  const desiredShelf = userBooks[mongoShelf];
   for (let i = 0; i < desiredShelf.length; i++) {
     if (desiredShelf[i].isbn === finalIsbn) {
       foundIsbn = true;
@@ -23,18 +23,18 @@ module.exports = async function addUserBook(email, shelf, finalIsbn) {
 
   if (foundIsbn) {
     // If the book was found, return something that we can pass to the user letting them know so
-    return;
+    return { msg: "This book already exists on this shelf!", success: false };
   }
 
   // Book was not found, so now check if there is room on main display shelf
   // Ideally the 6 should be an env variable for how many books can fit on shelf
-  if (newUserBook[mongoDisplayCount] < 6) {
+  if (userBooks[mongoDisplayCount] < 6) {
     displayBook = true;
   }
 
   const newObject = { isbn: finalIsbn, display: displayBook };
   if (displayBook) {
-    await NewUserBook.updateOne(
+    await UserBooks.updateOne(
       { email },
       {
         $push: { [mongoShelf]: newObject },
@@ -42,10 +42,10 @@ module.exports = async function addUserBook(email, shelf, finalIsbn) {
       }
     );
   } else {
-    await NewUserBook.updateOne(
+    await UserBooks.updateOne(
       { email },
       { $push: { [mongoShelf]: newObject }, $inc: { [mongoCount]: 1 } }
     );
   }
-  // Return a success to let the user know that the book was added
+  return { msg: "Book successfully added to shelf", success: true };
 };

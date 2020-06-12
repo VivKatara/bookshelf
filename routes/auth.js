@@ -7,7 +7,6 @@ const router = express.Router();
 
 const User = require("../models/User");
 const UserBooks = require("../models/UserBooks");
-const NewUserBooks = require("../models/NewUserBooks");
 const Token = require("../models/Token");
 
 const validateLoginInput = require("../validation/login");
@@ -34,13 +33,7 @@ router.post("/register", (req, res) => {
         fullName,
         password,
       });
-      const userBooks = new UserBooks({
-        email,
-        currentBooks: [],
-        pastBooks: [],
-        futureBooks: [],
-      });
-      const newUserBooks = new NewUserBooks({
+      const newUserBooks = new UserBooks({
         email,
         currentBooks: [],
         currentBooksCount: 0,
@@ -62,8 +55,8 @@ router.post("/register", (req, res) => {
           newUser
             .save()
             .then(async (savedUser) => {
-              await userBooks.save(); // Must I do then and catch here too?
               await newUserBooks.save();
+              console.log("Success Register");
               return res.status(200).json({
                 user: { email: savedUser.email, name: savedUser.fullName },
                 msg: "Successful register",
