@@ -1,11 +1,13 @@
-import React, { useReducer, useEffect } from "react";
+import React, { useState, useReducer, useEffect } from "react";
 import axios from "axios";
 import styled from "@emotion/styled";
+import BookModal from "./BookModal";
 
 const initialState = {
   foundBook: false,
-  coverImage: "",
   title: "",
+  authors: [],
+  coverImage: "",
 };
 
 const reducer = (state, action) => {
@@ -14,8 +16,9 @@ const reducer = (state, action) => {
       return {
         ...state,
         foundBook: action.payload.foundBook,
-        coverImage: action.payload.coverImage,
         title: action.payload.title,
+        authors: action.payload.authors,
+        coverImage: action.payload.coverImage,
       };
     }
   }
@@ -24,28 +27,49 @@ const reducer = (state, action) => {
 function Book(props) {
   const { isbn } = props;
   const [bookState, dispatch] = useReducer(reducer, initialState);
+  const [show, setShowModal] = useState(false);
 
   useEffect(() => {
     async function getImage() {
-      const response = await axios.get("http://localhost:5000/book/getCover", {
-        params: { isbn },
-        withCredentials: true,
-      });
+      const response = await axios.get(
+        "http://localhost:5000/book/getBookDetails",
+        {
+          params: { isbn },
+          withCredentials: true,
+        }
+      );
       if (response.status === 200) {
         dispatch({
           type: "FOUND_BOOK",
           payload: {
             foundBook: true,
-            coverImage: response.data.coverImage,
             title: response.data.title,
+            authors: response.data.authors,
+            coverImage: response.data.coverImage,
           },
         });
       }
     }
     getImage();
   }, [isbn]);
+
+  const showModal = () => {
+    setShowModal(true);
+  };
+
+  const hideModal = () => {
+    setShowModal(false);
+  };
+
   return (
-    <BookContainer>
+    <BookContainer onClick={showModal}>
+      {bookState.foundBook && show && (
+        <BookModal
+          title={bookState.title}
+          authors={bookState.authors}
+          handleClose={hideModal}
+        />
+      )}
       {bookState.foundBook && (
         <img
           src={bookState.coverImage}
@@ -62,8 +86,12 @@ export default React.memo(Book);
 
 const BookContainer = styled.div`
   width: 120px;
-  height: 150px;
+  height: 160px;
   margin-top: 20px;
   margin-left: 25px;
-  background-color: blue;
+  // background-color: blue;
+
+  &:hover {
+    cursor: pointer;
+  }
 `;

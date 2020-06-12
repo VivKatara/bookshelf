@@ -101,12 +101,12 @@ router.get("/getTotalPages", authenticateToken, async (req, res) => {
   return res.status(200).json({ totalPages });
 });
 
-router.get("/getCover", authenticateToken, async (req, res) => {
+router.get("/getBookDetails", authenticateToken, async (req, res) => {
   const isbn = req.query.isbn;
   const book = await Book.findOne({ isbn });
   if (book) {
-    const { title, coverImage } = book;
-    return res.status(200).json({ coverImage, title });
+    const { title, authors, coverImage } = book;
+    return res.status(200).json({ title, authors, coverImage });
   } else {
     return res.status(400).json({ msg: "Book not found", success: false });
   }
