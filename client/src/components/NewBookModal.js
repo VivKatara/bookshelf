@@ -1,10 +1,70 @@
-import React from "react";
+import React, { useState, useReducer, useEffect } from "react";
+import axios from "axios";
 import styled from "@emotion/styled";
 import { MainModal } from "./AddBookModal";
 import Book from "./Book";
 
+const initialState = {
+  shelf: "",
+};
+
+const reducer = (state, action) => {
+  switch (action.type) {
+    case "UPDATE_SHELF":
+      return {
+        ...state,
+        shelf: action.payload,
+      };
+    default:
+      return state;
+  }
+};
+
 function NewBookModal(props) {
-  const { title, authors, description } = props;
+  const { title, authors, description, isbn, shelf } = props;
+  const [initialDisplayState, setInitialDisplayState] = useState(false);
+  const [currentDisplayState, setCurrentDisplayState] = useState(false);
+  const [shelfState, dispatch] = useReducer(reducer, initialState);
+
+  useEffect(() => {
+    async function getDisplay() {
+      const response = await axios.get(
+        "http://localhost:5000/book/getBookDisplay",
+        {
+          params: { isbn, shelf },
+          withCredentials: true,
+        }
+      );
+      const responseDisplay = response.data.display;
+      // This means that the responseDisplay was true and initialState should be set to true;
+      if (responseDisplay !== initialDisplayState) {
+        setInitialDisplayState(responseDisplay);
+        setCurrentDisplayState(responseDisplay);
+      }
+    }
+    getDisplay();
+    dispatch({ type: "UPDATE_SHELF", payload: shelf });
+  }, []);
+
+  const handleCheckChange = (event) => {
+    setCurrentDisplayState(event.target.checked);
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    console.log("Submitting");
+    // if (currentDisplayState !== initialDisplayState) {
+    //   const desiredDisplay = currentDisplayState;
+    //   const response = await axios.post(
+    //     "http://localhost:5000/book/changeBookDisplay",
+    //     { isbn, shelf, desiredDisplay },
+    //     { withCredentials: true }
+    //   );
+    // }
+
+    // Now to handle the form
+  };
+
   return (
     <MainModal>
       <BookDescription>
@@ -21,13 +81,20 @@ function NewBookModal(props) {
           <Value>{description}</Value>
         </BookDescriptionDiv>
       </BookDescription>
-      <BookSettingsForm>
+      <BookSettingsForm onSubmit={handleSubmit}>
         <FormDiv>
           <SettingsLabel>Shelf Settings</SettingsLabel>
         </FormDiv>
         <FormDiv>
           <Label>Shelf:</Label>
-          <Select id="shelf" name="shelf">
+          <Select
+            id="shelf"
+            name="shelf"
+            value={shelfState.shelf}
+            onChange={(e) =>
+              dispatch({ type: "UPDATE_SHELF", payload: e.target.value })
+            }
+          >
             <option value="currentBooks">Currently Reading</option>
             <option value="pastBooks">Have Read</option>
             <option value="futureBooks">Want to Read</option>
@@ -36,7 +103,11 @@ function NewBookModal(props) {
         </FormDiv>
         <FormDiv>
           <Label>Display on homepage:</Label>
-          <Checkbox type="checkbox"></Checkbox>
+          <Checkbox
+            type="checkbox"
+            checked={currentDisplayState}
+            onChange={handleCheckChange}
+          ></Checkbox>
         </FormDiv>
         <FormDiv>
           <SaveChangesButton type="Submit">Save Changes</SaveChangesButton>

@@ -184,9 +184,39 @@ router.post("/changeBookDisplay", authenticateToken, async (req, res) => {
       .status(200)
       .json({ msg: "Successfully changed display", success: true });
   }
-
   // Other possibilities are that it's a genuinely good ture display (count less than 6)
   // Or a genuine false display (count greater than -)
+});
+
+router.delete("/deleteFromShelf", authenticateToken, async (req, res) => {
+  const email = req.user.email;
+  const { isbn, shelf } = req.body;
+
+  const userBooks = await UserBooks.findOne({ email });
+  const desiredShelf = userBooks[shelf];
+  const desiredShelfCount = `${shelf}Count`;
+
+  const newShelf = desiredShelf.filter((book) => {
+    if (book.isbn !== isbn) {
+      return book;
+    }
+  });
+
+  // Is this the best way to check this? Or does the delete HTTP Method have a better way to check?
+  if (newShelf.length === desiredShelf.length) {
+    return res.status(404).json({
+      msg: "This book has already been removed from this shelf",
+      success: false,
+    });
+  }
+
+  await UserBooks.updateOne(
+    { email },
+    { $set: { [shelf]: newShelf }, $inc: { [desiredShelfCount]: -1 } }
+  );
+  return res
+    .status(200)
+    .json({ msg: "Successfully removed book from shelf", success: true });
 });
 
 module.exports = router;

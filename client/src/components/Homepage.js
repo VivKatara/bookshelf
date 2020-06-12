@@ -128,6 +128,8 @@ function Homepage(props) {
       )}
       {showBookModal && (
         <NewBookModal
+          shelf="pastBooks"
+          isbn="9781524763152"
           title="Becoming"
           authors={["Michelle Obama"]}
           description="Becoming is the memoir of former United States first lady Michelle Obama published in 2018. Described by the author as a deeply personal experience, the book talks about her roots and how she found her voice, as well as her time in the White House, her public health campaign, and her role as a mother."
