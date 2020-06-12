@@ -195,10 +195,15 @@ router.delete("/deleteFromShelf", authenticateToken, async (req, res) => {
   const userBooks = await UserBooks.findOne({ email });
   const desiredShelf = userBooks[shelf];
   const desiredShelfCount = `${shelf}Count`;
+  const desiredShelfDisplayCount = `${shelf}DisplayCount`;
+
+  let displayIncrement = 0;
 
   const newShelf = desiredShelf.filter((book) => {
     if (book.isbn !== isbn) {
       return book;
+    } else {
+      if (book.display === true) displayIncrement = -1;
     }
   });
 
@@ -212,11 +217,69 @@ router.delete("/deleteFromShelf", authenticateToken, async (req, res) => {
 
   await UserBooks.updateOne(
     { email },
-    { $set: { [shelf]: newShelf }, $inc: { [desiredShelfCount]: -1 } }
+    {
+      $set: { [shelf]: newShelf },
+      $inc: {
+        [desiredShelfCount]: -1,
+        [desiredShelfDisplayCount]: displayIncrement,
+      },
+    }
   );
   return res
     .status(200)
     .json({ msg: "Successfully removed book from shelf", success: true });
+});
+
+router.get("/addBookToNewShelf", authenticateToken, async (req, res) => {
+  const email = req.user.email;
+  const { isbn, shelf, displayState } = req.query;
+
+  const userBooks = await UserBooks.findOne({ email });
+  const desiredShelfCount = `${shelf}Count`;
+  const desiredShelfDisplayCount = `${shelf}DisplayCount`;
+
+  const currentDisplayItems = userBooks[desiredShelfDisplayCount];
+
+  if (displayState && currentDisplayItems < 6) {
+    await UserBooks.updateOne(
+      { email },
+      {
+        $push: { [shelf]: { isbn: isbn, display: true } },
+        $inc: { [desiredShelfCount]: 1, [desiredShelfDisplayCount]: 1 },
+      }
+    );
+    return res
+      .status(200)
+      .json({
+        msg:
+          "Successfully added book to new shelf and set the book to be displayed",
+        success: true,
+      });
+  } else if (displayState && currentDisplayItems === 6) {
+    await UserBooks.updateOne(
+      { email },
+      {
+        $push: { [shelf]: { isbn: isbn, display: false } },
+        $inc: { [desiredShelfCount]: 1 },
+      }
+    );
+    return res.status(200).json({
+      msg:
+        "Successfully added book to new shelf, but your display shelf is full",
+      success: true,
+    });
+  } else {
+    await UserBooks.updateOne(
+      { email },
+      {
+        $push: { [shelf]: { isbn: isbn, display: false } },
+        $inc: { [desiredShelfCount]: 1 },
+      }
+    );
+    return res
+      .status(200)
+      .json({ msg: "Successfully added book to new shelf", success: true });
+  }
 });
 
 module.exports = router;

@@ -53,6 +53,28 @@ function NewBookModal(props) {
   const handleSubmit = async (event) => {
     event.preventDefault();
     console.log("Submitting");
+    // Changing the displayState on the current shelf
+    if (currentDisplayState !== initialDisplayState) {
+      const desiredDisplay = currentDisplayState;
+      const response = await axios.post(
+        "http://localhost:5000/book/changebookDisplay",
+        { isbn, shelf, desiredDisplay },
+        { withCredentials: true }
+      );
+      setInitialDisplayState(currentDisplayState);
+    }
+
+    // Wanting to change shelves
+    if (shelfState.shelf !== shelf) {
+      const response = await axios.delete(
+        "http://localhost:5000/book/deleteFromShelf",
+        { isbn, shelf },
+        { withCredentials: true }
+      );
+    }
+
+    console.log(shelf);
+    console.log(shelfState.shelf);
     // if (currentDisplayState !== initialDisplayState) {
     //   const desiredDisplay = currentDisplayState;
     //   const response = await axios.post(
@@ -64,6 +86,7 @@ function NewBookModal(props) {
 
     // Now to handle the form
   };
+  console.log("In the new modal");
 
   return (
     <MainModal>
@@ -146,7 +169,7 @@ export const Value = styled.p`
   // background-color: green;
 `;
 
-export const BookSettingsForm = styled.div`
+export const BookSettingsForm = styled.form`
   display: flex;
   flex-direction: column;
 `;
