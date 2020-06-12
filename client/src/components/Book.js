@@ -25,7 +25,7 @@ const reducer = (state, action) => {
 };
 
 function Book(props) {
-  const { isbn, shelf } = props;
+  const { isbn } = props;
   const [bookState, dispatch] = useReducer(reducer, initialState);
   const [show, setShowModal] = useState(false);
   const buttonRef = useRef(null);
@@ -76,7 +76,6 @@ function Book(props) {
       </BookContainer>
       {show && (
         <NewBookModal
-          shelf={shelf}
           isbn={isbn}
           title={bookState.title}
           authors={bookState.authors}

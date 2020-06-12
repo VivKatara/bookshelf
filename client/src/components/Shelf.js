@@ -7,9 +7,7 @@ export const ShelfContext = React.createContext();
 
 function Shelf(props) {
   const { isbns, shelf, children } = props;
-  const books = isbns.map((isbn) => (
-    <Book key={isbn} isbn={isbn} shelf={shelf} />
-  ));
+  const books = isbns.map((isbn) => <Book key={isbn} isbn={isbn} />);
 
   return (
     <ShelfContainer>

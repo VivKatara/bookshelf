@@ -1,8 +1,9 @@
-import React, { useState, useReducer, useEffect } from "react";
+import React, { useState, useReducer, useEffect, useContext } from "react";
+import { useOutsideClick } from "../hooks/useOutsideClick";
 import axios from "axios";
 import styled from "@emotion/styled";
 import { MainModal } from "./AddBookModal";
-import Book from "./Book";
+import { ShelfContext } from "./Shelf";
 
 const initialState = {
   shelf: "",
@@ -21,13 +22,12 @@ const reducer = (state, action) => {
 };
 
 function NewBookModal(props) {
-  const { title, authors, description, isbn, shelf, handleClose } = props;
+  const { title, authors, description, isbn, handleClose } = props;
   const [initialDisplayState, setInitialDisplayState] = useState(false);
   const [currentDisplayState, setCurrentDisplayState] = useState(false);
   const [shelfState, dispatch] = useReducer(reducer, initialState);
 
-  console.log("In modal");
-  console.log(title, authors, isbn, shelf);
+  const shelf = useContext(ShelfContext);
 
   useEffect(() => {
     async function getDisplay() {
