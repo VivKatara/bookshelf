@@ -134,4 +134,59 @@ router.get("/getBookDisplay", authenticateToken, async (req, res) => {
   return res.status(200).json({ display: desiredBook.display, success: true });
 });
 
+router.post("/changeBookDisplay", authenticateToken, async (req, res) => {
+  const email = req.user.email;
+  const { isbn, shelf, desiredDisplay } = req.body;
+  const userBooks = await UserBooks.findOne({ email });
+  const displayKey = `${shelf}DisplayCount`;
+
+  if (!userBooks) {
+    return res
+      .status(400)
+      .json({ msg: "Something unexpected occurred", success: false });
+  }
+
+  const desiredShelf = userBooks[shelf];
+  const displayCount = userBooks[displayKey];
+  if (desiredDisplay && displayCount >= 6) {
+    return res.status(401).json({
+      msg:
+        "There are already 6 books on your main display. Please take one off before updating this book",
+      success: false,
+    });
+  } else if (!desiredDisplay && displayCount <= 0) {
+    return res.status(400).json({
+      msg:
+        "There are no books to take away from the main shelf! This won't work",
+      success: false,
+    });
+  } else {
+    const newDesiredBooks = desiredShelf.map((book) => {
+      if (book.isbn === isbn) {
+        book.display = desiredDisplay;
+      }
+      return book;
+    });
+    let incrementCount = 0;
+    if (desiredDisplay) {
+      incrementCount = 1;
+    } else {
+      incrementCount = -1;
+    }
+    await UserBooks.updateOne(
+      { email },
+      {
+        $set: { [shelf]: newDesiredBooks },
+        $inc: { [displayKey]: incrementCount },
+      }
+    );
+    return res
+      .status(200)
+      .json({ msg: "Successfully changed display", success: true });
+  }
+
+  // Other possibilities are that it's a genuinely good ture display (count less than 6)
+  // Or a genuine false display (count greater than -)
+});
+
 module.exports = router;
