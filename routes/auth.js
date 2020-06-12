@@ -179,9 +179,9 @@ router.get("/token", (req, res) => {
 });
 
 // Logout - do we get rid of all browser cookies, and all session data? Must this be checked?
-router.delete("/logout", (req, res) => {
+router.delete("/logout", async (req, res) => {
   const refreshToken = req.cookies["refreshToken"];
-  Token.remove({ refreshToken });
+  await Token.deleteOne({ refreshToken });
   res.clearCookie("accessToken");
   res.clearCookie("refreshToken");
   req.logout(); // Is this needed? Check Passport documentation
