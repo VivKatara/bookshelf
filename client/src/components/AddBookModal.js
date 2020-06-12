@@ -32,7 +32,7 @@ const reducer = (state, action) => {
 };
 
 function AddBookModal(props) {
-  const { show, buttonRef, handleClose, shelfUpdate, shelf } = props;
+  const { buttonRef, handleClose, shelfUpdate, shelf } = props;
   const [shelfTitle, setShelfTitle] = useState("");
   const [newBookState, dispatch] = useReducer(reducer, initialState);
   const modalRef = useRef(null);
@@ -82,65 +82,63 @@ function AddBookModal(props) {
   );
 
   return (
-    show && (
-      <MainModal ref={modalRef}>
-        <CloseButton onClick={handleClose}>X</CloseButton>
-        <Form onSubmit={handleSubmit}>
-          <FormDiv>
-            <h3>Add a Book to one of your Shelves</h3>
-          </FormDiv>
-          <FormDiv>
-            <label>Title</label>
-            <Input
-              type="text"
-              name="title"
-              id="title"
-              value={newBookState.title}
-              onChange={(e) =>
-                dispatch({ type: "UPDATE_TITLE", payload: e.target.value })
-              }
-            />
-          </FormDiv>
-          <FormDiv>
-            <label>Author</label>
-            <Input
-              type="text"
-              name="author"
-              id="author"
-              value={newBookState.author}
-              onChange={(e) =>
-                dispatch({ type: "UPDATE_AUTHOR", payload: e.target.value })
-              }
-            />
-          </FormDiv>
-          <FormDiv>
-            <label>Shelf</label>
-            <Select
-              id="shelf"
-              name="shelf"
-              value={newBookState.shelf}
-              onChange={(e) =>
-                dispatch({ type: "UPDATE_SHELF", payload: e.target.value })
-              }
-            >
-              {shelfOptions}
-              {/* <option value="currentBooks">Currently Reading</option>
+    <MainModal ref={modalRef}>
+      <CloseButton onClick={handleClose}>X</CloseButton>
+      <Form onSubmit={handleSubmit}>
+        <FormDiv>
+          <h3>Add a Book to one of your Shelves</h3>
+        </FormDiv>
+        <FormDiv>
+          <label>Title</label>
+          <Input
+            type="text"
+            name="title"
+            id="title"
+            value={newBookState.title}
+            onChange={(e) =>
+              dispatch({ type: "UPDATE_TITLE", payload: e.target.value })
+            }
+          />
+        </FormDiv>
+        <FormDiv>
+          <label>Author</label>
+          <Input
+            type="text"
+            name="author"
+            id="author"
+            value={newBookState.author}
+            onChange={(e) =>
+              dispatch({ type: "UPDATE_AUTHOR", payload: e.target.value })
+            }
+          />
+        </FormDiv>
+        <FormDiv>
+          <label>Shelf</label>
+          <Select
+            id="shelf"
+            name="shelf"
+            value={newBookState.shelf}
+            onChange={(e) =>
+              dispatch({ type: "UPDATE_SHELF", payload: e.target.value })
+            }
+          >
+            {shelfOptions}
+            {/* <option value="currentBooks">Currently Reading</option>
               <option value="pastBooks">Have Read</option>
               <option value="futureBooks">Want to Read</option> */}
-            </Select>
-          </FormDiv>
-          <FormDiv>
-            <SubmitButton type="Submit">Add</SubmitButton>
-          </FormDiv>
-        </Form>
-      </MainModal>
-    )
+          </Select>
+        </FormDiv>
+        <FormDiv>
+          <SubmitButton type="Submit">Add</SubmitButton>
+        </FormDiv>
+      </Form>
+    </MainModal>
   );
 }
 
 export default AddBookModal;
 
-const MainModal = styled.div`
+export const MainModal = styled.div`
   position: fixed;
   background-color: #333333;
   min-width: 50%;

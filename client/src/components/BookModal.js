@@ -40,7 +40,7 @@ function BookModal(props) {
 
   const handleCheckClick = async (event) => {
     const desiredDisplay = event.target.checked;
-    setCheckState(desiredDisplay);
+
     const response = await axios.post(
       "http://localhost:5000/book/changeBookDisplay",
       { isbn, shelf, desiredDisplay },
