@@ -190,7 +190,7 @@ router.post("/changeBookDisplay", authenticateToken, async (req, res) => {
 
 router.delete("/deleteFromShelf", authenticateToken, async (req, res) => {
   const email = req.user.email;
-  const { isbn, shelf } = req.body;
+  const { isbn, shelf } = req.query;
 
   const userBooks = await UserBooks.findOne({ email });
   const desiredShelf = userBooks[shelf];
@@ -207,7 +207,7 @@ router.delete("/deleteFromShelf", authenticateToken, async (req, res) => {
     }
   });
 
-  // Is this the best way to check this? Or does the delete HTTP Method have a better way to check?
+  // // Is this the best way to check this? Or does the delete HTTP Method have a better way to check?
   if (newShelf.length === desiredShelf.length) {
     return res.status(404).json({
       msg: "This book has already been removed from this shelf",
@@ -230,15 +230,17 @@ router.delete("/deleteFromShelf", authenticateToken, async (req, res) => {
     .json({ msg: "Successfully removed book from shelf", success: true });
 });
 
-router.get("/addBookToNewShelf", authenticateToken, async (req, res) => {
+router.post("/addBookToNewShelf", authenticateToken, async (req, res) => {
   const email = req.user.email;
-  const { isbn, shelf, displayState } = req.query;
+  const { isbn, shelf, displayState } = req.body;
 
   const userBooks = await UserBooks.findOne({ email });
   const desiredShelfCount = `${shelf}Count`;
   const desiredShelfDisplayCount = `${shelf}DisplayCount`;
 
   const currentDisplayItems = userBooks[desiredShelfDisplayCount];
+
+  console.log(displayState);
 
   if (displayState && currentDisplayItems < 6) {
     await UserBooks.updateOne(
