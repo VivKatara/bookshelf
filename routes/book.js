@@ -248,13 +248,11 @@ router.get("/addBookToNewShelf", authenticateToken, async (req, res) => {
         $inc: { [desiredShelfCount]: 1, [desiredShelfDisplayCount]: 1 },
       }
     );
-    return res
-      .status(200)
-      .json({
-        msg:
-          "Successfully added book to new shelf and set the book to be displayed",
-        success: true,
-      });
+    return res.status(200).json({
+      msg:
+        "Successfully added book to new shelf and set the book to be displayed",
+      success: true,
+    });
   } else if (displayState && currentDisplayItems === 6) {
     await UserBooks.updateOne(
       { email },

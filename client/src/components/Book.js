@@ -1,7 +1,7 @@
 import React, { useState, useReducer, useEffect, useRef } from "react";
 import axios from "axios";
 import styled from "@emotion/styled";
-import BookModal from "./BookModal";
+import NewBookModal from "./NewBookModal";
 
 const initialState = {
   foundBook: false,
@@ -25,7 +25,7 @@ const reducer = (state, action) => {
 };
 
 function Book(props) {
-  const { isbn } = props;
+  const { isbn, shelf } = props;
   const [bookState, dispatch] = useReducer(reducer, initialState);
   const [show, setShowModal] = useState(false);
   const buttonRef = useRef(null);
@@ -63,25 +63,28 @@ function Book(props) {
   };
 
   return (
-    <BookContainer ref={buttonRef} onClick={showModal}>
-      {bookState.foundBook && show && (
-        <BookModal
+    <>
+      <BookContainer ref={buttonRef} onClick={showModal}>
+        {bookState.foundBook && (
+          <img
+            src={bookState.coverImage}
+            alt={bookState.title}
+            width="120"
+            height="160"
+          ></img>
+        )}
+      </BookContainer>
+      {show && (
+        <NewBookModal
+          shelf={shelf}
+          isbn={isbn}
           title={bookState.title}
           authors={bookState.authors}
-          isbn={isbn}
-          buttonRef={buttonRef}
+          description="Description is yet to come"
           handleClose={hideModal}
         />
       )}
-      {bookState.foundBook && (
-        <img
-          src={bookState.coverImage}
-          alt={bookState.title}
-          width="120"
-          height="160"
-        ></img>
-      )}
-    </BookContainer>
+    </>
   );
 }
 

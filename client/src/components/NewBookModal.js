@@ -21,10 +21,13 @@ const reducer = (state, action) => {
 };
 
 function NewBookModal(props) {
-  const { title, authors, description, isbn, shelf } = props;
+  const { title, authors, description, isbn, shelf, handleClose } = props;
   const [initialDisplayState, setInitialDisplayState] = useState(false);
   const [currentDisplayState, setCurrentDisplayState] = useState(false);
   const [shelfState, dispatch] = useReducer(reducer, initialState);
+
+  console.log("In modal");
+  console.log(title, authors, isbn, shelf);
 
   useEffect(() => {
     async function getDisplay() {
@@ -52,7 +55,6 @@ function NewBookModal(props) {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log("Submitting");
     // Changing the displayState on the current shelf
     if (currentDisplayState !== initialDisplayState) {
       const desiredDisplay = currentDisplayState;
@@ -64,7 +66,7 @@ function NewBookModal(props) {
       setInitialDisplayState(currentDisplayState);
     }
 
-    // Wanting to change shelves
+    // Wanting to change shelves or delete book
     if (shelfState.shelf !== shelf) {
       const response = await axios.delete(
         "http://localhost:5000/book/deleteFromShelf",
@@ -72,24 +74,22 @@ function NewBookModal(props) {
         { withCredentials: true }
       );
     }
-
-    console.log(shelf);
-    console.log(shelfState.shelf);
-    // if (currentDisplayState !== initialDisplayState) {
-    //   const desiredDisplay = currentDisplayState;
-    //   const response = await axios.post(
-    //     "http://localhost:5000/book/changeBookDisplay",
-    //     { isbn, shelf, desiredDisplay },
-    //     { withCredentials: true }
-    //   );
-    // }
-
-    // Now to handle the form
+    // Not a pure delete, but rather a shelf change. shelfState.shelf will have the new shelf.
+    // How to take care of the display?
+    if (shelfState.shelf !== "None") {
+      const response = await axios.post(
+        "http://localhost:5000/book/addBookToNewShelf",
+        {
+          params: { isbn, shelf, displayState: currentDisplayState },
+          withCredentials: true,
+        }
+      );
+    }
   };
-  console.log("In the new modal");
 
   return (
     <MainModal>
+      <CloseButton onClick={() => handleClose()}>X</CloseButton>
       <BookDescription>
         <BookDescriptionDiv>
           <Label>Title:</Label>
@@ -216,4 +216,19 @@ export const SaveChangesButton = styled.button`
   border-radius: 10px;
   background-color: #287bf8;
   color: white;
+`;
+
+const CloseButton = styled.button`
+  position: fixed;
+  width: 5%;
+  margin-top: 5px;
+  margin-left: 95%;
+  border: none;
+  outline: none;
+  color: white;
+  background-color: #333333;
+  &:hover {
+    cursor: pointer;
+    color: #287bf8;
+  }
 `;

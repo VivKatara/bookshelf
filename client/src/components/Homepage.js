@@ -5,7 +5,6 @@ import { connect } from "react-redux";
 import styled from "@emotion/styled";
 import Shelf from "./Shelf";
 import AddBookModal from "./AddBookModal";
-import NewBookModal from "./NewBookModal";
 
 const initialState = {
   currentIsbns: [],
@@ -37,7 +36,6 @@ const reducer = (state, action) => {
 
 function Homepage(props) {
   const [show, setModal] = useState(false);
-  const [showBookModal, setBookModal] = useState(true);
   const [isbnState, dispatch] = useReducer(reducer, initialState);
   const [currentUpdates, setCurrentUpdates] = useState(0);
   const [pastUpdates, setPastUpdates] = useState(0);
@@ -124,15 +122,6 @@ function Homepage(props) {
           buttonRef={buttonRef}
           handleClose={changeModal}
           shelfUpdate={handleShelfUpdate}
-        />
-      )}
-      {showBookModal && (
-        <NewBookModal
-          shelf="pastBooks"
-          isbn="9781524763152"
-          title="Becoming"
-          authors={["Michelle Obama"]}
-          description="Becoming is the memoir of former United States first lady Michelle Obama published in 2018. Described by the author as a deeply personal experience, the book talks about her roots and how she found her voice, as well as her time in the White House, her public health campaign, and her role as a mother."
         />
       )}
       <Add ref={buttonRef} onClick={changeModal}>
