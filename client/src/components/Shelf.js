@@ -3,15 +3,19 @@ import axios from "axios";
 import styled from "@emotion/styled";
 import Book from "./Book";
 
+export const ShelfContext = React.createContext();
+
 function Shelf(props) {
-  const { isbns, children } = props;
+  const { isbns, shelf, children } = props;
   const books = isbns.map((isbn) => <Book key={isbn} isbn={isbn} />);
 
   return (
     <ShelfContainer>
       <ShelfItems>
-        {books}
-        {children}
+        <ShelfContext.Provider value={shelf}>
+          {books}
+          {children}
+        </ShelfContext.Provider>
       </ShelfItems>
     </ShelfContainer>
   );

@@ -112,4 +112,26 @@ router.get("/getBookDetails", authenticateToken, async (req, res) => {
   }
 });
 
+router.get("/getBookDisplay", authenticateToken, async (req, res) => {
+  const email = req.user.email;
+  const { shelf, isbn } = req.query;
+
+  const userBooks = await UserBooks.findOne({ email });
+  if (!userBooks) {
+    return res
+      .status(400)
+      .json({ msg: "Something unexpected occurred", success: false });
+  }
+  const desiredShelf = userBooks[shelf];
+  const desiredBooks = desiredShelf.filter((book) => book.isbn === isbn);
+  if (!desiredBooks.length) {
+    return res.status(400).json({
+      msg: "Could not find book. Something unexpected occurred",
+      success: false,
+    });
+  }
+  const desiredBook = desiredBooks[0];
+  return res.status(200).json({ display: desiredBook.display, success: true });
+});
+
 module.exports = router;

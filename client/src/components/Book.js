@@ -68,6 +68,7 @@ function Book(props) {
         <BookModal
           title={bookState.title}
           authors={bookState.authors}
+          isbn={isbn}
           buttonRef={buttonRef}
           handleClose={hideModal}
         />

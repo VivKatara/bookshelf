@@ -172,19 +172,19 @@ function FullShelf(props) {
       )}
       <Add onClick={showModal}>Add Book to Shelf</Add>
       <Title>{pageState.shelfTitle}</Title>
-      <Shelf isbns={shelfState.firstShelfIsbn} />
+      <Shelf isbns={shelfState.firstShelfIsbn} shelf={shelf} />
       {pageState.showPrevious && (
         <PreviousButton href={`${props.match.url}?page=${page - 1}`}>
           Previous
         </PreviousButton>
       )}
-      <Shelf isbns={shelfState.secondShelfIsbn} />
+      <Shelf isbns={shelfState.secondShelfIsbn} shelf={shelf} />
       {pageState.showNext && (
         <NextButton href={`${props.match.url}?page=${page + 1}`}>
           Next
         </NextButton>
       )}
-      <Shelf isbns={shelfState.thirdShelfIsbn} />
+      <Shelf isbns={shelfState.thirdShelfIsbn} shelf={shelf} />
     </MainContainer>
   );
 }

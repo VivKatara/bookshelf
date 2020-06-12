@@ -1,11 +1,16 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import { useOutsideClick } from "../hooks/useOutsideClick";
+import axios from "axios";
 import styled from "@emotion/styled";
+import { ShelfContext } from "./Shelf";
 
 function BookModal(props) {
-  const { title, authors, buttonRef, handleClose } = props;
+  const { title, authors, isbn, buttonRef, handleClose } = props;
   const [displayAuthors, setDisplayAuthors] = useState("");
   const modalRef = useRef(null);
+  const [checkState, setCheckState] = useState(false);
+
+  const shelf = useContext(ShelfContext);
 
   useOutsideClick(modalRef, buttonRef, handleClose);
 
@@ -18,10 +23,37 @@ function BookModal(props) {
     }
   }, [authors]);
 
+  useEffect(() => {
+    async function getDisplay() {
+      const response = await axios.get(
+        "http://localhost:5000/book/getBookDisplay",
+        {
+          params: { isbn, shelf },
+          withCredentials: true,
+        }
+      );
+      const responseDisplay = response.data.display;
+      if (responseDisplay !== checkState) setCheckState(responseDisplay);
+    }
+    getDisplay();
+  }, []);
+
+  const handleCheckClick = (event) => {
+    setCheckState(event.target.checked);
+  };
+
   return (
     <ModalContainer ref={modalRef}>
       <p>Title: {title}</p>
       <p>Authors: {displayAuthors}</p>
+      <p>
+        Home Display
+        <input
+          type="checkbox"
+          checked={checkState}
+          onChange={handleCheckClick}
+        />{" "}
+      </p>
     </ModalContainer>
   );
 }

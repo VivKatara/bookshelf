@@ -129,19 +129,19 @@ function Homepage(props) {
         Add Book to Shelf
       </Add>
       <CurrentTitle>Currently Reading</CurrentTitle>
-      <Shelf isbns={isbnState.currentIsbns}>
+      <Shelf isbns={isbnState.currentIsbns} shelf="currentBooks">
         <Links>
           <SeeAll href="/shelf/current?page=1">See All</SeeAll>
         </Links>
       </Shelf>
       <PastTitle>Have Read</PastTitle>
-      <Shelf isbns={isbnState.pastIsbns}>
+      <Shelf isbns={isbnState.pastIsbns} shelf="pastBooks">
         <Links>
           <SeeAll href="/shelf/past?page=1">See All</SeeAll>
         </Links>
       </Shelf>
       <FutureTitle>Want to Read</FutureTitle>
-      <Shelf isbns={isbnState.futureIsbns}>
+      <Shelf isbns={isbnState.futureIsbns} shelf="futureBooks">
         <Links>
           <SeeAll href="/shelf/future?page=1">See All</SeeAll>
         </Links>
