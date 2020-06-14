@@ -25,7 +25,7 @@ const reducer = (state, action) => {
 };
 
 function Book(props) {
-  const { isbn } = props;
+  const { isbn, handleModalUpdate } = props;
   const [bookState, dispatch] = useReducer(reducer, initialState);
   const [show, setShowModal] = useState(false);
   const buttonRef = useRef(null);
@@ -78,6 +78,7 @@ function Book(props) {
           description="Description is yet to come"
           handleClose={changeModal}
           buttonRef={buttonRef}
+          handleModalUpdate={handleModalUpdate}
         />
       )}
     </>

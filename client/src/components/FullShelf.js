@@ -69,6 +69,8 @@ function FullShelf(props) {
   // Stae to maintain the displayed page size. Can maneuver it based on the size of viewport
   const [pageSize, setPageSize] = useState(21);
 
+  const [bookModalUpdates, setBookModalUpdates] = useState(0);
+
   const showModal = () => {
     setModal(true);
   };
@@ -79,6 +81,10 @@ function FullShelf(props) {
 
   const handleShelfUpdate = (shelf) => {
     setShelfUpdates((prev) => prev + 1);
+  };
+
+  const triggerBookModalUpdate = () => {
+    setBookModalUpdates((prev) => prev + 1);
   };
 
   // This is the effect that updates various pageState such as the total page count and whether or not to show certain buttons
@@ -127,7 +133,7 @@ function FullShelf(props) {
       pageDispatch(action);
     }
     pageMount();
-  }, [shelfUpdates]);
+  }, [shelfUpdates, bookModalUpdates]);
 
   // This is the effect that tracks which isbn numbers should be passed down to the shelves
   useEffect(() => {
@@ -153,7 +159,7 @@ function FullShelf(props) {
       isbnDispatch(action);
     }
     getIsbns();
-  }, [shelfUpdates]);
+  }, [shelfUpdates, bookModalUpdates]);
 
   return (
     <MainContainer>
@@ -172,19 +178,31 @@ function FullShelf(props) {
       )}
       <Add onClick={showModal}>Add Book to Shelf</Add>
       <Title>{pageState.shelfTitle}</Title>
-      <Shelf isbns={shelfState.firstShelfIsbn} shelf={shelf} />
+      <Shelf
+        isbns={shelfState.firstShelfIsbn}
+        shelf={shelf}
+        handleModalUpdate={triggerBookModalUpdate}
+      />
       {pageState.showPrevious && (
         <PreviousButton href={`${props.match.url}?page=${page - 1}`}>
           Previous
         </PreviousButton>
       )}
-      <Shelf isbns={shelfState.secondShelfIsbn} shelf={shelf} />
+      <Shelf
+        isbns={shelfState.secondShelfIsbn}
+        shelf={shelf}
+        handleModalUpdate={triggerBookModalUpdate}
+      />
       {pageState.showNext && (
         <NextButton href={`${props.match.url}?page=${page + 1}`}>
           Next
         </NextButton>
       )}
-      <Shelf isbns={shelfState.thirdShelfIsbn} shelf={shelf} />
+      <Shelf
+        isbns={shelfState.thirdShelfIsbn}
+        shelf={shelf}
+        handleModalUpdate={triggerBookModalUpdate}
+      />
     </MainContainer>
   );
 }

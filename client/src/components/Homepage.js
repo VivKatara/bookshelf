@@ -41,6 +41,7 @@ function Homepage(props) {
   const [pastUpdates, setPastUpdates] = useState(0);
   const [futureUpdates, setFutureUpdates] = useState(0);
   const buttonRef = useRef(null);
+  const [bookModalUpdates, setBookModalUpdates] = useState(0);
 
   useEffect(() => {
     async function getCurrentBookIsbns() {
@@ -59,7 +60,7 @@ function Homepage(props) {
       }
     }
     getCurrentBookIsbns();
-  }, [currentUpdates]);
+  }, [currentUpdates, bookModalUpdates]);
 
   useEffect(() => {
     async function getPastBookIsbns() {
@@ -78,7 +79,7 @@ function Homepage(props) {
       }
     }
     getPastBookIsbns();
-  }, [pastUpdates]);
+  }, [pastUpdates, bookModalUpdates]);
 
   useEffect(() => {
     async function getFutureBookIsbns() {
@@ -97,10 +98,14 @@ function Homepage(props) {
       }
     }
     getFutureBookIsbns();
-  }, [futureUpdates]);
+  }, [futureUpdates, bookModalUpdates]);
 
   const changeModal = () => {
     setModal((prev) => !prev);
+  };
+
+  const triggerBookModalUpdate = () => {
+    setBookModalUpdates((prev) => prev + 1);
   };
 
   const handleShelfUpdate = (shelf) => {
@@ -128,19 +133,31 @@ function Homepage(props) {
         Add Book to Shelf
       </Add>
       <CurrentTitle>Currently Reading</CurrentTitle>
-      <Shelf isbns={isbnState.currentIsbns} shelf="currentBooks">
+      <Shelf
+        isbns={isbnState.currentIsbns}
+        shelf="currentBooks"
+        handleModalUpdate={triggerBookModalUpdate}
+      >
         <Links>
           <SeeAll href="/shelf/current?page=1">See All</SeeAll>
         </Links>
       </Shelf>
       <PastTitle>Have Read</PastTitle>
-      <Shelf isbns={isbnState.pastIsbns} shelf="pastBooks">
+      <Shelf
+        isbns={isbnState.pastIsbns}
+        shelf="pastBooks"
+        handleModalUpdate={triggerBookModalUpdate}
+      >
         <Links>
           <SeeAll href="/shelf/past?page=1">See All</SeeAll>
         </Links>
       </Shelf>
       <FutureTitle>Want to Read</FutureTitle>
-      <Shelf isbns={isbnState.futureIsbns} shelf="futureBooks">
+      <Shelf
+        isbns={isbnState.futureIsbns}
+        shelf="futureBooks"
+        handleModalUpdate={triggerBookModalUpdate}
+      >
         <Links>
           <SeeAll href="/shelf/future?page=1">See All</SeeAll>
         </Links>

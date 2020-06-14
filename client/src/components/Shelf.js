@@ -6,8 +6,10 @@ import Book from "./Book";
 export const ShelfContext = React.createContext();
 
 function Shelf(props) {
-  const { isbns, shelf, children } = props;
-  const books = isbns.map((isbn) => <Book key={isbn} isbn={isbn} />);
+  const { isbns, shelf, children, handleModalUpdate } = props;
+  const books = isbns.map((isbn) => (
+    <Book key={isbn} isbn={isbn} handleModalUpdate={handleModalUpdate} />
+  ));
 
   return (
     <ShelfContainer>

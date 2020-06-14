@@ -28,7 +28,15 @@ const reducer = (state, action) => {
 };
 
 function NewBookModal(props) {
-  const { title, authors, description, isbn, handleClose, buttonRef } = props;
+  const {
+    title,
+    authors,
+    description,
+    isbn,
+    handleClose,
+    buttonRef,
+    handleModalUpdate,
+  } = props;
   const [initialDisplayState, setInitialDisplayState] = useState(false);
   const [currentDisplayState, setCurrentDisplayState] = useState(false);
   const [shelfState, dispatch] = useReducer(reducer, initialState);
@@ -63,8 +71,10 @@ function NewBookModal(props) {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    let change = false;
     // Changing the displayState on the current shelf
     if (currentDisplayState !== initialDisplayState) {
+      change = true;
       const desiredDisplay = currentDisplayState;
       const response = await axios.post(
         "http://localhost:5000/book/changebookDisplay",
@@ -76,6 +86,7 @@ function NewBookModal(props) {
 
     // If there's a shelf change, delete the book
     if (shelfState.shelf !== shelf) {
+      change = true;
       const response = await axios.delete(
         "http://localhost:5000/book/deleteFromShelf",
         { params: { isbn, shelf }, withCredentials: true }
@@ -89,6 +100,10 @@ function NewBookModal(props) {
           { withCredentials: true }
         );
       }
+    }
+
+    if (change) {
+      handleModalUpdate();
     }
 
     handleClose();
