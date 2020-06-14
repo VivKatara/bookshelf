@@ -64,6 +64,7 @@ router.get("/getDisplayBooks", authenticateToken, async (req, res) => {
   const desiredShelf = userBooks[shelf];
   const displayBooks = desiredShelf.filter((book) => {
     if (book.display) {
+      console.log(book.display);
       return book;
     }
   });
@@ -203,7 +204,9 @@ router.delete("/deleteFromShelf", authenticateToken, async (req, res) => {
     if (book.isbn !== isbn) {
       return book;
     } else {
-      if (book.display === true) displayIncrement = -1;
+      if (book.display === true) {
+        displayIncrement = -1;
+      }
     }
   });
 
@@ -239,8 +242,6 @@ router.post("/addBookToNewShelf", authenticateToken, async (req, res) => {
   const desiredShelfDisplayCount = `${shelf}DisplayCount`;
 
   const currentDisplayItems = userBooks[desiredShelfDisplayCount];
-
-  console.log(displayState);
 
   if (displayState && currentDisplayItems < 6) {
     await UserBooks.updateOne(
@@ -280,6 +281,20 @@ router.post("/addBookToNewShelf", authenticateToken, async (req, res) => {
       .status(200)
       .json({ msg: "Successfully added book to new shelf", success: true });
   }
+});
+
+router.get("/fix", async (req, res) => {
+  await UserBooks.updateOne(
+    { email: "vivek.r.katara@gmail.com" },
+    {
+      $inc: {
+        currentBooksCount: 1,
+        pastBooksCount: 2,
+        pastBooksDisplayCount: 1,
+      },
+    }
+  );
+  res.send("Success");
 });
 
 module.exports = router;

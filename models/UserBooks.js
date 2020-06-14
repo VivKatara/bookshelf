@@ -60,7 +60,7 @@ const UserBooksSchema = new Schema({
           required: true,
         },
         display: {
-          type: Number,
+          type: Boolean,
           required: true,
         },
       },

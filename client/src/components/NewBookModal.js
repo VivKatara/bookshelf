@@ -66,22 +66,23 @@ function NewBookModal(props) {
       setInitialDisplayState(currentDisplayState);
     }
 
-    // Wanting to change shelves or delete book
+    // If there's a shelf change, delete the book
     if (shelfState.shelf !== shelf) {
       const response = await axios.delete(
         "http://localhost:5000/book/deleteFromShelf",
         { params: { isbn, shelf }, withCredentials: true }
       );
+
+      // There's been a shelf change, and it's not a delete, so add the book to the new list
+      if (shelfState.shelf !== "delete") {
+        const newResponse = await axios.post(
+          "http://localhost:5000/book/addBookToNewShelf",
+          { isbn, shelf: shelfState.shelf, displayState: currentDisplayState },
+          { withCredentials: true }
+        );
+      }
     }
-    // Not a pure delete, but rather a shelf change. shelfState.shelf will have the new shelf.
-    // How to take care of the display?
-    if (shelfState.shelf !== "delete") {
-      const response = await axios.post(
-        "http://localhost:5000/book/addBookToNewShelf",
-        { isbn, shelf: shelfState.shelf, displayState: currentDisplayState },
-        { withCredentials: true }
-      );
-    }
+
     handleClose();
   };
 
