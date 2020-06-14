@@ -1,4 +1,10 @@
-import React, { useState, useReducer, useEffect, useContext } from "react";
+import React, {
+  useState,
+  useReducer,
+  useEffect,
+  useContext,
+  useRef,
+} from "react";
 import { useOutsideClick } from "../hooks/useOutsideClick";
 import axios from "axios";
 import styled from "@emotion/styled";
@@ -22,10 +28,12 @@ const reducer = (state, action) => {
 };
 
 function NewBookModal(props) {
-  const { title, authors, description, isbn, handleClose } = props;
+  const { title, authors, description, isbn, handleClose, buttonRef } = props;
   const [initialDisplayState, setInitialDisplayState] = useState(false);
   const [currentDisplayState, setCurrentDisplayState] = useState(false);
   const [shelfState, dispatch] = useReducer(reducer, initialState);
+  const modalRef = useRef(null);
+  useOutsideClick(modalRef, buttonRef, handleClose);
 
   const shelf = useContext(ShelfContext);
 
@@ -87,7 +95,7 @@ function NewBookModal(props) {
   };
 
   return (
-    <MainModal>
+    <MainModal ref={modalRef}>
       <CloseButton onClick={handleClose}>X</CloseButton>
       <BookDescription>
         <BookDescriptionDiv>

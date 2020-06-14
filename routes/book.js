@@ -64,7 +64,6 @@ router.get("/getDisplayBooks", authenticateToken, async (req, res) => {
   const desiredShelf = userBooks[shelf];
   const displayBooks = desiredShelf.filter((book) => {
     if (book.display) {
-      console.log(book.display);
       return book;
     }
   });
@@ -283,18 +282,18 @@ router.post("/addBookToNewShelf", authenticateToken, async (req, res) => {
   }
 });
 
-router.get("/fix", async (req, res) => {
-  await UserBooks.updateOne(
-    { email: "vivek.r.katara@gmail.com" },
-    {
-      $inc: {
-        currentBooksCount: 1,
-        pastBooksCount: 2,
-        pastBooksDisplayCount: 1,
-      },
-    }
-  );
-  res.send("Success");
-});
+// router.get("/fix", async (req, res) => {
+//   await UserBooks.updateOne(
+//     { email: "vivek.r.katara@gmail.com" },
+//     {
+//       $inc: {
+//         currentBooksCount: 1,
+//         pastBooksCount: 2,
+//         pastBooksDisplayCount: 1,
+//       },
+//     }
+//   );
+//   res.send("Success");
+// });
 
 module.exports = router;

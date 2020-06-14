@@ -54,17 +54,13 @@ function Book(props) {
     getImage();
   }, [isbn]);
 
-  const showModal = () => {
-    setShowModal(true);
-  };
-
-  const hideModal = () => {
-    setShowModal(false);
+  const changeModal = () => {
+    setShowModal((prev) => !prev);
   };
 
   return (
     <>
-      <BookContainer ref={buttonRef} onClick={showModal}>
+      <BookContainer ref={buttonRef} onClick={changeModal}>
         {bookState.foundBook && (
           <img
             src={bookState.coverImage}
@@ -80,7 +76,8 @@ function Book(props) {
           title={bookState.title}
           authors={bookState.authors}
           description="Description is yet to come"
-          handleClose={hideModal}
+          handleClose={changeModal}
+          buttonRef={buttonRef}
         />
       )}
     </>
