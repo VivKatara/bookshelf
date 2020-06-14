@@ -38,23 +38,23 @@ function AddBookModal(props) {
   const modalRef = useRef(null);
   useOutsideClick(modalRef, buttonRef, handleClose);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // Going to need the middleware to essentially check if token is expired and replace the token if so
-    axios
-      .get("http://localhost:5000/book/add", {
+    try {
+      const response = await axios.get("http://localhost:5000/book/add", {
         params: {
           title: newBookState.title,
           author: newBookState.author,
           shelf: newBookState.shelf,
         },
         withCredentials: true,
-      })
-      .then((res) => {
-        shelfUpdate(newBookState.shelf);
-        return console.log(res);
-      })
-      .catch((err) => console.log(err));
+      });
+      shelfUpdate(newBookState.shelf);
+      handleClose();
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   useEffect(() => {

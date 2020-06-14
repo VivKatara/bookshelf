@@ -1,7 +1,7 @@
 import React, { useState, useReducer, useEffect, useRef } from "react";
 import axios from "axios";
 import styled from "@emotion/styled";
-import NewBookModal from "./NewBookModal";
+import BookModal from "./BookModal";
 
 const initialState = {
   foundBook: false,
@@ -71,7 +71,7 @@ function Book(props) {
         )}
       </BookContainer>
       {show && (
-        <NewBookModal
+        <BookModal
           isbn={isbn}
           title={bookState.title}
           authors={bookState.authors}
