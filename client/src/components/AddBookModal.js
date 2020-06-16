@@ -42,14 +42,17 @@ function AddBookModal(props) {
     e.preventDefault();
     // Going to need the middleware to essentially check if token is expired and replace the token if so
     try {
-      const response = await axios.get("http://localhost:5000/book/add", {
-        params: {
+      const response = await axios.post(
+        "http://localhost:5000/book/add",
+        {
           title: newBookState.title,
           author: newBookState.author,
           shelf: newBookState.shelf,
         },
-        withCredentials: true,
-      });
+        {
+          withCredentials: true,
+        }
+      );
       shelfUpdate(newBookState.shelf);
       handleClose();
     } catch (e) {
