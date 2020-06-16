@@ -176,6 +176,7 @@ export const BookDescriptionDiv = styled.div`
   flex-direction: row;
   // background-color: red;
   // overflow: auto;
+  font-size: 8px;
 `;
 
 export const Label = styled.p`

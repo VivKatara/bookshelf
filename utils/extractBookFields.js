@@ -8,6 +8,7 @@ module.exports = function (items, userAddedTitle, userAddedAuthor) {
     const finalItem = newItems[0];
     const finalTitle = finalItem.volumeInfo.title;
     const finalAuthors = finalItem.volumeInfo.authors;
+    const finalDescription = finalItem.volumeInfo.description;
     const industryIdentifiers = finalItem.volumeInfo.industryIdentifiers;
     const filteredIsbn = industryIdentifiers.filter((identifer) => {
       return identifer.type === "ISBN_13";
@@ -16,7 +17,14 @@ module.exports = function (items, userAddedTitle, userAddedAuthor) {
     const finalImageLink = finalItem.volumeInfo.imageLinks.thumbnail
       ? finalItem.volumeInfo.imageLinks.thumbnail
       : finalItem.volumeInfo.imageLinks.smallThumbnail;
-    return [finalTitle, finalAuthors, finalIsbn, finalImageLink, true];
+    return [
+      finalTitle,
+      finalAuthors,
+      finalDescription,
+      finalIsbn,
+      finalImageLink,
+      true,
+    ];
   } else {
     // Throw an error because there was no match
     return ["", [], "", "", false];

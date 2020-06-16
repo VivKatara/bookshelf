@@ -6,7 +6,8 @@ import BookModal from "./BookModal";
 const initialState = {
   foundBook: false,
   title: "",
-  authors: [],
+  authors: "",
+  description: "",
   coverImage: "",
 };
 
@@ -18,6 +19,7 @@ const reducer = (state, action) => {
         foundBook: action.payload.foundBook,
         title: action.payload.title,
         authors: action.payload.authors,
+        description: action.payload.description,
         coverImage: action.payload.coverImage,
       };
     }
@@ -40,12 +42,16 @@ function Book(props) {
         }
       );
       if (response.status === 200) {
+        let splitAuthors = response.data.authors;
+        if (response.data.authors.length > 1)
+          splitAuthors = response.data.authors.join(", ");
         dispatch({
           type: "FOUND_BOOK",
           payload: {
             foundBook: true,
             title: response.data.title,
-            authors: response.data.authors,
+            authors: splitAuthors,
+            description: response.data.description,
             coverImage: response.data.coverImage,
           },
         });
@@ -75,7 +81,7 @@ function Book(props) {
           isbn={isbn}
           title={bookState.title}
           authors={bookState.authors}
-          description="Description is yet to come"
+          description={bookState.description}
           handleClose={changeModal}
           buttonRef={buttonRef}
           handleModalUpdate={handleModalUpdate}

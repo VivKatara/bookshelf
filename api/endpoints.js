@@ -60,12 +60,13 @@ module.exports = {
   },
 
   // Adds a book to the Books database
-  addBook: async function (title, authors, isbn, coverImage) {
-    const foundBook = await Book.findOne({ isbn });
+  addBook: async function (title, authors, description, isbn, coverImage) {
+    const foundBook = await Books.findOne({ isbn });
     if (!foundBook) {
-      const newBook = new Book({
+      const newBook = new Books({
         title,
         authors,
+        description,
         isbn,
         coverImage,
       });
@@ -165,17 +166,20 @@ module.exports = {
     let success = false;
     let title = "";
     let authors = [];
+    let descirpiton = "";
     let coverImage = "";
     if (book) {
       success = true;
       title = book.title;
       authors = book.authors;
+      description = book.description;
       coverImage = book.coverImage;
     }
     return {
       success,
       title,
       authors,
+      description,
       coverImage,
     };
   },

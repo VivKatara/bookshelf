@@ -37,6 +37,7 @@ router.post("/add", authenticateToken, async (req, res) => {
     const [
       finalTitle,
       finalAuthors,
+      finalDescription,
       finalIsbn,
       finalImageLink,
       matchFound,
@@ -46,7 +47,13 @@ router.post("/add", authenticateToken, async (req, res) => {
       return res.status(404).json({ msg: "Could not find book" });
     }
     // Add found book to the book database
-    await addBook(finalTitle, finalAuthors, finalIsbn, finalImageLink);
+    await addBook(
+      finalTitle,
+      finalAuthors,
+      finalDescription,
+      finalIsbn,
+      finalImageLink
+    );
     isbn = finalIsbn;
   }
 
@@ -95,9 +102,15 @@ router.get("/getTotalPages", authenticateToken, async (req, res) => {
 // Get the details of a given book
 router.get("/getBookDetails", authenticateToken, async (req, res) => {
   const isbn = req.query.isbn;
-  const { success, title, authors, coverImage } = await getBookDetails(isbn);
+  const {
+    success,
+    title,
+    authors,
+    description,
+    coverImage,
+  } = await getBookDetails(isbn);
   if (success) {
-    return res.status(200).json({ title, authors, coverImage });
+    return res.status(200).json({ title, authors, description, coverImage });
   } else {
     return res.status(400).json({ msg: "Book not found" });
   }
