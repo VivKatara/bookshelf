@@ -2,21 +2,22 @@ import axios from "axios";
 import { SET_USER, LOG_OFF_USER } from "./types";
 
 export const setUser = () => async (dispatch) => {
+  // TODO Implement a check here that also htis the refresh token route if authenticatetoken middleware returns an error
   try {
-    // you will have to use the frontend middleware here in case the access token passed in has expired and refresh token is necessary
     const response = await axios.get("http://localhost:5000/profile", {
       withCredentials: true,
     });
     const action = {
       type: SET_USER,
       payload: {
-        userFullName: response.data.user.name,
+        userFullName: response.data.user.fullName,
         username: response.data.user.username,
         isLoggedIn: true,
       },
     };
     dispatch(action);
   } catch (e) {
+    // TODO Before Throwing error here, use the refreshtoken route
     console.log(
       "Error occurred while trying to set user profile. User must not be logged in"
     );

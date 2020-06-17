@@ -7,18 +7,24 @@ import {
   Redirect,
 } from "react-router-dom";
 import { connect } from "react-redux";
+
 import Header from "./Header";
 import Homepage from "./Homepage";
 import FullShelf from "./FullShelf";
 import LandingPage from "./LandingPage";
 import Login from "./Login";
 import Register from "./Register";
+import NotFound from "./NotFound";
+
 import { setUser } from "../actions/setUser";
 
 const Routes = (props) => {
   const { isLoggedIn, username, setUser } = props;
   useEffect(() => {
-    setUser();
+    async function setUserOnMount() {
+      await setUser();
+    }
+    setUserOnMount();
   }, []);
   return (
     <Router>
@@ -48,10 +54,9 @@ const PrivateRoutes = (props) => {
         <Redirect exact from="/" to={`/${props.username}`} />
         <Redirect exact from="/login" to={`/${props.username}`} />
         <Redirect exact from="/register" to={`/${props.username}`} />
-        <Redirect exact from="/home" to={`/${props.username}`} />
         <Route exact path={"/:username"} component={Homepage} />
         <Route exact path="/:username/shelf/:type" component={FullShelf} />
-        {/* <Route path="*" component={NotFoundPage} /> */}
+        <Route path="*" component={NotFound} />
       </Switch>
     </>
   );
@@ -61,13 +66,12 @@ const AuthRoutes = () => {
   return (
     <>
       <Switch>
-        <Redirect exact from="/home" to="/" />
         <Route exact path="/" component={LandingPage} />
         <Route exact path="/login" component={Login} />
         <Route exact path="/register" component={Register} />
         <Route exact path={"/:username"} component={Homepage} />
         <Route exact path="/:username/shelf/:type" component={FullShelf} />
-        {/* <Route path="*" component={NotFoundPage} /> */}
+        <Route path="*" component={NotFound} />
       </Switch>
     </>
   );

@@ -1,12 +1,13 @@
 import React, { useReducer } from "react";
 import PropTypes from "prop-types";
+import axios from "axios";
 import { useHistory } from "react-router-dom";
 import { connect } from "react-redux";
-import axios from "axios";
+
 import { setUser } from "../actions/setUser";
+
+import { MainContainer, CentralDiv } from "../styles/mainPages";
 import {
-  MainContainer,
-  CentralDiv,
   Form,
   FormDiv,
   FormHeader,
@@ -38,11 +39,12 @@ const reducer = (state, action) => {
 };
 
 const Login = (props) => {
-  const [loginState, dispatch] = useReducer(reducer, initialState);
+  const [userState, dispatch] = useReducer(reducer, initialState);
   const history = useHistory();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { email, password } = loginState;
+    const { email, password } = userState;
     try {
       const response = await axios.post(
         "http://localhost:5000/auth/login",
@@ -55,6 +57,7 @@ const Login = (props) => {
       await props.setUser();
       history.push("/");
     } catch (e) {
+      // TODO - If the user login attempt fails, find a way here to let the user know
       console.log(e);
     }
   };
@@ -72,7 +75,7 @@ const Login = (props) => {
               type="text"
               name="email"
               id="email"
-              value={loginState.email}
+              value={userState.email}
               onChange={(e) =>
                 dispatch({ type: "EMAIL_CHANGE", payload: e.target.value })
               }
@@ -85,7 +88,7 @@ const Login = (props) => {
               type="text"
               name="password"
               id="password"
-              value={loginState.password}
+              value={userState.password}
               onChange={(e) =>
                 dispatch({ type: "PASSWORD_CHANGE", payload: e.target.value })
               }

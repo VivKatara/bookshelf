@@ -1,7 +1,8 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import styled from "@emotion/styled";
-import Register from "./Register";
+import { Link } from "react-router-dom";
+
+import { MainContainer, CentralDiv, Button } from "../styles/mainPages";
 
 function LandingPage() {
   return (
@@ -29,30 +30,6 @@ function LandingPage() {
 
 export default LandingPage;
 
-const MainContainer = styled.div`
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-color: #222222;
-`;
-
-const CentralDiv = styled.div`
-  width: 50%;
-  min-height: 500px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  color: white;
-
-  @media (max-width: 700px) {
-    width: 100%;
-  }
-`;
-
 const Title = styled.h3`
   font-size: 48px;
   margin-top: 50px;
@@ -77,18 +54,12 @@ const NavButtons = styled.div`
   // background-color: yellow;
 `;
 
-const RegisterButton = styled.button`
+const RegisterButton = styled(Button)`
   height: 40px;
   width: 100px;
   margin: 10px;
-  outline: none;
-  border: none;
-  border-radius: 10px;
   background-color: #287bf8;
   color: #ffffff;
-  &:hover {
-    cursor: pointer;
-  }
 `;
 
 const LoginButton = styled(RegisterButton)`

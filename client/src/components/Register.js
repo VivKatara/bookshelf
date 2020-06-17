@@ -1,9 +1,9 @@
 import React, { useReducer } from "react";
-import { useHistory } from "react-router-dom";
 import axios from "axios";
+import { useHistory } from "react-router-dom";
+
+import { MainContainer, CentralDiv } from "../styles/mainPages";
 import {
-  MainContainer,
-  CentralDiv,
   Form,
   FormDiv,
   FormHeader,
@@ -61,12 +61,13 @@ const Register = () => {
         password,
         passwordConfirm,
       });
-      console.log(response);
       history.push("/login");
     } catch (e) {
+      // TODO - On failure here, let the user know that it failed and that they ought to retry
       console.log(e);
     }
   };
+
   return (
     <MainContainer>
       <CentralDiv>

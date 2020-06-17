@@ -1,28 +1,5 @@
 import styled from "@emotion/styled";
 
-export const MainContainer = styled.div`
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-color: #222222;
-`;
-
-export const CentralDiv = styled.div`
-  width: 50%;
-  min-height: 500px;
-  display: flex;
-  flex-direction: column;
-  text-align: center;
-  color: white;
-
-  @media (max-width: 700px) {
-    width: 100%;
-  }
-`;
-
 export const Form = styled.form`
   display: flex;
   flex-direction: column;
