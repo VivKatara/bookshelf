@@ -8,6 +8,8 @@ import React, {
 import { useOutsideClick } from "../hooks/useOutsideClick";
 import axios from "axios";
 import styled from "@emotion/styled";
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
 import { MainModal } from "./AddBookModal";
 import { ShelfContext } from "./Shelf";
 
@@ -27,7 +29,7 @@ const reducer = (state, action) => {
   }
 };
 
-function NewBookModal(props) {
+function BooKModal(props) {
   const {
     title,
     authors,
@@ -61,7 +63,9 @@ function NewBookModal(props) {
         setCurrentDisplayState(responseDisplay);
       }
     }
-    getDisplay();
+    if (props.isLoggedIn) {
+      getDisplay();
+    }
     dispatch({ type: "UPDATE_SHELF", payload: shelf });
   }, []);
 
@@ -126,43 +130,53 @@ function NewBookModal(props) {
           <Value>{description}</Value>
         </BookDescriptionDiv>
       </BookDescription>
-      <BookSettingsForm onSubmit={handleSubmit}>
-        <FormDiv>
-          <SettingsLabel>Shelf Settings</SettingsLabel>
-        </FormDiv>
-        <FormDiv>
-          <Label>Shelf:</Label>
-          <Select
-            id="shelf"
-            name="shelf"
-            value={shelfState.shelf}
-            onChange={(e) =>
-              dispatch({ type: "UPDATE_SHELF", payload: e.target.value })
-            }
-          >
-            <option value="currentBooks">Currently Reading</option>
-            <option value="pastBooks">Have Read</option>
-            <option value="futureBooks">Want to Read</option>
-            <option value="delete">Remove book from this shelf</option>
-          </Select>
-        </FormDiv>
-        <FormDiv>
-          <Label>Display on homepage:</Label>
-          <Checkbox
-            type="checkbox"
-            checked={currentDisplayState}
-            onChange={handleCheckChange}
-          ></Checkbox>
-        </FormDiv>
-        <FormDiv>
-          <SaveChangesButton type="Submit">Save Changes</SaveChangesButton>
-        </FormDiv>
-      </BookSettingsForm>
+      {props.isLoggedIn && (
+        <BookSettingsForm onSubmit={handleSubmit}>
+          <FormDiv>
+            <SettingsLabel>Shelf Settings</SettingsLabel>
+          </FormDiv>
+          <FormDiv>
+            <Label>Shelf:</Label>
+            <Select
+              id="shelf"
+              name="shelf"
+              value={shelfState.shelf}
+              onChange={(e) =>
+                dispatch({ type: "UPDATE_SHELF", payload: e.target.value })
+              }
+            >
+              <option value="currentBooks">Currently Reading</option>
+              <option value="pastBooks">Have Read</option>
+              <option value="futureBooks">Want to Read</option>
+              <option value="delete">Remove book from this shelf</option>
+            </Select>
+          </FormDiv>
+          <FormDiv>
+            <Label>Display on homepage:</Label>
+            <Checkbox
+              type="checkbox"
+              checked={currentDisplayState}
+              onChange={handleCheckChange}
+            ></Checkbox>
+          </FormDiv>
+          <FormDiv>
+            <SaveChangesButton type="Submit">Save Changes</SaveChangesButton>
+          </FormDiv>
+        </BookSettingsForm>
+      )}
     </MainModal>
   );
 }
 
-export default NewBookModal;
+BooKModal.propTypes = {
+  isLoggedIn: PropTypes.bool.isRequired,
+};
+
+const mapStateToProps = (state) => ({
+  isLoggedIn: state.userState.isLoggedIn,
+});
+
+export default connect(mapStateToProps, {})(BooKModal);
 
 export const BookDescription = styled.div`
   display: flex;

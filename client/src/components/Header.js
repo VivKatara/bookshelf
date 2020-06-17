@@ -15,7 +15,7 @@ function Header(props) {
   return (
     <>
       <HeaderContainer>
-        <HyperLink href="/home">
+        <HyperLink href="/">
           <p>Bookshelf</p>
         </HyperLink>
         <User>

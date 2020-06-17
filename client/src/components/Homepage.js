@@ -143,7 +143,6 @@ function Homepage(props) {
       setFutureUpdates((prev) => prev + 1);
     }
   };
-  console.log(props);
   if (validUsername) {
     return (
       <>
@@ -174,7 +173,7 @@ function Homepage(props) {
               handleModalUpdate={triggerBookModalUpdate}
             >
               <Links>
-                <SeeAll href={`/${username}shelf/current?page=1`}>
+                <SeeAll href={`/${username}/shelf/current?page=1`}>
                   See All
                 </SeeAll>
               </Links>

@@ -1,9 +1,19 @@
-import React, { useState, useReducer, useEffect, useLocation } from "react";
+import React, {
+  useState,
+  useReducer,
+  useEffect,
+  useLocation,
+  useRef,
+} from "react";
 import axios from "axios";
+import { connect } from "react-redux";
+import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import styled from "@emotion/styled";
 import AddBookModal from "./AddBookModal";
 import Shelf from "./Shelf";
+import NotLoggedInHeader from "./NotLoggedInHeader";
+import NotFound from "./NotFound";
 
 // Keep track of array of ISBNs to pass down to shelves
 const initialIsbnState = {
@@ -53,6 +63,7 @@ const pageReducer = (state, action) => {
 
 function FullShelf(props) {
   const username = props.match.params.username;
+  const [validUsername, setValidUsername] = useState(false);
 
   const queryString = new URLSearchParams(props.location.search);
   const pageValues = queryString.getAll("page");
@@ -67,18 +78,15 @@ function FullShelf(props) {
   // to the shelf while using the modal
   const [show, setModal] = useState(false);
   const [shelfUpdates, setShelfUpdates] = useState(0);
+  const buttonRef = useRef(null);
 
   // Stae to maintain the displayed page size. Can maneuver it based on the size of viewport
   const [pageSize, setPageSize] = useState(21);
 
   const [bookModalUpdates, setBookModalUpdates] = useState(0);
 
-  const showModal = () => {
-    setModal(true);
-  };
-
-  const hideModal = () => {
-    setModal(false);
+  const changeModal = () => {
+    setModal((prev) => !prev);
   };
 
   const handleShelfUpdate = (shelf) => {
@@ -88,6 +96,23 @@ function FullShelf(props) {
   const triggerBookModalUpdate = () => {
     setBookModalUpdates((prev) => prev + 1);
   };
+
+  // If the user is not logged in, you need to find a way to make sure that this username is valid
+  useEffect(() => {
+    async function checkUsername() {
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/auth/checkUsername",
+          { params: { username } }
+        );
+        if (response.status === 200) setValidUsername(true);
+      } catch (e) {
+        // validUsername is already set to false, so no need to set it to false again
+        console.log(e);
+      }
+    }
+    checkUsername();
+  }, [username]);
 
   // This is the effect that updates various pageState such as the total page count and whether or not to show certain buttons
   useEffect(() => {
@@ -163,53 +188,76 @@ function FullShelf(props) {
     getIsbns();
   }, [shelfUpdates, bookModalUpdates]);
 
-  return (
-    <MainContainer>
-      {pageState.showPageCount && (
-        <PageCount>
-          Page {page} of {pageState.totalPages}
-        </PageCount>
-      )}
-      {show && (
-        <AddBookModal
-          show={show}
-          handleClose={hideModal}
-          shelfUpdate={handleShelfUpdate}
-          shelf={shelf}
-        />
-      )}
-      <Add onClick={showModal}>Add Book to Shelf</Add>
-      <Title>{pageState.shelfTitle}</Title>
-      <Shelf
-        isbns={shelfState.firstShelfIsbn}
-        shelf={shelf}
-        handleModalUpdate={triggerBookModalUpdate}
-      />
-      {pageState.showPrevious && (
-        <PreviousButton href={`${props.match.url}?page=${page - 1}`}>
-          Previous
-        </PreviousButton>
-      )}
-      <Shelf
-        isbns={shelfState.secondShelfIsbn}
-        shelf={shelf}
-        handleModalUpdate={triggerBookModalUpdate}
-      />
-      {pageState.showNext && (
-        <NextButton href={`${props.match.url}?page=${page + 1}`}>
-          Next
-        </NextButton>
-      )}
-      <Shelf
-        isbns={shelfState.thirdShelfIsbn}
-        shelf={shelf}
-        handleModalUpdate={triggerBookModalUpdate}
-      />
-    </MainContainer>
-  );
+  if (validUsername) {
+    return (
+      <>
+        {!props.isLoggedIn && <NotLoggedInHeader username={username} />}
+        <MainContainer>
+          {pageState.showPageCount && (
+            <PageCount>
+              Page {page} of {pageState.totalPages}
+            </PageCount>
+          )}
+          {show && (
+            <AddBookModal
+              buttonRef={buttonRef}
+              handleClose={changeModal}
+              shelfUpdate={handleShelfUpdate}
+            />
+          )}
+          {props.isLoggedIn ? (
+            <Add ref={buttonRef} onClick={changeModal}>
+              Add Book to Shelf
+            </Add>
+          ) : (
+            <AuthButtons>
+              <SignUp href="/register">Sign Up</SignUp>/
+              <Login href="/login">Login</Login>
+            </AuthButtons>
+          )}
+          <Title>{pageState.shelfTitle}</Title>
+          <Shelf
+            isbns={shelfState.firstShelfIsbn}
+            shelf={shelf}
+            handleModalUpdate={triggerBookModalUpdate}
+          />
+          {pageState.showPrevious && (
+            <PreviousButton href={`${props.match.url}?page=${page - 1}`}>
+              Previous
+            </PreviousButton>
+          )}
+          <Shelf
+            isbns={shelfState.secondShelfIsbn}
+            shelf={shelf}
+            handleModalUpdate={triggerBookModalUpdate}
+          />
+          {pageState.showNext && (
+            <NextButton href={`${props.match.url}?page=${page + 1}`}>
+              Next
+            </NextButton>
+          )}
+          <Shelf
+            isbns={shelfState.thirdShelfIsbn}
+            shelf={shelf}
+            handleModalUpdate={triggerBookModalUpdate}
+          />
+        </MainContainer>
+      </>
+    );
+  } else {
+    return <NotFound />;
+  }
 }
 
-export default FullShelf;
+FullShelf.propTypes = {
+  isLoggedIn: PropTypes.bool.isRequired,
+};
+
+const mapStateToProps = (state) => ({
+  isLoggedIn: state.userState.isLoggedIn,
+});
+
+export default connect(mapStateToProps, {})(FullShelf);
 
 export const MainContainer = styled.div`
   width: 100vw;
@@ -274,5 +322,35 @@ const NextButton = styled.a`
   &:focus {
     outline: none;
     box-shadow: none;
+  }
+`;
+
+export const AuthButtons = styled.div`
+  margin-left: 80%;
+  margin-top: 20px;
+  display: inline-flex;
+  // flex-direction: row;
+  align-items: flex-start;
+  // background-color: yellow;
+  color: white;
+`;
+
+export const SignUp = styled.a`
+  margin-right: 5px;
+  color: #287bf8;
+  text-decoration: none;
+  &:hover {
+    cursor: pointer;
+    text-decoration: underline;
+  }
+`;
+
+export const Login = styled.a`
+  margin-left: 5px;
+  color: #287bf8;
+  text-decoration: none;
+  &:hover {
+    cursor: pointer;
+    text-decoration: underline;
   }
 `;
