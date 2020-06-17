@@ -9,6 +9,7 @@ import { useUsernameValidityCheck } from "../hooks/useUsernameValidityCheck";
 import AddBookModal from "./AddBookModal";
 import Shelf from "./Shelf";
 import NotLoggedInHeader from "./NotLoggedInHeader";
+import Loading from "./Loading";
 import NotFound from "./NotFound";
 
 // Keep track of array of ISBNs to pass down to shelves
@@ -171,7 +172,7 @@ function FullShelf(props) {
 
   //TODO Make a nice Loading component
   if (validUsername === null) {
-    return <h1>Loading...</h1>;
+    return <Loading />;
   } else if (validUsername) {
     return (
       <>

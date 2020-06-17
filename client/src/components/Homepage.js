@@ -9,6 +9,7 @@ import { useModal } from "../hooks/useModal";
 
 import Shelf from "./Shelf";
 import AddBookModal from "./AddBookModal";
+import Loading from "./Loading";
 import NotFound from "./NotFound";
 import NotLoggedInHeader from "./NotLoggedInHeader";
 
@@ -86,10 +87,6 @@ function Homepage(props) {
     bookModalUpdates
   );
 
-  // const changeModal = () => {
-  //   setModal((prev) => !prev);
-  // };
-
   const handleShelfUpdate = (shelf) => {
     if (shelf === "currentBooks") {
       setCurrentUpdates((prev) => prev + 1);
@@ -106,9 +103,8 @@ function Homepage(props) {
     setBookModalUpdates((prev) => prev + 1);
   };
 
-  //TODO Make a nice Loading component
   if (validUsername === null) {
-    return <h1>Loading...</h1>;
+    return <Loading />;
   } else if (validUsername) {
     return (
       <>
