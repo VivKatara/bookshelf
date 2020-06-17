@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import styled from "@emotion/styled";
+import Register from "./Register";
 
 function LandingPage() {
   return (
@@ -41,8 +42,16 @@ const MainContainer = styled.div`
 const CentralDiv = styled.div`
   width: 50%;
   min-height: 500px;
-  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
+  // background-color: blue;
+  color: white;
+
+  @media (max-width: 700px) {
+    width: 100%;
+  }
 `;
 
 const Title = styled.h3`
@@ -53,18 +62,21 @@ const Title = styled.h3`
 const Caption = styled.div`
   width: 50%;
   min-height: 100px;
-  margin-left: auto;
-  margin-right: auto;
-  font-size: 24px;
   text-align: left;
+  font-size: 24px;
+  // background-color: red;
+  @media (max-width: 500px) {
+    width: 80%;
+  }
 `;
 
 const NavButtons = styled.div`
-  width: 80%;
-  min-height: 100px;
-  margin-left: auto;
-  margin-right: auto;
+  width: 100%;
   margin-top: 20px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  // background-color: yellow;
 `;
 
 const RegisterButton = styled.button`
@@ -76,23 +88,12 @@ const RegisterButton = styled.button`
   border-radius: 10px;
   background-color: #287bf8;
   color: #ffffff;
-
   &:hover {
     cursor: pointer;
   }
 `;
 
-const LoginButton = styled.button`
-  height: 40px;
-  width: 100px;
-  margin: 10px;
-  outline: none;
-  border: none;
-  border-radius: 10px;
+const LoginButton = styled(RegisterButton)`
   background-color: #ffffff;
   color: #287bf8;
-
-  &:hover {
-    cursor: pointer;
-  }
 `;
