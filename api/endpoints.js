@@ -45,8 +45,8 @@ module.exports = {
   },
 
   // Searches UserBook database for all books on display for a given shelf
-  getBooksOnDisplay: async function (email, shelf) {
-    const userBooks = await UserBooks.findOne({ email });
+  getBooksOnDisplay: async function (username, shelf) {
+    const userBooks = await UserBooks.findOne({ username });
     const desiredShelf = userBooks[shelf];
     const displayBooks = desiredShelf.filter((book) => {
       if (book.display) {
@@ -135,10 +135,10 @@ module.exports = {
   },
 
   // Gets the books on a user's shelf with pagination
-  getBooksOnShelfPaginated: async function (email, page, pageSize, shelf) {
+  getBooksOnShelfPaginated: async function (username, page, pageSize, shelf) {
     const currentPage = parseInt(page);
     const currentPageSize = parseInt(pageSize);
-    const userBooks = await UserBooks.findOne({ email });
+    const userBooks = await UserBooks.findOne({ username });
     const desiredShelf = userBooks[shelf];
     const desiredShelfLength = userBooks[`${shelf}Count`];
     const desiredBooks = paginate(
@@ -152,8 +152,8 @@ module.exports = {
   },
 
   // Gets the total number of pages for a paginated bookshelf
-  getTotalPages: async function (email, pageSize, shelf) {
-    const userBooks = await UserBooks.findOne({ email });
+  getTotalPages: async function (username, pageSize, shelf) {
+    const userBooks = await UserBooks.findOne({ username });
     const desiredShelf = userBooks[shelf];
     const desiredShelfLength = userBooks[`${shelf}Count`];
     const totalPages = Math.ceil(desiredShelfLength / pageSize);

@@ -11,7 +11,11 @@ router.use("/book", bookRoutes);
 router.get("/profile", authenticateToken, (req, res) => {
   // If it gets here, it must have been a successful request, so return the user
   return res.status(200).json({
-    user: { email: req.user.email, name: req.user.name },
+    user: {
+      email: req.user.email,
+      name: req.user.name,
+      username: req.user.username,
+    },
     msg: "Returning user",
     success: true,
   });

@@ -52,6 +52,8 @@ const pageReducer = (state, action) => {
 };
 
 function FullShelf(props) {
+  const username = props.match.params.username;
+
   const queryString = new URLSearchParams(props.location.search);
   const pageValues = queryString.getAll("page");
   const page = parseInt(pageValues[0]);
@@ -93,7 +95,7 @@ function FullShelf(props) {
       let totalPages = 1;
       const response = await axios.get(
         "http://localhost:5000/book/getTotalPages",
-        { params: { shelf, pageSize }, withCredentials: true }
+        { params: { username, shelf, pageSize }, withCredentials: true }
       );
       totalPages = response.data.totalPages;
 
@@ -139,7 +141,7 @@ function FullShelf(props) {
   useEffect(() => {
     async function getIsbns() {
       const response = await axios.get("http://localhost:5000/book/getBooks", {
-        params: { shelf, page, pageSize },
+        params: { username, shelf, page, pageSize },
         withCredentials: true,
       });
       const firstShelfIsbn = response.data.isbn.slice(0, pageSize / 3);

@@ -11,6 +11,7 @@ const Token = require("../models/Token");
 
 const validateLoginInput = require("../validation/login");
 const validateRegisterInput = require("../validation/register");
+const createUsername = require("../utils/createUsername");
 
 router.post("/register", (req, res) => {
   const { errors, isValid } = validateRegisterInput(req.body);
@@ -20,21 +21,25 @@ router.post("/register", (req, res) => {
       .json({ msg: errors[Object.keys(errors)[0]], success: false });
   }
   const { email, fullName, password } = req.body;
-  User.findOne({ email }).then((user) => {
+  User.findOne({ email }).then(async (user) => {
     if (user) {
       return res.status(400).json({
         msg: "Email already exists",
         success: false,
       });
     } else {
+      // Create the username
+      const username = await createUsername(fullName);
       // Create the user
       const newUser = new User({
         email,
         fullName,
+        username,
         password,
       });
       const newUserBooks = new UserBooks({
         email,
+        username,
         currentBooks: [],
         currentBooksCount: 0,
         currentBooksDisplayCount: 0,
@@ -92,6 +97,7 @@ router.post("/login", (req, res) => {
           id: user.id,
           email: user.email,
           name: user.fullName,
+          username: user.username,
         };
         const accessToken = generateAccessToken(
           payload,
@@ -130,7 +136,6 @@ router.post("/login", (req, res) => {
 
 router.get("/token", (req, res) => {
   const refreshToken = req.cookies["refreshToken"];
-  console.log(refreshToken);
   if (refreshToken == null) {
     console.log("Attempt to refresh access token without refresh token");
     return res
@@ -155,6 +160,7 @@ router.get("/token", (req, res) => {
             id: user.id,
             email: user.email,
             name: user.name,
+            username: user.username,
           };
           const accessToken = generateAccessToken(
             payload,

@@ -19,9 +19,9 @@ function Header(props) {
           <p>Bookshelf</p>
         </HyperLink>
         <User>
-          <Username>{props.userName}</Username>
+          <Username>{props.userFullName}</Username>
           <Profile ref={buttonRef} onClick={changeModal}>
-            {props.userName[0]}
+            {props.userFullName[0]}
           </Profile>
         </User>
       </HeaderContainer>
@@ -31,11 +31,11 @@ function Header(props) {
 }
 
 Header.propTypes = {
-  userName: PropTypes.string.isRequired,
+  userFullName: PropTypes.string.isRequired,
 };
 
 const mapStateToProps = (state) => ({
-  userName: state.userState.userName,
+  userFullName: state.userState.userFullName,
 });
 
 export default connect(mapStateToProps, {})(Header);

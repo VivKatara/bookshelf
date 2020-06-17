@@ -16,34 +16,41 @@ import Register from "./Register";
 import { setUser } from "../actions/setUser";
 
 const Routes = (props) => {
-  const { isLoggedIn, setUser } = props;
+  const { isLoggedIn, username, setUser } = props;
   useEffect(() => {
     setUser();
   }, []);
-  return <Router>{isLoggedIn ? <PrivateRoutes /> : <AuthRoutes />}</Router>;
+  return (
+    <Router>
+      {isLoggedIn ? <PrivateRoutes username={username} /> : <AuthRoutes />}
+    </Router>
+  );
 };
 
 const mapStateToProps = (state) => ({
   isLoggedIn: state.userState.isLoggedIn,
+  username: state.userState.username,
 });
 
 Routes.propTypes = {
   setUser: PropTypes.func.isRequired,
   isLoggedIn: PropTypes.bool.isRequired,
+  username: PropTypes.string.isRequired,
 };
 
 export default connect(mapStateToProps, { setUser })(Routes);
 
-const PrivateRoutes = () => {
+const PrivateRoutes = (props) => {
   return (
     <>
       <Header />
       <Switch>
-        <Redirect exact from="/" to="/home" />
-        <Redirect exact from="/login" to="/home" />
-        <Redirect exact from="/register" to="/home" />
-        <Route exact path={"/home"} component={Homepage} />
-        <Route exact path="/shelf/:type" component={FullShelf} />
+        <Redirect exact from="/" to={`/${props.username}`} />
+        <Redirect exact from="/login" to={`/${props.username}`} />
+        <Redirect exact from="/register" to={`/${props.username}`} />
+        <Redirect exact from="/home" to={`/${props.username}`} />
+        <Route exact path={"/:username"} component={Homepage} />
+        <Route exact path="/:username/shelf/:type" component={FullShelf} />
         {/* <Route path="*" component={NotFoundPage} /> */}
       </Switch>
     </>
@@ -58,6 +65,8 @@ const AuthRoutes = () => {
         <Route exact path="/" component={LandingPage} />
         <Route exact path="/login" component={Login} />
         <Route exact path="/register" component={Register} />
+        <Route exact path={"/:username"} component={Homepage} />
+        <Route exact path="/:username/shelf/:type" component={FullShelf} />
         {/* <Route path="*" component={NotFoundPage} /> */}
       </Switch>
     </>

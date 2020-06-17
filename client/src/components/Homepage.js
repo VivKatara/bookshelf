@@ -34,7 +34,11 @@ const reducer = (state, action) => {
   }
 };
 
+export const UserContext = React.createContext();
+
 function Homepage(props) {
+  const username = props.match.params.username;
+
   const [show, setModal] = useState(false);
   const [isbnState, dispatch] = useReducer(reducer, initialState);
   const [currentUpdates, setCurrentUpdates] = useState(0);
@@ -48,7 +52,7 @@ function Homepage(props) {
       const response = await axios.get(
         "http://localhost:5000/book/getDisplayBooks",
         {
-          params: { shelf: "currentBooks" },
+          params: { username, shelf: "currentBooks" },
           withCredentials: true,
         }
       );
@@ -67,7 +71,7 @@ function Homepage(props) {
       const response = await axios.get(
         "http://localhost:5000/book/getDisplayBooks",
         {
-          params: { shelf: "pastBooks" },
+          params: { username, shelf: "pastBooks" },
           withCredentials: true,
         }
       );
@@ -86,7 +90,7 @@ function Homepage(props) {
       const response = await axios.get(
         "http://localhost:5000/book/getDisplayBooks",
         {
-          params: { shelf: "futureBooks" },
+          params: { username, shelf: "futureBooks" },
           withCredentials: true,
         }
       );
@@ -122,56 +126,58 @@ function Homepage(props) {
 
   return (
     <MainContainer>
-      {show && (
-        <AddBookModal
-          buttonRef={buttonRef}
-          handleClose={changeModal}
-          shelfUpdate={handleShelfUpdate}
-        />
-      )}
-      <Add ref={buttonRef} onClick={changeModal}>
-        Add Book to Shelf
-      </Add>
-      <CurrentTitle>Currently Reading</CurrentTitle>
-      <Shelf
-        isbns={isbnState.currentIsbns}
-        shelf="currentBooks"
-        handleModalUpdate={triggerBookModalUpdate}
-      >
-        <Links>
-          <SeeAll href="/shelf/current?page=1">See All</SeeAll>
-        </Links>
-      </Shelf>
-      <PastTitle>Have Read</PastTitle>
-      <Shelf
-        isbns={isbnState.pastIsbns}
-        shelf="pastBooks"
-        handleModalUpdate={triggerBookModalUpdate}
-      >
-        <Links>
-          <SeeAll href="/shelf/past?page=1">See All</SeeAll>
-        </Links>
-      </Shelf>
-      <FutureTitle>Want to Read</FutureTitle>
-      <Shelf
-        isbns={isbnState.futureIsbns}
-        shelf="futureBooks"
-        handleModalUpdate={triggerBookModalUpdate}
-      >
-        <Links>
-          <SeeAll href="/shelf/future?page=1">See All</SeeAll>
-        </Links>
-      </Shelf>
+      <UserContext.Provider value={username}>
+        {show && (
+          <AddBookModal
+            buttonRef={buttonRef}
+            handleClose={changeModal}
+            shelfUpdate={handleShelfUpdate}
+          />
+        )}
+        <Add ref={buttonRef} onClick={changeModal}>
+          Add Book to Shelf
+        </Add>
+        <CurrentTitle>Currently Reading</CurrentTitle>
+        <Shelf
+          isbns={isbnState.currentIsbns}
+          shelf="currentBooks"
+          handleModalUpdate={triggerBookModalUpdate}
+        >
+          <Links>
+            <SeeAll href={`/${username}shelf/current?page=1`}>See All</SeeAll>
+          </Links>
+        </Shelf>
+        <PastTitle>Have Read</PastTitle>
+        <Shelf
+          isbns={isbnState.pastIsbns}
+          shelf="pastBooks"
+          handleModalUpdate={triggerBookModalUpdate}
+        >
+          <Links>
+            <SeeAll href={`/${username}/shelf/past?page=1`}>See All</SeeAll>
+          </Links>
+        </Shelf>
+        <FutureTitle>Want to Read</FutureTitle>
+        <Shelf
+          isbns={isbnState.futureIsbns}
+          shelf="futureBooks"
+          handleModalUpdate={triggerBookModalUpdate}
+        >
+          <Links>
+            <SeeAll href={`/${username}/shelf/future?page=1`}>See All</SeeAll>
+          </Links>
+        </Shelf>
+      </UserContext.Provider>
     </MainContainer>
   );
 }
 
 Homepage.propTypes = {
-  userName: PropTypes.string.isRequired,
+  username: PropTypes.string.isRequired,
 };
 
 const mapStateToProps = (state) => ({
-  userName: state.userState.userName,
+  username: state.userState.username,
 });
 
 export default connect(mapStateToProps, {})(Homepage);

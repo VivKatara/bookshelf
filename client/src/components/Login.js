@@ -53,7 +53,7 @@ const Login = (props) => {
         { withCredentials: true }
       );
       await props.setUser();
-      history.push("/home");
+      history.push("/");
     } catch (e) {
       console.log(e);
     }
@@ -101,10 +101,10 @@ const Login = (props) => {
   );
 };
 
-const mapStateToProps = (state) => ({});
-
 Login.propTypes = {
   setUser: PropTypes.func.isRequired,
 };
+
+const mapStateToProps = (state) => ({});
 
 export default connect(mapStateToProps, { setUser })(Login);

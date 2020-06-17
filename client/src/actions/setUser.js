@@ -10,7 +10,8 @@ export const setUser = () => async (dispatch) => {
     const action = {
       type: SET_USER,
       payload: {
-        userName: response.data.user.name,
+        userFullName: response.data.user.name,
+        username: response.data.user.username,
         isLoggedIn: true,
       },
     };
@@ -23,7 +24,8 @@ export const setUser = () => async (dispatch) => {
     const action = {
       type: SET_USER,
       payload: {
-        userName: "",
+        userFullName: "",
+        username: "",
         isLoggedIn: false,
       },
     };

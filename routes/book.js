@@ -69,19 +69,18 @@ router.post("/add", authenticateToken, async (req, res) => {
 });
 
 // Called to get all the books on display for a given shelf
-router.get("/getDisplayBooks", authenticateToken, async (req, res) => {
-  const email = req.user.email;
-  const shelf = req.query.shelf;
-  const displayBooksIsbn = await getBooksOnDisplay(email, shelf);
+router.get("/getDisplayBooks", async (req, res) => {
+  // const email = req.user.email;
+  const { username, shelf } = req.query;
+  const displayBooksIsbn = await getBooksOnDisplay(username, shelf);
   return res.status(200).json({ isbn: displayBooksIsbn });
 });
 
 // Called to get all the books on a given shelf, paginated
-router.get("/getBooks", authenticateToken, async (req, res) => {
-  const email = req.user.email;
-  const { page, pageSize, shelf } = req.query;
+router.get("/getBooks", async (req, res) => {
+  const { username, page, pageSize, shelf } = req.query;
   const desiredIsbns = await getBooksOnShelfPaginated(
-    email,
+    username,
     page,
     pageSize,
     shelf
@@ -92,15 +91,14 @@ router.get("/getBooks", authenticateToken, async (req, res) => {
 });
 
 // Get the number of pages a paginated bookshelf has
-router.get("/getTotalPages", authenticateToken, async (req, res) => {
-  const email = req.user.email;
-  const { pageSize, shelf } = req.query;
-  const totalPages = await getTotalPages(email, pageSize, shelf);
+router.get("/getTotalPages", async (req, res) => {
+  const { username, pageSize, shelf } = req.query;
+  const totalPages = await getTotalPages(username, pageSize, shelf);
   return res.status(200).json({ totalPages });
 });
 
 // Get the details of a given book
-router.get("/getBookDetails", authenticateToken, async (req, res) => {
+router.get("/getBookDetails", async (req, res) => {
   const isbn = req.query.isbn;
   const {
     success,

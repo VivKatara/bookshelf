@@ -1,4 +1,10 @@
-import React, { useState, useReducer, useEffect, useRef } from "react";
+import React, {
+  useState,
+  useReducer,
+  useEffect,
+  useRef,
+  useContext,
+} from "react";
 import axios from "axios";
 import styled from "@emotion/styled";
 import BookModal from "./BookModal";
