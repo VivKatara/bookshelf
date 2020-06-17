@@ -5,6 +5,7 @@ import { connect } from "react-redux";
 import styled from "@emotion/styled";
 
 import { useUsernameValidityCheck } from "../hooks/useUsernameValidityCheck";
+import { useAbilityToGetDisplayBooks } from "../hooks/useAbilityToGetDisplayBooks";
 
 import Shelf from "./Shelf";
 import AddBookModal from "./AddBookModal";
@@ -44,73 +45,46 @@ export const UserContext = React.createContext();
 function Homepage(props) {
   // Acquire the username from route parameters and check if it is valid
   const username = props.match.params.username;
-  const [validUsername, setValidUsername] = useState(false);
+  const [validUsername, setValidUsername] = useState(null);
   useUsernameValidityCheck(username, setValidUsername);
 
-  const [show, setModal] = useState(false);
+  // State for all the ISBNs that will be passed down to shelves
   const [isbnState, dispatch] = useReducer(reducer, initialState);
+
+  // Logic to track the modal, as well as whether there were any updates to a shelf, or a particular book
+  const [show, setModal] = useState(false);
+  const buttonRef = useRef(null);
   const [currentUpdates, setCurrentUpdates] = useState(0);
   const [pastUpdates, setPastUpdates] = useState(0);
   const [futureUpdates, setFutureUpdates] = useState(0);
-  const buttonRef = useRef(null);
   const [bookModalUpdates, setBookModalUpdates] = useState(0);
-
-  useEffect(() => {
-    async function getCurrentBookIsbns() {
-      const response = await axios.get(
-        "http://localhost:5000/book/getDisplayBooks",
-        {
-          params: { username, shelf: "currentBooks" },
-          withCredentials: true,
-        }
-      );
-      if (response.status === 200) {
-        dispatch({
-          type: "UPDATE_CURRENT",
-          payload: response.data.isbn.slice(0, 6),
-        });
-      }
-    }
-    getCurrentBookIsbns();
-  }, [currentUpdates, bookModalUpdates]);
-
-  useEffect(() => {
-    async function getPastBookIsbns() {
-      const response = await axios.get(
-        "http://localhost:5000/book/getDisplayBooks",
-        {
-          params: { username, shelf: "pastBooks" },
-          withCredentials: true,
-        }
-      );
-      if (response.status === 200) {
-        dispatch({
-          type: "UPDATE_PAST",
-          payload: response.data.isbn.slice(0, 6),
-        });
-      }
-    }
-    getPastBookIsbns();
-  }, [pastUpdates, bookModalUpdates]);
-
-  useEffect(() => {
-    async function getFutureBookIsbns() {
-      const response = await axios.get(
-        "http://localhost:5000/book/getDisplayBooks",
-        {
-          params: { username, shelf: "futureBooks" },
-          withCredentials: true,
-        }
-      );
-      if (response.status === 200) {
-        dispatch({
-          type: "UPDATE_FUTURE",
-          payload: response.data.isbn.slice(0, 6),
-        });
-      }
-    }
-    getFutureBookIsbns();
-  }, [futureUpdates, bookModalUpdates]);
+  useAbilityToGetDisplayBooks(
+    username,
+    validUsername,
+    "currentBooks",
+    dispatch,
+    "UPDATE_CURRENT",
+    currentUpdates,
+    bookModalUpdates
+  );
+  useAbilityToGetDisplayBooks(
+    username,
+    validUsername,
+    "pastBooks",
+    dispatch,
+    "UPDATE_PAST",
+    pastUpdates,
+    bookModalUpdates
+  );
+  useAbilityToGetDisplayBooks(
+    username,
+    validUsername,
+    "futureBooks",
+    dispatch,
+    "UPDATE_FUTURE",
+    futureUpdates,
+    bookModalUpdates
+  );
 
   const changeModal = () => {
     setModal((prev) => !prev);
@@ -131,7 +105,11 @@ function Homepage(props) {
       setFutureUpdates((prev) => prev + 1);
     }
   };
-  if (validUsername) {
+
+  //TODO Make a nice Loading component
+  if (validUsername === null) {
+    return <h1>Loading...</h1>;
+  } else if (validUsername) {
     return (
       <>
         {!props.isLoggedIn && <NotLoggedInHeader username={username} />}

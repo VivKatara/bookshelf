@@ -60,7 +60,7 @@ const pageReducer = (state, action) => {
 function FullShelf(props) {
   // Acquire the username from route parameters and check if it is valid
   const username = props.match.params.username;
-  const [validUsername, setValidUsername] = useState(false);
+  const [validUsername, setValidUsername] = useState(null);
   useUsernameValidityCheck(username, setValidUsername);
 
   const queryString = new URLSearchParams(props.location.search);
@@ -169,7 +169,10 @@ function FullShelf(props) {
     getIsbns();
   }, [shelfUpdates, bookModalUpdates]);
 
-  if (validUsername) {
+  //TODO Make a nice Loading component
+  if (validUsername === null) {
+    return <h1>Loading...</h1>;
+  } else if (validUsername) {
     return (
       <>
         {!props.isLoggedIn && <NotLoggedInHeader username={username} />}
