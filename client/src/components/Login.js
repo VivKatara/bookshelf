@@ -42,6 +42,8 @@ const Login = (props) => {
   const [userState, dispatch] = useReducer(reducer, initialState);
   const history = useHistory();
 
+  const { setUser } = props;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { email, password } = userState;
@@ -54,7 +56,7 @@ const Login = (props) => {
         },
         { withCredentials: true }
       );
-      await props.setUser();
+      await setUser();
       history.push("/");
     } catch (e) {
       // TODO - If the user login attempt fails, find a way here to let the user know

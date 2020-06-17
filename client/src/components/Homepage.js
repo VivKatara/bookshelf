@@ -3,6 +3,9 @@ import PropTypes from "prop-types";
 import axios from "axios";
 import { connect } from "react-redux";
 import styled from "@emotion/styled";
+
+import { useUsernameValidityCheck } from "../hooks/useUsernameValidityCheck";
+
 import Shelf from "./Shelf";
 import AddBookModal from "./AddBookModal";
 import NotFound from "./NotFound";
@@ -39,8 +42,10 @@ const reducer = (state, action) => {
 export const UserContext = React.createContext();
 
 function Homepage(props) {
+  // Acquire the username from route parameters and check if it is valid
   const username = props.match.params.username;
   const [validUsername, setValidUsername] = useState(false);
+  useUsernameValidityCheck(username, setValidUsername);
 
   const [show, setModal] = useState(false);
   const [isbnState, dispatch] = useReducer(reducer, initialState);
@@ -49,23 +54,6 @@ function Homepage(props) {
   const [futureUpdates, setFutureUpdates] = useState(0);
   const buttonRef = useRef(null);
   const [bookModalUpdates, setBookModalUpdates] = useState(0);
-
-  // If the user is not logged in, you need to find a way to make sure that this username is valid
-  useEffect(() => {
-    async function checkUsername() {
-      try {
-        const response = await axios.get(
-          "http://localhost:5000/auth/checkUsername",
-          { params: { username } }
-        );
-        if (response.status === 200) setValidUsername(true);
-      } catch (e) {
-        // validUsername is already set to false, so no need to set it to false again
-        console.log(e);
-      }
-    }
-    checkUsername();
-  }, [username]);
 
   useEffect(() => {
     async function getCurrentBookIsbns() {
@@ -305,8 +293,6 @@ export const SignUp = styled.a`
     text-decoration: underline;
   }
 `;
-
-export const Divider = styled.p``;
 
 export const Login = styled.a`
   margin-left: 5px;

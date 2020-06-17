@@ -1,8 +1,11 @@
 import React, { useState, useReducer, useEffect, useRef } from "react";
+import PropTypes from "prop-types";
 import axios from "axios";
 import { connect } from "react-redux";
-import PropTypes from "prop-types";
 import styled from "@emotion/styled";
+
+import { useUsernameValidityCheck } from "../hooks/useUsernameValidityCheck";
+
 import AddBookModal from "./AddBookModal";
 import Shelf from "./Shelf";
 import NotLoggedInHeader from "./NotLoggedInHeader";
@@ -55,8 +58,10 @@ const pageReducer = (state, action) => {
 };
 
 function FullShelf(props) {
+  // Acquire the username from route parameters and check if it is valid
   const username = props.match.params.username;
   const [validUsername, setValidUsername] = useState(false);
+  useUsernameValidityCheck(username, setValidUsername);
 
   const queryString = new URLSearchParams(props.location.search);
   const pageValues = queryString.getAll("page");
@@ -89,23 +94,6 @@ function FullShelf(props) {
   const triggerBookModalUpdate = () => {
     setBookModalUpdates((prev) => prev + 1);
   };
-
-  // If the user is not logged in, you need to find a way to make sure that this username is valid
-  useEffect(() => {
-    async function checkUsername() {
-      try {
-        const response = await axios.get(
-          "http://localhost:5000/auth/checkUsername",
-          { params: { username } }
-        );
-        if (response.status === 200) setValidUsername(true);
-      } catch (e) {
-        // validUsername is already set to false, so no need to set it to false again
-        console.log(e);
-      }
-    }
-    checkUsername();
-  }, [username]);
 
   // This is the effect that updates various pageState such as the total page count and whether or not to show certain buttons
   useEffect(() => {
