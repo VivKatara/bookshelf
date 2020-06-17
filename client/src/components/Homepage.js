@@ -157,9 +157,16 @@ function Homepage(props) {
                 shelfUpdate={handleShelfUpdate}
               />
             )}
-            <Add ref={buttonRef} onClick={changeModal}>
-              Add Book to Shelf
-            </Add>
+            {props.isLoggedIn ? (
+              <Add ref={buttonRef} onClick={changeModal}>
+                Add Book to Shelf
+              </Add>
+            ) : (
+              <AuthButtons>
+                <SignUp href="/register">Sign Up</SignUp>
+                {/* <Divider>/</Divider> */}/<Login href="/login">Login</Login>
+              </AuthButtons>
+            )}
             <CurrentTitle>Currently Reading</CurrentTitle>
             <Shelf
               isbns={isbnState.currentIsbns}
@@ -277,6 +284,38 @@ const SeeAll = styled.a`
   color: #287bf8;
   &:hover {
     cursor: pointer;
+  }
+`;
+
+export const AuthButtons = styled.div`
+  margin-left: 80%;
+  margin-top: 20px;
+  display: inline-flex;
+  // flex-direction: row;
+  align-items: flex-start;
+  // background-color: yellow;
+  color: white;
+`;
+
+export const SignUp = styled.a`
+  margin-right: 5px;
+  color: #287bf8;
+  text-decoration: none;
+  &:hover {
+    cursor: pointer;
+    text-decoration: underline;
+  }
+`;
+
+export const Divider = styled.p``;
+
+export const Login = styled.a`
+  margin-left: 5px;
+  color: #287bf8;
+  text-decoration: none;
+  &:hover {
+    cursor: pointer;
+    text-decoration: underline;
   }
 `;
 
