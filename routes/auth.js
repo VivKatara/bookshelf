@@ -194,6 +194,20 @@ router.delete("/logout", async (req, res) => {
   return res.status(200).json({ msg: "Successful logout", success: true });
 });
 
+router.get("/checkUsername", async (req, res) => {
+  const { username } = req.query;
+  const user = await User.findOne({ username });
+  if (user) return res.status(200).json({ msg: "Success" });
+  else return res.status(400).json({ msg: "Can't find username" });
+});
+
+router.get("/getUserFullName", async (req, res) => {
+  const { username } = req.query;
+  const user = await User.findOne({ username });
+  if (user) return res.status(200).json({ userFullName: user.fullName });
+  else return res.status(400).json({ msg: "Can't find user's full name" });
+});
+
 function generateAccessToken(payload, secret, expires) {
   return jwt.sign(payload, secret, { expiresIn: expires });
 }

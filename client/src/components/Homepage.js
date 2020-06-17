@@ -5,6 +5,8 @@ import { connect } from "react-redux";
 import styled from "@emotion/styled";
 import Shelf from "./Shelf";
 import AddBookModal from "./AddBookModal";
+import NotFound from "./NotFound";
+import NotLoggedInHeader from "./NotLoggedInHeader";
 
 const initialState = {
   currentIsbns: [],
@@ -38,6 +40,7 @@ export const UserContext = React.createContext();
 
 function Homepage(props) {
   const username = props.match.params.username;
+  const [validUsername, setValidUsername] = useState(false);
 
   const [show, setModal] = useState(false);
   const [isbnState, dispatch] = useReducer(reducer, initialState);
@@ -46,6 +49,23 @@ function Homepage(props) {
   const [futureUpdates, setFutureUpdates] = useState(0);
   const buttonRef = useRef(null);
   const [bookModalUpdates, setBookModalUpdates] = useState(0);
+
+  // If the user is not logged in, you need to find a way to make sure that this username is valid
+  useEffect(() => {
+    async function checkUsername() {
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/auth/checkUsername",
+          { params: { username } }
+        );
+        if (response.status === 200) setValidUsername(true);
+      } catch (e) {
+        // validUsername is already set to false, so no need to set it to false again
+        console.log(e);
+      }
+    }
+    checkUsername();
+  }, [username]);
 
   useEffect(() => {
     async function getCurrentBookIsbns() {
@@ -123,61 +143,75 @@ function Homepage(props) {
       setFutureUpdates((prev) => prev + 1);
     }
   };
-
-  return (
-    <MainContainer>
-      <UserContext.Provider value={username}>
-        {show && (
-          <AddBookModal
-            buttonRef={buttonRef}
-            handleClose={changeModal}
-            shelfUpdate={handleShelfUpdate}
-          />
-        )}
-        <Add ref={buttonRef} onClick={changeModal}>
-          Add Book to Shelf
-        </Add>
-        <CurrentTitle>Currently Reading</CurrentTitle>
-        <Shelf
-          isbns={isbnState.currentIsbns}
-          shelf="currentBooks"
-          handleModalUpdate={triggerBookModalUpdate}
-        >
-          <Links>
-            <SeeAll href={`/${username}shelf/current?page=1`}>See All</SeeAll>
-          </Links>
-        </Shelf>
-        <PastTitle>Have Read</PastTitle>
-        <Shelf
-          isbns={isbnState.pastIsbns}
-          shelf="pastBooks"
-          handleModalUpdate={triggerBookModalUpdate}
-        >
-          <Links>
-            <SeeAll href={`/${username}/shelf/past?page=1`}>See All</SeeAll>
-          </Links>
-        </Shelf>
-        <FutureTitle>Want to Read</FutureTitle>
-        <Shelf
-          isbns={isbnState.futureIsbns}
-          shelf="futureBooks"
-          handleModalUpdate={triggerBookModalUpdate}
-        >
-          <Links>
-            <SeeAll href={`/${username}/shelf/future?page=1`}>See All</SeeAll>
-          </Links>
-        </Shelf>
-      </UserContext.Provider>
-    </MainContainer>
-  );
+  console.log(props);
+  if (validUsername) {
+    return (
+      <>
+        {!props.isLoggedIn && <NotLoggedInHeader username={username} />}
+        <MainContainer>
+          <UserContext.Provider value={username}>
+            {show && (
+              <AddBookModal
+                buttonRef={buttonRef}
+                handleClose={changeModal}
+                shelfUpdate={handleShelfUpdate}
+              />
+            )}
+            <Add ref={buttonRef} onClick={changeModal}>
+              Add Book to Shelf
+            </Add>
+            <CurrentTitle>Currently Reading</CurrentTitle>
+            <Shelf
+              isbns={isbnState.currentIsbns}
+              shelf="currentBooks"
+              handleModalUpdate={triggerBookModalUpdate}
+            >
+              <Links>
+                <SeeAll href={`/${username}shelf/current?page=1`}>
+                  See All
+                </SeeAll>
+              </Links>
+            </Shelf>
+            <PastTitle>Have Read</PastTitle>
+            <Shelf
+              isbns={isbnState.pastIsbns}
+              shelf="pastBooks"
+              handleModalUpdate={triggerBookModalUpdate}
+            >
+              <Links>
+                <SeeAll href={`/${username}/shelf/past?page=1`}>See All</SeeAll>
+              </Links>
+            </Shelf>
+            <FutureTitle>Want to Read</FutureTitle>
+            <Shelf
+              isbns={isbnState.futureIsbns}
+              shelf="futureBooks"
+              handleModalUpdate={triggerBookModalUpdate}
+            >
+              <Links>
+                <SeeAll href={`/${username}/shelf/future?page=1`}>
+                  See All
+                </SeeAll>
+              </Links>
+            </Shelf>
+          </UserContext.Provider>
+        </MainContainer>
+      </>
+    );
+  } else {
+    // Here, we will make a not found component to display
+    return <NotFound />;
+  }
 }
 
 Homepage.propTypes = {
   username: PropTypes.string.isRequired,
+  isLoggedIn: PropTypes.bool.isRequired,
 };
 
 const mapStateToProps = (state) => ({
   username: state.userState.username,
+  isLoggedIn: state.userState.isLoggedIn,
 });
 
 export default connect(mapStateToProps, {})(Homepage);
