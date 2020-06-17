@@ -2,7 +2,7 @@ import React, { useState, useReducer, useEffect, useRef } from "react";
 import axios from "axios";
 import { useOutsideClick } from "../hooks/useOutsideClick";
 import styled from "@emotion/styled";
-import { Form, Input } from "./Login";
+import { Form, Input } from "../styles/authForms";
 
 const initialState = {
   title: "",

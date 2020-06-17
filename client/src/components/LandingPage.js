@@ -46,7 +46,6 @@ const CentralDiv = styled.div`
   flex-direction: column;
   align-items: center;
   text-align: center;
-  // background-color: blue;
   color: white;
 
   @media (max-width: 700px) {
@@ -64,7 +63,6 @@ const Caption = styled.div`
   min-height: 100px;
   text-align: left;
   font-size: 24px;
-  // background-color: red;
   @media (max-width: 500px) {
     width: 80%;
   }

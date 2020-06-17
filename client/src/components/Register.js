@@ -1,7 +1,14 @@
 import React, { useReducer } from "react";
 import { useHistory } from "react-router-dom";
 import axios from "axios";
-import styled from "@emotion/styled";
+import {
+  MainContainer,
+  CentralDiv,
+  Form,
+  FormDiv,
+  Input,
+  SubmitButton,
+} from "../styles/authForms";
 
 const initialState = {
   email: "",
@@ -121,7 +128,7 @@ const Register = () => {
             />
           </FormDiv>
           <FormDiv>
-            <RegisterButton type="Submit">Sign Up</RegisterButton>
+            <SubmitButton type="Submit">Sign Up</SubmitButton>
           </FormDiv>
         </Form>
       </CentralDiv>
@@ -130,60 +137,3 @@ const Register = () => {
 };
 
 export default Register;
-
-const MainContainer = styled.div`
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-color: #222222;
-`;
-
-const CentralDiv = styled.div`
-  width: 50%;
-  min-height: 500px;
-  display: flex;
-  flex-direction: column;
-  text-align: center;
-  color: white;
-`;
-
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-`;
-
-const FormDiv = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin-top: 20px;
-  margin-left: 25%;
-  text-align: left;
-`;
-
-const Input = styled.input`
-  height: 20px;
-  width: 290px;
-  border: none;
-  border-radius: 5px;
-  padding: 2px;
-  margin-top: 10px;
-`;
-
-const RegisterButton = styled.button`
-  height: 30px;
-  width: 300px;
-  margin-top: 20px;
-  outline: none;
-  border: none;
-  border-radius: 10px;
-  text-align: center;
-  background-color: #287bf8;
-  color: #ffffff;
-
-  &:hover {
-    cursor: pointer;
-  }
-`;

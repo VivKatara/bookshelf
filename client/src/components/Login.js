@@ -3,8 +3,15 @@ import PropTypes from "prop-types";
 import { useHistory } from "react-router-dom";
 import { connect } from "react-redux";
 import axios from "axios";
-import styled from "@emotion/styled";
 import { setUser } from "../actions/setUser";
+import {
+  MainContainer,
+  CentralDiv,
+  Form,
+  FormDiv,
+  Input,
+  SubmitButton,
+} from "../styles/authForms";
 
 const initialState = {
   email: "",
@@ -84,7 +91,7 @@ const Login = (props) => {
             />
           </FormDiv>
           <FormDiv>
-            <LoginButton type="Submit">Continue</LoginButton>
+            <SubmitButton type="Submit">Continue</SubmitButton>
           </FormDiv>
         </Form>
       </CentralDiv>
@@ -99,60 +106,3 @@ Login.propTypes = {
 };
 
 export default connect(mapStateToProps, { setUser })(Login);
-
-const MainContainer = styled.div`
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-color: #222222;
-`;
-
-const CentralDiv = styled.div`
-  width: 50%;
-  min-height: 500px;
-  display: flex;
-  flex-direction: column;
-  text-align: center;
-  color: white;
-`;
-
-export const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-`;
-
-const FormDiv = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin-top: 20px;
-  margin-left: 25%;
-  text-align: left;
-`;
-
-export const Input = styled.input`
-  height: 20px;
-  width: 290px;
-  border: none;
-  border-radius: 5px;
-  padding: 2px;
-  margin-top: 10px;
-`;
-
-const LoginButton = styled.button`
-  height: 30px;
-  width: 300px;
-  margin-top: 20px;
-  outline: none;
-  border: none;
-  border-radius: 10px;
-  text-align: center;
-  background-color: #287bf8;
-  color: #ffffff;
-
-  &:hover {
-    cursor: pointer;
-  }
-`;
