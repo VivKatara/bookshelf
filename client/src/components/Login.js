@@ -9,6 +9,8 @@ import {
   CentralDiv,
   Form,
   FormDiv,
+  FormHeader,
+  Label,
   Input,
   SubmitButton,
 } from "../styles/authForms";
@@ -62,10 +64,10 @@ const Login = (props) => {
       <CentralDiv>
         <Form onSubmit={handleSubmit}>
           <FormDiv>
-            <h3>Sign into your Bookshelf account</h3>
+            <FormHeader>Sign into your Bookshelf account</FormHeader>
           </FormDiv>
           <FormDiv>
-            <label>Email</label>
+            <Label>Email</Label>
             <Input
               type="text"
               name="email"
@@ -78,7 +80,7 @@ const Login = (props) => {
             />
           </FormDiv>
           <FormDiv>
-            <label>Password</label>
+            <Label>Password</Label>
             <Input
               type="text"
               name="password"

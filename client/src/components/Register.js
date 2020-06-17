@@ -6,6 +6,8 @@ import {
   CentralDiv,
   Form,
   FormDiv,
+  FormHeader,
+  Label,
   Input,
   SubmitButton,
 } from "../styles/authForms";
@@ -70,10 +72,10 @@ const Register = () => {
       <CentralDiv>
         <Form onSubmit={handleSubmit}>
           <FormDiv>
-            <h3>Create your Bookshelf account</h3>
+            <FormHeader>Create your Bookshelf account</FormHeader>
           </FormDiv>
           <FormDiv>
-            <label>Email</label>
+            <Label>Email</Label>
             <Input
               type="text"
               name="email"
@@ -86,7 +88,7 @@ const Register = () => {
             />
           </FormDiv>
           <FormDiv>
-            <label>Full Name</label>
+            <Label>Full Name</Label>
             <Input
               type="text"
               name="fullName"
@@ -99,7 +101,7 @@ const Register = () => {
             />
           </FormDiv>
           <FormDiv>
-            <label>Password</label>
+            <Label>Password</Label>
             <Input
               type="text"
               name="password"
@@ -112,7 +114,7 @@ const Register = () => {
             />
           </FormDiv>
           <FormDiv>
-            <label>Confirm Password</label>
+            <Label>Confirm Password</Label>
             <Input
               type="text"
               name="passwordConfirm"

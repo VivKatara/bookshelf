@@ -19,7 +19,7 @@ function Header(props) {
           <p>Bookshelf</p>
         </HyperLink>
         <User>
-          <p>{props.userName}</p>
+          <Username>{props.userName}</Username>
           <Profile ref={buttonRef} onClick={changeModal}>
             {props.userName[0]}
           </Profile>
@@ -42,52 +42,72 @@ export default connect(mapStateToProps, {})(Header);
 
 const HeaderContainer = styled.div`
   width: 100%;
-  min-height: 50px;
-  border-bottom: 1px solid white;
   display: flex;
   flex-direction: row;
-  color: #ffffff;
+  border-bottom: 1px solid white;
   font-size: 20px;
   background-color: #222222;
-  // background-color: blue;
+  color: #ffffff;
+
+  @media (max-width: 400px) {
+    font-size: 14px;
+  }
 `;
 
 const HyperLink = styled.a`
   margin-left: 10%;
   color: white;
   text-decoration: none;
-
   &:hover {
     color: #287bf8;
   }
-  // background-color: blue;
 `;
 
 const User = styled.div`
-  width: 15%;
-  display: flex;
-  flex-direction: row;
   margin-left: auto;
   margin-right: 10%;
-  // background-color: green;
+  flex-basis: 50%;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+
+  @media (max-width: 400px) {
+    margin-right: 10px;
+  }
+`;
+
+const Username = styled.p`
+  margin-right: 30px;
+
+  @media (max-width: 400px) {
+    margin-right: 10px;
+  }
 `;
 
 const Profile = styled.button`
-  margin-left: 20%;
-  margin-top: 10px;
-  color: white;
-  height: 40px;
   width: 40px;
-  background: none;
+  height: 40px;
   border: 1px solid white;
   border-radius: 50%;
+  font-size: 20px;
+  background-color: red;
+  color: white;
+
   &:hover {
     cursor: pointer;
   }
+
   &:active,
   &:focus {
     text-decoration: none;
     outline: none;
   }
-  font-size: 20px;
+
+  @media (max-width: 400px) {
+    width: 30px;
+    height: 30px;
+    font-size: 12px;
+  }
 `;

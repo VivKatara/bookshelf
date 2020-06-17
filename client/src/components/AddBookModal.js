@@ -2,7 +2,13 @@ import React, { useState, useReducer, useEffect, useRef } from "react";
 import axios from "axios";
 import { useOutsideClick } from "../hooks/useOutsideClick";
 import styled from "@emotion/styled";
-import { Form, Input } from "../styles/authForms";
+import {
+  Form,
+  FormHeader,
+  Label,
+  Input,
+  SubmitButton,
+} from "../styles/authForms";
 
 const initialState = {
   title: "",
@@ -89,10 +95,10 @@ function AddBookModal(props) {
       <CloseButton onClick={handleClose}>X</CloseButton>
       <Form onSubmit={handleSubmit}>
         <FormDiv>
-          <h3>Add a Book to one of your Shelves</h3>
+          <FormHeader>Add a Book to one of your Shelves</FormHeader>
         </FormDiv>
         <FormDiv>
-          <label>Title</label>
+          <Label>Title</Label>
           <Input
             type="text"
             name="title"
@@ -104,7 +110,7 @@ function AddBookModal(props) {
           />
         </FormDiv>
         <FormDiv>
-          <label>Author</label>
+          <Label>Author</Label>
           <Input
             type="text"
             name="author"
@@ -116,7 +122,7 @@ function AddBookModal(props) {
           />
         </FormDiv>
         <FormDiv>
-          <label>Shelf</label>
+          <Label>Shelf</Label>
           <Select
             id="shelf"
             name="shelf"
@@ -126,9 +132,6 @@ function AddBookModal(props) {
             }
           >
             {shelfOptions}
-            {/* <option value="currentBooks">Currently Reading</option>
-              <option value="pastBooks">Have Read</option>
-              <option value="futureBooks">Want to Read</option> */}
           </Select>
         </FormDiv>
         <FormDiv>
@@ -142,15 +145,20 @@ function AddBookModal(props) {
 export default AddBookModal;
 
 export const MainModal = styled.div`
+  width: 50%;
+  heigth: 50%;
   position: fixed;
-  background-color: #333333;
-  min-width: 50%;
-  max-width: 50%;
-  min-height: 50%;
-  max-height: 50%;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  background-color: #333333;
+  z-index: 1;
+
+  @media (max-width: 700px) {
+    width: 90%;
+  }
 `;
 
 const FormDiv = styled.div`
@@ -160,6 +168,7 @@ const FormDiv = styled.div`
   margin-left: auto;
   margin-right: auto;
   text-align: left;
+  // background-color: green;
   color: white;
 `;
 
@@ -170,29 +179,14 @@ const Select = styled.select`
   border-radius: 5px;
   padding: 2px;
   margin-top: 10px;
-`;
 
-const SubmitButton = styled.button`
-  height: 30px;
-  width: 300px;
-  margin-top: 20px;
-  outline: none;
-  border: none;
-  border-radius: 10px;
-  text-align: center;
-  background-color: #287bf8;
-  color: #ffffff;
-
-  &:hover {
-    cursor: pointer;
+  @media (max-width: 400px) {
+    width: 200px;
   }
 `;
 
 const CloseButton = styled.button`
-  position: fixed;
-  width: 5%;
-  margin-top: 5px;
-  margin-left: 95%;
+  margin-left: auto;
   border: none;
   outline: none;
   color: white;
