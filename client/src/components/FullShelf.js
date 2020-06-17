@@ -1,14 +1,7 @@
-import React, {
-  useState,
-  useReducer,
-  useEffect,
-  useLocation,
-  useRef,
-} from "react";
+import React, { useState, useReducer, useEffect, useRef } from "react";
 import axios from "axios";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
-import { Link } from "react-router-dom";
 import styled from "@emotion/styled";
 import AddBookModal from "./AddBookModal";
 import Shelf from "./Shelf";
