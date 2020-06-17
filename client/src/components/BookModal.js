@@ -165,21 +165,22 @@ function NewBookModal(props) {
 export default NewBookModal;
 
 export const BookDescription = styled.div`
-  // display: flex;
-  // flex-direction: column;
+  display: flex;
+  flex-direction: column;
   // background-color: blue;
-  // overflow: auto;
 `;
 
 export const BookDescriptionDiv = styled.div`
   display: flex;
   flex-direction: row;
   // background-color: red;
-  // overflow: auto;
-  font-size: 8px;
+  font-size: 12px;
+  margin-top: 10px;
 `;
 
 export const Label = styled.p`
+  // background-color: orange;
+  min-width: 100px;
   color: white;
   margin-left: 10%;
 `;
@@ -235,6 +236,7 @@ export const SaveChangesButton = styled.button`
   height: 30px;
   margin-left: 25%;
   margin-top: 20px;
+  margin-bottom: 20px;
   border: none;
   border-radius: 10px;
   background-color: #287bf8;
