@@ -146,7 +146,7 @@ export default AddBookModal;
 
 export const MainModal = styled.div`
   width: 50%;
-  heigth: 50%;
+  height: 50%;
   position: fixed;
   top: 50%;
   left: 50%;

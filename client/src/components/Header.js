@@ -4,13 +4,11 @@ import { connect } from "react-redux";
 import styled from "@emotion/styled";
 import ProfileModal from "./ProfileModal";
 
-function Header(props) {
-  const [show, setShowModal] = useState(false);
-  const buttonRef = useRef(null);
+import { useModal } from "../hooks/useModal";
 
-  const changeModal = () => {
-    setShowModal((prev) => !prev);
-  };
+function Header(props) {
+  const [show, toggleModal] = useModal();
+  const buttonRef = useRef(null);
 
   return (
     <>
@@ -20,12 +18,12 @@ function Header(props) {
         </HyperLink>
         <User>
           <Username>{props.userFullName}</Username>
-          <Profile ref={buttonRef} onClick={changeModal}>
+          <Profile ref={buttonRef} onClick={toggleModal}>
             {props.userFullName[0]}
           </Profile>
         </User>
       </HeaderContainer>
-      {show && <ProfileModal buttonRef={buttonRef} handleClose={changeModal} />}
+      {show && <ProfileModal buttonRef={buttonRef} handleClose={toggleModal} />}
     </>
   );
 }

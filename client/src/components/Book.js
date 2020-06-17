@@ -9,6 +9,8 @@ import axios from "axios";
 import styled from "@emotion/styled";
 import BookModal from "./BookModal";
 
+import { useModal } from "../hooks/useModal";
+
 const initialState = {
   foundBook: false,
   title: "",
@@ -35,7 +37,7 @@ const reducer = (state, action) => {
 function Book(props) {
   const { isbn, handleModalUpdate } = props;
   const [bookState, dispatch] = useReducer(reducer, initialState);
-  const [show, setShowModal] = useState(false);
+  const [show, toggleModal] = useModal();
   const buttonRef = useRef(null);
 
   useEffect(() => {
@@ -66,13 +68,9 @@ function Book(props) {
     getImage();
   }, [isbn]);
 
-  const changeModal = () => {
-    setShowModal((prev) => !prev);
-  };
-
   return (
     <>
-      <BookContainer ref={buttonRef} onClick={changeModal}>
+      <BookContainer ref={buttonRef} onClick={toggleModal}>
         {bookState.foundBook && (
           <img
             src={bookState.coverImage}
@@ -88,7 +86,7 @@ function Book(props) {
           title={bookState.title}
           authors={bookState.authors}
           description={bookState.description}
-          handleClose={changeModal}
+          handleClose={toggleModal}
           buttonRef={buttonRef}
           handleModalUpdate={handleModalUpdate}
         />

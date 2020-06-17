@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useReducer, useRef } from "react";
 import PropTypes from "prop-types";
-import axios from "axios";
 import { connect } from "react-redux";
 import styled from "@emotion/styled";
 
 import { useUsernameValidityCheck } from "../hooks/useUsernameValidityCheck";
 import { useAbilityToGetDisplayBooks } from "../hooks/useAbilityToGetDisplayBooks";
+import { useModal } from "../hooks/useModal";
 
 import Shelf from "./Shelf";
 import AddBookModal from "./AddBookModal";
@@ -52,7 +52,7 @@ function Homepage(props) {
   const [isbnState, dispatch] = useReducer(reducer, initialState);
 
   // Logic to track the modal, as well as whether there were any updates to a shelf, or a particular book
-  const [show, setModal] = useState(false);
+  const [show, toggleModal] = useModal();
   const buttonRef = useRef(null);
   const [currentUpdates, setCurrentUpdates] = useState(0);
   const [pastUpdates, setPastUpdates] = useState(0);
@@ -86,13 +86,9 @@ function Homepage(props) {
     bookModalUpdates
   );
 
-  const changeModal = () => {
-    setModal((prev) => !prev);
-  };
-
-  const triggerBookModalUpdate = () => {
-    setBookModalUpdates((prev) => prev + 1);
-  };
+  // const changeModal = () => {
+  //   setModal((prev) => !prev);
+  // };
 
   const handleShelfUpdate = (shelf) => {
     if (shelf === "currentBooks") {
@@ -104,6 +100,10 @@ function Homepage(props) {
     if (shelf === "futureBooks") {
       setFutureUpdates((prev) => prev + 1);
     }
+  };
+
+  const triggerBookModalUpdate = () => {
+    setBookModalUpdates((prev) => prev + 1);
   };
 
   //TODO Make a nice Loading component
@@ -118,12 +118,12 @@ function Homepage(props) {
             {show && (
               <AddBookModal
                 buttonRef={buttonRef}
-                handleClose={changeModal}
+                handleClose={toggleModal}
                 shelfUpdate={handleShelfUpdate}
               />
             )}
             {props.isLoggedIn ? (
-              <Add ref={buttonRef} onClick={changeModal}>
+              <Add ref={buttonRef} onClick={toggleModal}>
                 Add Book to Shelf
               </Add>
             ) : (
