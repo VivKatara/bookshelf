@@ -13,12 +13,13 @@ function AuthLinks() {
 export default AuthLinks;
 
 export const AuthLinksContainer = styled.div`
-  margin-left: 80%;
   margin-top: 20px;
-  display: inline-flex;
+  margin-left: auto;
+  margin-right: 11%;
   flex-direction: row;
   align-items: flex-start;
   color: white;
+  // background-color: white;
 `;
 
 export const Link = styled.a`

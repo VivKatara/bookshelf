@@ -13,22 +13,19 @@ function SeeAll(props) {
 export default SeeAll;
 
 const LinkContainer = styled.div`
-  position: absolute;
-  width: 10%;
-  display: flex;
-  flex-direction: column;
-  margin-left: 70%;
-  margin-top: 20px;
+  margin-left: auto;
+  margin-right: 2%;
+  align-self: flex-end;
   color: #287bf8;
-  text-align: center;
-  //   background-color: white;
+  // background-color: white;
 `;
 
 const Link = styled.a`
-  margin-top: 140px;
+  width: max-content;
   text-decoration: none;
   color: #287bf8;
   &:hover {
     cursor: pointer;
   }
+  // background-color: red;
 `;

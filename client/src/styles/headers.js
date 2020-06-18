@@ -12,6 +12,7 @@ export const HeaderContainer = styled.div`
   @media (max-width: 400px) {
     font-size: 14px;
   }
+  // background-color: red;
 `;
 
 export const HyperLink = styled.a`
@@ -25,17 +26,15 @@ export const HyperLink = styled.a`
 
 export const User = styled.div`
   margin-left: auto;
-  margin-right: 10%;
-  flex-basis: 50%;
-  flex-grow: 1;
+  margin-right: 5%;
   display: flex;
   flex-direction: row;
-  justify-content: flex-end;
-  align-items: center;
+  align-items: baseline;
 
   @media (max-width: 400px) {
     margin-right: 10px;
   }
+  // background-color: green;
 `;
 
 export const Username = styled.p`

@@ -14,10 +14,13 @@ export default AddBookLink;
 
 export const AddBookLinkContainer = styled.a`
   margin-top: 20px;
-  margin-left: 80%;
+  margin-left: auto;
+  margin-right: 11%;
+  width: max-content;
   color: #287bf8;
   &:hover {
     cursor: pointer;
     text-decoration: underline;
   }
+  // background-color: white;
 `;
