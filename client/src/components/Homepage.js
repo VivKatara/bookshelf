@@ -11,7 +11,7 @@ import Shelf from "./Shelf";
 import AddBookModal from "./AddBookModal";
 import Loading from "./Loading";
 import NotFound from "./NotFound";
-import NotLoggedInHeader from "./NotLoggedInHeader";
+import NotLoggedInHeader from "./headers/NotLoggedInHeader";
 
 const initialState = {
   currentIsbns: [],

@@ -8,7 +8,7 @@ import {
 } from "react-router-dom";
 import { connect } from "react-redux";
 
-import Header from "./Header";
+import LoggedInHeader from "./headers/LoggedInHeader";
 import Homepage from "./Homepage";
 import FullShelf from "./FullShelf";
 import LandingPage from "./LandingPage";
@@ -49,7 +49,7 @@ export default connect(mapStateToProps, { setUser })(Routes);
 const PrivateRoutes = (props) => {
   return (
     <>
-      <Header />
+      <LoggedInHeader />
       <Switch>
         <Redirect exact from="/" to={`/${props.username}`} />
         <Redirect exact from="/login" to={`/${props.username}`} />

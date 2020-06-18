@@ -8,7 +8,7 @@ import { useUsernameValidityCheck } from "../hooks/useUsernameValidityCheck";
 
 import AddBookModal from "./AddBookModal";
 import Shelf from "./Shelf";
-import NotLoggedInHeader from "./NotLoggedInHeader";
+import NotLoggedInHeader from "./headers/NotLoggedInHeader";
 import Loading from "./Loading";
 import NotFound from "./NotFound";
 
