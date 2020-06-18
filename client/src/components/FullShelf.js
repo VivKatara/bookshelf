@@ -201,32 +201,36 @@ function FullShelf(props) {
               <Login href="/login">Login</Login>
             </AuthButtons>
           )}
-          <Title>{pageState.shelfTitle}</Title>
-          <Shelf
-            isbns={shelfState.firstShelfIsbn}
-            shelf={shelf}
-            handleModalUpdate={triggerBookModalUpdate}
-          />
-          {pageState.showPrevious && (
-            <PreviousButton href={`${props.match.url}?page=${page - 1}`}>
-              Previous
-            </PreviousButton>
-          )}
-          <Shelf
-            isbns={shelfState.secondShelfIsbn}
-            shelf={shelf}
-            handleModalUpdate={triggerBookModalUpdate}
-          />
-          {pageState.showNext && (
-            <NextButton href={`${props.match.url}?page=${page + 1}`}>
-              Next
-            </NextButton>
-          )}
-          <Shelf
-            isbns={shelfState.thirdShelfIsbn}
-            shelf={shelf}
-            handleModalUpdate={triggerBookModalUpdate}
-          />
+          <CentralDiv>
+            <Title>{pageState.shelfTitle}</Title>
+            <Shelf
+              isbns={shelfState.firstShelfIsbn}
+              shelf={shelf}
+              handleModalUpdate={triggerBookModalUpdate}
+            />
+            {pageState.showPrevious && (
+              <PreviousButton href={`${props.match.url}?page=${page - 1}`}>
+                Previous
+              </PreviousButton>
+            )}
+            <Space />
+            <Shelf
+              isbns={shelfState.secondShelfIsbn}
+              shelf={shelf}
+              handleModalUpdate={triggerBookModalUpdate}
+            />
+            {pageState.showNext && (
+              <NextButton href={`${props.match.url}?page=${page + 1}`}>
+                Next
+              </NextButton>
+            )}
+            <Space />
+            <Shelf
+              isbns={shelfState.thirdShelfIsbn}
+              shelf={shelf}
+              handleModalUpdate={triggerBookModalUpdate}
+            />
+          </CentralDiv>
         </MainContainer>
       </>
     );
@@ -253,6 +257,11 @@ export const MainContainer = styled.div`
   background-color: #222222;
 `;
 
+export const CentralDiv = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
 const PageCount = styled.p`
   position: absolute;
   margin-left: 5%;
@@ -270,11 +279,14 @@ export const Add = styled.a`
 `;
 
 const Title = styled.p`
-  position: absolute;
-  color: white;
-  font-size: 14px;
+  position: relative;
   margin-left: 10%;
-  margin-top: 50px;
+  font-size: 14px;
+  color: white;
+`;
+
+const Space = styled.div`
+  flex-basis: 45px;
 `;
 
 const PreviousButton = styled.a`

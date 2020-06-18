@@ -128,40 +128,44 @@ function Homepage(props) {
                 {/* <Divider>/</Divider> */}/<Login href="/login">Login</Login>
               </AuthButtons>
             )}
-            <CurrentTitle>Currently Reading</CurrentTitle>
-            <Shelf
-              isbns={isbnState.currentIsbns}
-              shelf="currentBooks"
-              handleModalUpdate={triggerBookModalUpdate}
-            >
-              <Links>
-                <SeeAll href={`/${username}/shelf/current?page=1`}>
-                  See All
-                </SeeAll>
-              </Links>
-            </Shelf>
-            <PastTitle>Have Read</PastTitle>
-            <Shelf
-              isbns={isbnState.pastIsbns}
-              shelf="pastBooks"
-              handleModalUpdate={triggerBookModalUpdate}
-            >
-              <Links>
-                <SeeAll href={`/${username}/shelf/past?page=1`}>See All</SeeAll>
-              </Links>
-            </Shelf>
-            <FutureTitle>Want to Read</FutureTitle>
-            <Shelf
-              isbns={isbnState.futureIsbns}
-              shelf="futureBooks"
-              handleModalUpdate={triggerBookModalUpdate}
-            >
-              <Links>
-                <SeeAll href={`/${username}/shelf/future?page=1`}>
-                  See All
-                </SeeAll>
-              </Links>
-            </Shelf>
+            <CentralDiv>
+              <Title>Currently Reading</Title>
+              <Shelf
+                isbns={isbnState.currentIsbns}
+                shelf="currentBooks"
+                handleModalUpdate={triggerBookModalUpdate}
+              >
+                <Links>
+                  <SeeAll href={`/${username}/shelf/current?page=1`}>
+                    See All
+                  </SeeAll>
+                </Links>
+              </Shelf>
+              <Title>Have Read</Title>
+              <Shelf
+                isbns={isbnState.pastIsbns}
+                shelf="pastBooks"
+                handleModalUpdate={triggerBookModalUpdate}
+              >
+                <Links>
+                  <SeeAll href={`/${username}/shelf/past?page=1`}>
+                    See All
+                  </SeeAll>
+                </Links>
+              </Shelf>
+              <Title>Want to Read</Title>
+              <Shelf
+                isbns={isbnState.futureIsbns}
+                shelf="futureBooks"
+                handleModalUpdate={triggerBookModalUpdate}
+              >
+                <Links>
+                  <SeeAll href={`/${username}/shelf/future?page=1`}>
+                    See All
+                  </SeeAll>
+                </Links>
+              </Shelf>
+            </CentralDiv>
           </UserContext.Provider>
         </MainContainer>
       </>
@@ -215,28 +219,11 @@ const Links = styled.div`
   // background-color: white;
 `;
 
-const CurrentTitle = styled.p`
-  position: absolute;
-  color: white;
-  font-size: 14px;
+const Title = styled.p`
+  position: relative;
   margin-left: 10%;
-  margin-top: 50px;
-`;
-
-const PastTitle = styled.p`
-  position: absolute;
-  color: white;
   font-size: 14px;
-  margin-left: 10%;
-  margin-top: 300px;
-`;
-
-const FutureTitle = styled.p`
-  position: absolute;
   color: white;
-  font-size: 14px;
-  margin-left: 10%;
-  margin-top: 530px;
 `;
 
 const SeeAll = styled.a`
@@ -246,6 +233,12 @@ const SeeAll = styled.a`
   &:hover {
     cursor: pointer;
   }
+`;
+
+const CentralDiv = styled.div`
+  display: flex;
+  flex-direction: column;
+  // background-color: red;
 `;
 
 export const AuthButtons = styled.div`

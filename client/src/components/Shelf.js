@@ -27,50 +27,19 @@ export default React.memo(Shelf);
 
 const ShelfContainer = styled.div`
   width: 80%;
-  height: 235px;
+  height: 200px;
   // margin-top: 20px;
   margin-left: 10%;
   display: flex;
   flex-direction: column;
   border-bottom: 1px solid white;
-  // background-color: red;
-`;
-
-const ShelfTitle = styled.div`
-  // margin-top: 20px;
-  font-size: 14px;
-  color: #ffffff;
-  // background-color: black;
+  // background-color: white;
 `;
 
 const ShelfItems = styled.div`
   width: 100%;
+  margin-top: 20px;
   display: flex;
   flex-direction: row;
-  margin-top: 50px;
   // background-color: yellow;
-`;
-const Links = styled.div`
-  position: absolute;
-  width: 10%;
-  display: flex;
-  flex-direction: column;
-  margin-left: 70%;
-  margin-top: 20px;
-  color: #287bf8;
-  text-align: center;
-  // background-color: white;
-`;
-
-const Add = styled.a`
-  &:hover {
-    cursor: pointer;
-  }
-`;
-
-const SeeAll = styled.a`
-  margin-top: 140px;
-  &:hover {
-    cursor: pointer;
-  }
 `;
