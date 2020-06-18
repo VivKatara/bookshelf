@@ -5,13 +5,14 @@ import React, {
   useContext,
   useRef,
 } from "react";
-import { useOutsideClick } from "../hooks/useOutsideClick";
-import axios from "axios";
-import styled from "@emotion/styled";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { MainModal } from "./AddBookModal";
+import axios from "axios";
+import styled from "@emotion/styled";
+
 import { ShelfContext } from "./Shelf";
+
+import { useOutsideClick } from "../hooks/useOutsideClick";
 
 const initialState = {
   shelf: "",
@@ -22,7 +23,7 @@ const reducer = (state, action) => {
     case "UPDATE_SHELF":
       return {
         ...state,
-        shelf: action.payload,
+        shelf: action.payload.shelf,
       };
     default:
       return state;
@@ -39,6 +40,7 @@ function BooKModal(props) {
     buttonRef,
     handleModalUpdate,
   } = props;
+
   const [initialDisplayState, setInitialDisplayState] = useState(false);
   const [currentDisplayState, setCurrentDisplayState] = useState(false);
   const [shelfState, dispatch] = useReducer(reducer, initialState);
@@ -49,6 +51,7 @@ function BooKModal(props) {
 
   useEffect(() => {
     async function getDisplay() {
+      //TODO Embed in a try catch and apply frontend middleware to check refreshtoken as well
       const response = await axios.get(
         "http://localhost:5000/book/getBookDisplay",
         {
@@ -66,7 +69,7 @@ function BooKModal(props) {
     if (props.isLoggedIn) {
       getDisplay();
     }
-    dispatch({ type: "UPDATE_SHELF", payload: shelf });
+    dispatch({ type: "UPDATE_SHELF", payload: { shelf } });
   }, []);
 
   const handleCheckChange = (event) => {
@@ -80,6 +83,7 @@ function BooKModal(props) {
     if (currentDisplayState !== initialDisplayState) {
       change = true;
       const desiredDisplay = currentDisplayState;
+      //TODO Refresh Token middleware
       const response = await axios.post(
         "http://localhost:5000/book/changebookDisplay",
         { isbn, shelf, desiredDisplay },
@@ -89,6 +93,7 @@ function BooKModal(props) {
     }
 
     // If there's a shelf change, delete the book
+    // TODO Refresh Token middleware
     if (shelfState.shelf !== shelf) {
       change = true;
       const response = await axios.delete(
@@ -142,7 +147,10 @@ function BooKModal(props) {
               name="shelf"
               value={shelfState.shelf}
               onChange={(e) =>
-                dispatch({ type: "UPDATE_SHELF", payload: e.target.value })
+                dispatch({
+                  type: "UPDATE_SHELF",
+                  payload: { shelf: e.target.value },
+                })
               }
             >
               <option value="currentBooks">Currently Reading</option>
@@ -178,6 +186,17 @@ const mapStateToProps = (state) => ({
 
 export default connect(mapStateToProps, {})(BooKModal);
 
+export const MainModal = styled.div`
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #333333;
+  z-index: 1;
+`;
+
 export const BookDescription = styled.div`
   display: flex;
   flex-direction: column;
@@ -188,21 +207,18 @@ export const BookDescriptionDiv = styled.div`
   display: flex;
   flex-direction: row;
   // background-color: red;
-  font-size: 12px;
-  margin-top: 10px;
+  font-size: 14px;
 `;
 
 export const Label = styled.p`
-  // background-color: orange;
   min-width: 100px;
+  margin-left: 5%;
   color: white;
-  margin-left: 10%;
+  // background-color: orange;
 `;
 
 export const Value = styled.p`
-  position: relative;
-  margin-right: 10%;
-  margin-left: 2%;
+  margin-right: 5%;
   color: white;
   // background-color: green;
 `;
@@ -210,23 +226,23 @@ export const Value = styled.p`
 export const BookSettingsForm = styled.form`
   display: flex;
   flex-direction: column;
+  font-size: 14px;
 `;
 
 export const FormDiv = styled.div`
   display: flex;
   flex-direction: row;
   // background-color: red;
-  // flex-wrap: wrap;
 `;
 
 export const SettingsLabel = styled.p`
   color: #287bf8;
-  margin-left: 10%;
+  margin-left: 5%;
 `;
 
 export const Select = styled.select`
   position: absolute;
-  margin-left: 25%;
+  margin-left: 30%;
   margin-top: 10px;
   width: 300px;
   height: 30px;
@@ -237,7 +253,7 @@ export const Select = styled.select`
 
 export const Checkbox = styled.input`
   position: absolute;
-  margin-left: 40%;
+  margin-left: 30%;
   margin-top: 15px;
   outline: none;
   height: 20px;

@@ -188,6 +188,7 @@ function FullShelf(props) {
               buttonRef={buttonRef}
               handleClose={changeModal}
               shelfUpdate={handleShelfUpdate}
+              shelf={shelf}
             />
           )}
           {props.isLoggedIn ? (

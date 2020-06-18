@@ -1,19 +1,26 @@
 import React, { useRef } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
-import { useOutsideClick } from "../hooks/useOutsideClick";
+import { useHistory } from "react-router-dom";
 import styled from "@emotion/styled";
 
-import { logOffUser } from "../actions/setUser";
+import { useOutsideClick } from "../../hooks/useOutsideClick";
+
+import { logOffUser } from "../../actions/setUser";
 
 function ProfileModal(props) {
-  const { buttonRef, handleClose } = props;
+  const { buttonRef, handleClose, logOffUser } = props;
+  const history = useHistory();
+
+  // Closes modal window when there's an outside click
   const modalRef = useRef(null);
   useOutsideClick(modalRef, buttonRef, handleClose);
 
   const logOut = async () => {
-    await props.logOffUser();
+    await logOffUser();
+    history.push("/");
   };
+
   return (
     <ModalContainer ref={modalRef}>
       <Profile>Profile</Profile>

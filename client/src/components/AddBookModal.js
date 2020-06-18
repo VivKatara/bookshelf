@@ -1,7 +1,9 @@
 import React, { useState, useReducer, useEffect, useRef } from "react";
 import axios from "axios";
-import { useOutsideClick } from "../hooks/useOutsideClick";
 import styled from "@emotion/styled";
+
+import { useOutsideClick } from "../hooks/useOutsideClick";
+
 import {
   Form,
   FormHeader,
@@ -14,23 +16,31 @@ const initialState = {
   title: "",
   author: "",
   shelf: "currentBooks",
+  shelfLabelTitle: "",
 };
+
 const reducer = (state, action) => {
   switch (action.type) {
     case "UPDATE_TITLE":
       return {
         ...state,
-        title: action.payload,
+        title: action.payload.title,
       };
     case "UPDATE_AUTHOR":
       return {
         ...state,
-        author: action.payload,
+        author: action.payload.author,
+      };
+    case "UPDATE_SHELF_AND_LABEL":
+      return {
+        ...state,
+        shelf: action.payload.shelf,
+        shelfLabelTitle: action.payload.shelfLabelTitle,
       };
     case "UPDATE_SHELF":
       return {
         ...state,
-        shelf: action.payload,
+        shelf: action.payload.shelf,
       };
     default:
       return state;
@@ -39,49 +49,52 @@ const reducer = (state, action) => {
 
 function AddBookModal(props) {
   const { buttonRef, handleClose, shelfUpdate, shelf } = props;
-  const [shelfTitle, setShelfTitle] = useState("");
-  const [newBookState, dispatch] = useReducer(reducer, initialState);
+
   const modalRef = useRef(null);
   useOutsideClick(modalRef, buttonRef, handleClose);
 
+  // To manage state of the modal
+  const [addBookState, dispatch] = useReducer(reducer, initialState);
+
+  // If the shelf is given, define the label title so only that one option will display in modal
+  useEffect(() => {
+    if (shelf) {
+      let shelfLabelTitle = "";
+      if (shelf === "currentBooks") shelfLabelTitle = "Currently Reading";
+      else if (shelf === "pastBooks") shelfLabelTitle = "Have Read";
+      else shelfLabelTitle = "Want to Read";
+      dispatch({
+        type: "UPDATE_SHELF_AND_LABEL",
+        payload: { shelf, shelfLabelTitle },
+      });
+    }
+  }, [shelf]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Going to need the middleware to essentially check if token is expired and replace the token if so
+    // TODO Implement frontend middleware here to check refresh token if necessary
     try {
       const response = await axios.post(
         "http://localhost:5000/book/add",
         {
-          title: newBookState.title,
-          author: newBookState.author,
-          shelf: newBookState.shelf,
+          title: addBookState.title,
+          author: addBookState.author,
+          shelf: addBookState.shelf,
         },
         {
           withCredentials: true,
         }
       );
-      shelfUpdate(newBookState.shelf);
+      shelfUpdate(addBookState.shelf);
       handleClose();
     } catch (e) {
       console.log(e);
     }
   };
 
-  useEffect(() => {
-    if (shelf) {
-      dispatch({ type: "UPDATE_SHELF", payload: shelf });
-      if (shelf === "currentBooks") {
-        setShelfTitle("Currently Reading");
-      } else if (shelf === "pastBooks") {
-        setShelfTitle("Have Read");
-      } else {
-        setShelfTitle("Want to Read");
-      }
-    }
-  }, []);
-
-  // Note that shelf prop isn't passed down from Homepage, only from Full Shelf view
+  // If the shelf is defined in props, only display that one shelf. Else, display all
   const shelfOptions = shelf ? (
-    <option value={shelf}>{shelfTitle}</option>
+    <option value={shelf}>{addBookState.shelfLabelTitle}</option>
   ) : (
     <>
       <option value="currentBooks">Currently Reading</option>
@@ -103,9 +116,12 @@ function AddBookModal(props) {
             type="text"
             name="title"
             id="title"
-            value={newBookState.title}
+            value={addBookState.title}
             onChange={(e) =>
-              dispatch({ type: "UPDATE_TITLE", payload: e.target.value })
+              dispatch({
+                type: "UPDATE_TITLE",
+                payload: { title: e.target.value },
+              })
             }
           />
         </FormDiv>
@@ -115,9 +131,12 @@ function AddBookModal(props) {
             type="text"
             name="author"
             id="author"
-            value={newBookState.author}
+            value={addBookState.author}
             onChange={(e) =>
-              dispatch({ type: "UPDATE_AUTHOR", payload: e.target.value })
+              dispatch({
+                type: "UPDATE_AUTHOR",
+                payload: { author: e.target.value },
+              })
             }
           />
         </FormDiv>
@@ -126,9 +145,12 @@ function AddBookModal(props) {
           <Select
             id="shelf"
             name="shelf"
-            value={newBookState.shelf}
+            value={addBookState.shelf}
             onChange={(e) =>
-              dispatch({ type: "UPDATE_SHELF", payload: e.target.value })
+              dispatch({
+                type: "UPDATE_SHELF",
+                payload: { shelf: e.target.value },
+              })
             }
           >
             {shelfOptions}

@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 
-import ProfileModal from "../ProfileModal";
+import ProfileModal from "../modals/ProfileModal";
 
 import { useModal } from "../../hooks/useModal";
 
@@ -44,4 +44,4 @@ const mapStateToProps = (state) => ({
   userFullName: state.userState.userFullName,
 });
 
-export default connect(mapStateToProps, {})(LoggedInHeader);
+export default connect(mapStateToProps, {})(React.memo(LoggedInHeader));

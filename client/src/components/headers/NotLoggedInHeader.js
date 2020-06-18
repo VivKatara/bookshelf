@@ -42,4 +42,4 @@ function NotLoggedInHeader(props) {
   );
 }
 
-export default NotLoggedInHeader;
+export default React.memo(NotLoggedInHeader);
