@@ -12,6 +12,7 @@ import AddBookModal from "./modals/AddBookModal";
 import Loading from "./Loading";
 import NotFound from "./NotFound";
 import NotLoggedInHeader from "./headers/NotLoggedInHeader";
+import SeeAll from "./SeeAll";
 
 const initialState = {
   currentIsbns: [],
@@ -135,11 +136,7 @@ function Homepage(props) {
                 shelf="currentBooks"
                 handleModalUpdate={triggerBookModalUpdate}
               >
-                <Links>
-                  <SeeAll href={`/${username}/shelf/current?page=1`}>
-                    See All
-                  </SeeAll>
-                </Links>
+                <SeeAll route={`/${username}/shelf/current?page=1`} />
               </Shelf>
               <Title>Have Read</Title>
               <Shelf
@@ -147,11 +144,7 @@ function Homepage(props) {
                 shelf="pastBooks"
                 handleModalUpdate={triggerBookModalUpdate}
               >
-                <Links>
-                  <SeeAll href={`/${username}/shelf/past?page=1`}>
-                    See All
-                  </SeeAll>
-                </Links>
+                <SeeAll route={`/${username}/shelf/past?page=1`} />
               </Shelf>
               <Title>Want to Read</Title>
               <Shelf
@@ -159,11 +152,7 @@ function Homepage(props) {
                 shelf="futureBooks"
                 handleModalUpdate={triggerBookModalUpdate}
               >
-                <Links>
-                  <SeeAll href={`/${username}/shelf/future?page=1`}>
-                    See All
-                  </SeeAll>
-                </Links>
+                <SeeAll route={`/${username}/shelf/future?page=1`} />
               </Shelf>
             </CentralDiv>
           </UserContext.Provider>
@@ -206,33 +195,11 @@ export const Add = styled.a`
     text-decoration: underline;
   }
 `;
-
-const Links = styled.div`
-  position: absolute;
-  width: 10%;
-  display: flex;
-  flex-direction: column;
-  margin-left: 70%;
-  margin-top: 20px;
-  color: #287bf8;
-  text-align: center;
-  // background-color: white;
-`;
-
 const Title = styled.p`
   position: relative;
   margin-left: 10%;
   font-size: 14px;
   color: white;
-`;
-
-const SeeAll = styled.a`
-  margin-top: 140px;
-  text-decoration: none;
-  color: #287bf8;
-  &:hover {
-    cursor: pointer;
-  }
 `;
 
 const CentralDiv = styled.div`
