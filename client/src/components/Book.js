@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useReducer,
-  useEffect,
-  useRef,
-  useContext,
-} from "react";
+import React, { useReducer, useEffect, useRef } from "react";
 import axios from "axios";
 import styled from "@emotion/styled";
 
@@ -38,11 +32,13 @@ const reducer = (state, action) => {
 function Book(props) {
   const { isbn, handleModalUpdate } = props;
   const [bookState, dispatch] = useReducer(reducer, initialState);
-  const [show, toggleModal] = useModal();
+  const [showModal, toggleModal] = useModal();
   const buttonRef = useRef(null);
 
   useEffect(() => {
-    async function getImage() {
+    // Get the details of book with given ISBN
+    // TODO Try Catch error logic here
+    async function getBookDetails() {
       const response = await axios.get(
         "http://localhost:5000/book/getBookDetails",
         {
@@ -66,7 +62,7 @@ function Book(props) {
         });
       }
     }
-    getImage();
+    getBookDetails();
   }, [isbn]);
 
   return (
@@ -81,7 +77,7 @@ function Book(props) {
           ></img>
         )}
       </BookContainer>
-      {show && (
+      {showModal && (
         <BookModal
           isbn={isbn}
           title={bookState.title}

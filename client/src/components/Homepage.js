@@ -57,7 +57,7 @@ function Homepage(props) {
   const [isbnState, dispatch] = useReducer(reducer, initialState);
 
   // Logic to track the modal, as well as whether there were any updates to a shelf, or a particular book
-  const [show, toggleModal] = useModal();
+  const [showModal, toggleModal] = useModal();
   const buttonRef = useRef(null);
   const [currentUpdates, setCurrentUpdates] = useState(0);
   const [pastUpdates, setPastUpdates] = useState(0);
@@ -111,7 +111,7 @@ function Homepage(props) {
         {!props.isLoggedIn && <NotLoggedInHeader username={username} />}
         <MainContainer>
           <UserContext.Provider value={username}>
-            {show && (
+            {showModal && (
               <AddBookModal
                 buttonRef={buttonRef}
                 handleClose={toggleModal}

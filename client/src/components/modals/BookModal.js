@@ -264,7 +264,7 @@ export const Checkbox = styled.input`
 export const SaveChangesButton = styled.button`
   width: 300px;
   height: 30px;
-  margin-left: 25%;
+  margin-left: 30%;
   margin-top: 20px;
   margin-bottom: 20px;
   border: none;

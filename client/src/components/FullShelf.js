@@ -7,6 +7,7 @@ import styled from "@emotion/styled";
 import Shelf from "./Shelf";
 import Loading from "./Loading";
 import NotFound from "./NotFound";
+import PageCount from "./PageCount";
 import NotLoggedInHeader from "./headers/NotLoggedInHeader";
 import AddBookModal from "./modals/AddBookModal";
 import AddBookLink from "./links/AddBookLink";
@@ -82,7 +83,7 @@ function FullShelf(props) {
   const [pageState, pageDispatch] = useReducer(pageReducer, initialPageState);
 
   // State to handle modal, will be updated if there is a shelf Update
-  const [show, toggleModal] = useModal();
+  const [showModal, toggleModal] = useModal();
   const [shelfUpdates, setShelfUpdates] = useState(0);
   const buttonRef = useRef(null);
 
@@ -97,6 +98,7 @@ function FullShelf(props) {
   useEffect(() => {
     async function pageMount() {
       let totalPages = 1;
+      //TODO Refresh Token middelware
       const response = await axios.get(
         "http://localhost:5000/book/getTotalPages",
         { params: { username, shelf, pageSize }, withCredentials: true }
@@ -175,12 +177,12 @@ function FullShelf(props) {
       <>
         {!props.isLoggedIn && <NotLoggedInHeader username={username} />}
         <MainContainer>
-          {pageState.showPageCount && (
-            <PageCount>
-              Page {page} of {pageState.totalPages}
-            </PageCount>
-          )}
-          {show && (
+          <PageCount
+            show={pageState.showPageCount}
+            page={page}
+            totalPages={pageState.totalPages}
+          />
+          {showModal && (
             <AddBookModal
               buttonRef={buttonRef}
               handleClose={toggleModal}
@@ -250,22 +252,6 @@ export const CentralDiv = styled.div`
   flex-direction: column;
 `;
 
-const PageCount = styled.p`
-  position: absolute;
-  margin-left: 5%;
-  color: #287bf8;
-`;
-
-export const Add = styled.a`
-  margin-top: 20px;
-  margin-left: 80%;
-  color: #287bf8;
-  &:hover {
-    cursor: pointer;
-    text-decoration: underline;
-  }
-`;
-
 const Title = styled.p`
   position: relative;
   margin-left: 10%;
@@ -275,38 +261,4 @@ const Title = styled.p`
 
 const Space = styled.div`
   flex-basis: 45px;
-`;
-
-const PreviousButton = styled.a`
-  position: absolute;
-  margin-left: 2%;
-  margin-top: 450px;
-  cursor: pointer;
-  color: #287bf8;
-  font-size: 16px;
-  text-decoration: none;
-  &:hover {
-    text-decoration: underline;
-  }
-  &:focus {
-    outline: none;
-    box-shadow: none;
-  }
-`;
-
-const NextButton = styled.a`
-  position: absolute;
-  margin-left: 95%;
-  margin-top: 450px;
-  cursor: pointer;
-  color: #287bf8;
-  font-size: 16px;
-  text-decoration: none;
-  &:hover {
-    text-decoration: underline;
-  }
-  &:focus {
-    outline: none;
-    box-shadow: none;
-  }
 `;
