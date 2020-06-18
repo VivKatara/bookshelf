@@ -3,8 +3,11 @@ import PropTypes from "prop-types";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
 import { connect } from "react-redux";
+import styled from "@emotion/styled";
 
 import { setUser } from "../actions/setUser";
+
+import { useErrorMessage } from "../hooks/useErrorMessage";
 
 import { MainContainer, CentralDiv } from "../styles/mainPages";
 import {
@@ -26,12 +29,12 @@ const reducer = (state, action) => {
     case "EMAIL_CHANGE":
       return {
         ...state,
-        email: action.payload,
+        email: action.payload.email,
       };
     case "PASSWORD_CHANGE":
       return {
         ...state,
-        password: action.payload,
+        password: action.payload.password,
       };
     default:
       return state;
@@ -39,14 +42,17 @@ const reducer = (state, action) => {
 };
 
 const Login = (props) => {
-  const [userState, dispatch] = useReducer(reducer, initialState);
+  const [loginState, dispatch] = useReducer(reducer, initialState);
+  const [errorState, dispatchError] = useErrorMessage();
+
   const history = useHistory();
 
   const { setUser } = props;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { email, password } = userState;
+    const { email, password } = loginState;
+
     try {
       const response = await axios.post(
         "http://localhost:5000/auth/login",
@@ -56,11 +62,20 @@ const Login = (props) => {
         },
         { withCredentials: true }
       );
+
+      // If the error is set, turn it off again
+      if (loginState.error) {
+        dispatchError({ type: "SUCCESS" });
+      }
       await setUser();
       history.push("/");
-    } catch (e) {
-      // TODO - If the user login attempt fails, find a way here to let the user know
-      console.log(e);
+    } catch (error) {
+      // Set the error to true and update the message
+      console.log(error.response.data.msg);
+      dispatchError({
+        type: "FAIL",
+        payload: { errorMsg: error.response.data.msg },
+      });
     }
   };
 
@@ -77,9 +92,12 @@ const Login = (props) => {
               type="text"
               name="email"
               id="email"
-              value={userState.email}
+              value={loginState.email}
               onChange={(e) =>
-                dispatch({ type: "EMAIL_CHANGE", payload: e.target.value })
+                dispatch({
+                  type: "EMAIL_CHANGE",
+                  payload: { email: e.target.value },
+                })
               }
               required
             />
@@ -90,13 +108,19 @@ const Login = (props) => {
               type="text"
               name="password"
               id="password"
-              value={userState.password}
+              value={loginState.password}
               onChange={(e) =>
-                dispatch({ type: "PASSWORD_CHANGE", payload: e.target.value })
+                dispatch({
+                  type: "PASSWORD_CHANGE",
+                  payload: { password: e.target.value },
+                })
               }
               required
             />
           </FormDiv>
+          {errorState.error && (
+            <ErrorMessage>{errorState.errorMsg}</ErrorMessage>
+          )}
           <FormDiv>
             <SubmitButton type="Submit">Continue</SubmitButton>
           </FormDiv>
@@ -113,3 +137,10 @@ Login.propTypes = {
 const mapStateToProps = (state) => ({});
 
 export default connect(mapStateToProps, { setUser })(Login);
+
+export const ErrorMessage = styled.p`
+  position: absolute;
+  margin-top: 90px;
+  font-size: 12px;
+  color: red;
+`;

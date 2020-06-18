@@ -15,11 +15,11 @@ const createUsername = require("../utils/createUsername");
 
 // TODO Refactor all of these routes to make it a bit easier to read
 router.post("/register", async (req, res) => {
-  const { errors, isValid } = validateRegisterInput(req.body);
+  const { errors, isValid, validatedData } = validateRegisterInput(req.body);
   if (!isValid) {
     return res.status(400).json({ msg: errors[Object.keys(errors)[0]] });
   }
-  const { email, fullName, password } = req.body;
+  const { email, fullName, password } = validatedData;
   const user = await User.findOne({ email });
   if (user) {
     return res.status(409).json({ msg: "This email already exists" });
@@ -42,9 +42,19 @@ router.post("/register", async (req, res) => {
 
   // Hash the password before saving it in the database
   bcrypt.genSalt(10, (err, salt) => {
-    if (err) throw err; // Should this be a more sophisticated error?
+    if (err) {
+      console.log(err);
+      return res
+        .status(500)
+        .json({ msg: "Something unexpected occurred. Please try again." });
+    }
     bcrypt.hash(newUser.password, salt, (err, hash) => {
-      if (err) throw err; // Should this be a more sophisticated error
+      if (err) {
+        console.log(err);
+        return res
+          .status(500)
+          .json({ msg: "Something unexpected occurred. Please try again." });
+      }
       newUser.password = hash;
       newUser
         .save()
@@ -58,7 +68,9 @@ router.post("/register", async (req, res) => {
         })
         .catch((err) => {
           console.log(err);
-          return res.status(500).json({ msg: "Something unexpected occurred" });
+          return res
+            .status(500)
+            .json({ msg: "Something unexpected occurred. Please try again." });
         });
     });
   });
@@ -66,13 +78,15 @@ router.post("/register", async (req, res) => {
 
 // Login route, you have to add access tokens and refresh tokens to this
 router.post("/login", (req, res) => {
-  const { errors, isValid } = validateLoginInput(req.body);
+  const { errors, isValid, validatedData } = validateLoginInput(req.body);
   if (!isValid) {
     return res.status(400).json({ msg: errors[Object.keys(errors)[0]] });
   }
   passport.authenticate("local", (err, user, info) => {
     if (err) {
-      return res.status(500).json({ msg: "Something unexpected happened" });
+      return res
+        .status(500)
+        .json({ msg: "Something unexpected occurred. Please try again." });
     } else if (!user) {
       console.log(info.message);
       return res.status(401).json({ msg: info.message });
@@ -113,9 +127,7 @@ router.post("/login", (req, res) => {
           maxAge: 365 * 24 * 60 * 60 * 1000,
           httpOnly: true,
         });
-        return res
-          .status(200)
-          .json({ msg: "Logged In Successfully", success: true });
+        return res.status(200).json({ msg: "Logged In Successfully" });
       });
     }
   })(req, res);

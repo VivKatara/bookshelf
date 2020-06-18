@@ -1,6 +1,9 @@
 import React, { useReducer } from "react";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
+import styled from "@emotion/styled";
+
+import { useErrorMessage } from "../hooks/useErrorMessage";
 
 import { MainContainer, CentralDiv } from "../styles/mainPages";
 import {
@@ -24,23 +27,23 @@ const reducer = (state = initialState, action) => {
     case "EMAIL_CHANGE":
       return {
         ...state,
-        email: action.payload,
+        email: action.payload.email,
       };
     case "FULLNAME_CHANGE":
       return {
         ...state,
-        fullName: action.payload,
+        fullName: action.payload.fullName,
       };
 
     case "PASSWORD_CHANGE":
       return {
         ...state,
-        password: action.payload,
+        password: action.payload.password,
       };
     case "PASSWORD_CONFIRM_CHANGE":
       return {
         ...state,
-        passwordConfirm: action.payload,
+        passwordConfirm: action.payload.passwordConfirm,
       };
     default:
       return state;
@@ -48,12 +51,13 @@ const reducer = (state = initialState, action) => {
 };
 
 const Register = () => {
-  const [userState, dispatch] = useReducer(reducer, initialState);
+  const [registerState, dispatch] = useReducer(reducer, initialState);
+  const [errorState, dispatchError] = useErrorMessage();
   const history = useHistory();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { email, fullName, password, passwordConfirm } = userState;
+    const { email, fullName, password, passwordConfirm } = registerState;
     try {
       const response = await axios.post("http://localhost:5000/auth/register", {
         email,
@@ -61,10 +65,14 @@ const Register = () => {
         password,
         passwordConfirm,
       });
+      dispatchError({ type: "SUCCESS" });
       history.push("/login");
-    } catch (e) {
-      // TODO - On failure here, let the user know that it failed and that they ought to retry
-      console.log(e);
+    } catch (error) {
+      console.log(error.response.data.msg);
+      dispatchError({
+        type: "FAIL",
+        payload: { errorMsg: error.response.data.msg },
+      });
     }
   };
 
@@ -81,9 +89,12 @@ const Register = () => {
               type="text"
               name="email"
               id="email"
-              value={userState.email}
+              value={registerState.email}
               onChange={(e) =>
-                dispatch({ type: "EMAIL_CHANGE", payload: e.target.value })
+                dispatch({
+                  type: "EMAIL_CHANGE",
+                  payload: { email: e.target.value },
+                })
               }
               required
             />
@@ -94,9 +105,12 @@ const Register = () => {
               type="text"
               name="fullName"
               id="fullName"
-              value={userState.fullName}
+              value={registerState.fullName}
               onChange={(e) =>
-                dispatch({ type: "FULLNAME_CHANGE", payload: e.target.value })
+                dispatch({
+                  type: "FULLNAME_CHANGE",
+                  payload: { fullName: e.target.value },
+                })
               }
               required
             />
@@ -107,9 +121,12 @@ const Register = () => {
               type="text"
               name="password"
               id="password"
-              value={userState.password}
+              value={registerState.password}
               onChange={(e) =>
-                dispatch({ type: "PASSWORD_CHANGE", payload: e.target.value })
+                dispatch({
+                  type: "PASSWORD_CHANGE",
+                  payload: { password: e.target.value },
+                })
               }
               required
             />
@@ -120,16 +137,19 @@ const Register = () => {
               type="text"
               name="passwordConfirm"
               id="passwordConfirm"
-              value={userState.passwordConfirm}
+              value={registerState.passwordConfirm}
               onChange={(e) =>
                 dispatch({
                   type: "PASSWORD_CONFIRM_CHANGE",
-                  payload: e.target.value,
+                  payload: { passwordConfirm: e.target.value },
                 })
               }
               required
             />
           </FormDiv>
+          {errorState.error && (
+            <ErrorMessage>{errorState.errorMsg}</ErrorMessage>
+          )}
           <FormDiv>
             <SubmitButton type="Submit">Sign Up</SubmitButton>
           </FormDiv>
@@ -138,5 +158,12 @@ const Register = () => {
     </MainContainer>
   );
 };
+
+export const ErrorMessage = styled.p`
+  position: absolute;
+  margin-top: 160px;
+  font-size: 12px;
+  color: red;
+`;
 
 export default Register;
