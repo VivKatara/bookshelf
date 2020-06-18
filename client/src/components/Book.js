@@ -7,7 +7,8 @@ import React, {
 } from "react";
 import axios from "axios";
 import styled from "@emotion/styled";
-import BookModal from "./BookModal";
+
+import BookModal from "./modals/BookModal";
 
 import { useModal } from "../hooks/useModal";
 

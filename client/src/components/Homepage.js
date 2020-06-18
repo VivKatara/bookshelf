@@ -8,7 +8,7 @@ import { useAbilityToGetDisplayBooks } from "../hooks/useAbilityToGetDisplayBook
 import { useModal } from "../hooks/useModal";
 
 import Shelf from "./Shelf";
-import AddBookModal from "./AddBookModal";
+import AddBookModal from "./modals/AddBookModal";
 import Loading from "./Loading";
 import NotFound from "./NotFound";
 import NotLoggedInHeader from "./headers/NotLoggedInHeader";

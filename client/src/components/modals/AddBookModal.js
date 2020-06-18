@@ -2,7 +2,7 @@ import React, { useState, useReducer, useEffect, useRef } from "react";
 import axios from "axios";
 import styled from "@emotion/styled";
 
-import { useOutsideClick } from "../hooks/useOutsideClick";
+import { useOutsideClick } from "../../hooks/useOutsideClick";
 
 import {
   Form,
@@ -10,7 +10,7 @@ import {
   Label,
   Input,
   SubmitButton,
-} from "../styles/authForms";
+} from "../../styles/authForms";
 
 const initialState = {
   title: "",

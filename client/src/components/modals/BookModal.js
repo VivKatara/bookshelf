@@ -10,9 +10,9 @@ import { connect } from "react-redux";
 import axios from "axios";
 import styled from "@emotion/styled";
 
-import { ShelfContext } from "./Shelf";
+import { ShelfContext } from "../Shelf";
 
-import { useOutsideClick } from "../hooks/useOutsideClick";
+import { useOutsideClick } from "../../hooks/useOutsideClick";
 
 const initialState = {
   shelf: "",

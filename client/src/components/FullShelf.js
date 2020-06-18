@@ -6,7 +6,7 @@ import styled from "@emotion/styled";
 
 import { useUsernameValidityCheck } from "../hooks/useUsernameValidityCheck";
 
-import AddBookModal from "./AddBookModal";
+import AddBookModal from "./modals/AddBookModal";
 import Shelf from "./Shelf";
 import NotLoggedInHeader from "./headers/NotLoggedInHeader";
 import Loading from "./Loading";
