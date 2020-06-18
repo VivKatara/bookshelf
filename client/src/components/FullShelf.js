@@ -4,13 +4,18 @@ import axios from "axios";
 import { connect } from "react-redux";
 import styled from "@emotion/styled";
 
-import { useUsernameValidityCheck } from "../hooks/useUsernameValidityCheck";
-
-import AddBookModal from "./modals/AddBookModal";
 import Shelf from "./Shelf";
-import NotLoggedInHeader from "./headers/NotLoggedInHeader";
 import Loading from "./Loading";
 import NotFound from "./NotFound";
+import NotLoggedInHeader from "./headers/NotLoggedInHeader";
+import AddBookModal from "./modals/AddBookModal";
+import AddBookLink from "./links/AddBookLink";
+import AuthLinks from "./links/AuthLinks";
+import NextPreviousNavigation from "./links/NextPreviousNavigation";
+
+import { useUsernameValidityCheck } from "../hooks/useUsernameValidityCheck";
+import { useModal } from "../hooks/useModal";
+import { useBookModalUpdates } from "../hooks/useBookModalUpdates";
 
 // Keep track of array of ISBNs to pass down to shelves
 const initialIsbnState = {
@@ -64,36 +69,28 @@ function FullShelf(props) {
   const [validUsername, setValidUsername] = useState(null);
   useUsernameValidityCheck(username, setValidUsername);
 
+  // Get shelf from the url
+  const shelf = `${props.match.params.type}Books`;
+
+  // Get page number from query string parameter
   const queryString = new URLSearchParams(props.location.search);
   const pageValues = queryString.getAll("page");
   const page = parseInt(pageValues[0]);
-
-  const shelf = `${props.match.params.type}Books`;
+  const [pageSize, setPageSize] = useState(21);
 
   const [shelfState, isbnDispatch] = useReducer(isbnReducer, initialIsbnState);
   const [pageState, pageDispatch] = useReducer(pageReducer, initialPageState);
 
-  // State to handle modal show as well as to render an update in this component if a book is added
-  // to the shelf while using the modal
-  const [show, setModal] = useState(false);
+  // State to handle modal, will be updated if there is a shelf Update
+  const [show, toggleModal] = useModal();
   const [shelfUpdates, setShelfUpdates] = useState(0);
   const buttonRef = useRef(null);
 
-  // Stae to maintain the displayed page size. Can maneuver it based on the size of viewport
-  const [pageSize, setPageSize] = useState(21);
-
-  const [bookModalUpdates, setBookModalUpdates] = useState(0);
-
-  const changeModal = () => {
-    setModal((prev) => !prev);
-  };
+  // State to manage updates triggered by the book modal
+  const [bookModalUpdates, triggerBookModalUpdate] = useBookModalUpdates();
 
   const handleShelfUpdate = (shelf) => {
     setShelfUpdates((prev) => prev + 1);
-  };
-
-  const triggerBookModalUpdate = () => {
-    setBookModalUpdates((prev) => prev + 1);
   };
 
   // This is the effect that updates various pageState such as the total page count and whether or not to show certain buttons
@@ -186,20 +183,15 @@ function FullShelf(props) {
           {show && (
             <AddBookModal
               buttonRef={buttonRef}
-              handleClose={changeModal}
+              handleClose={toggleModal}
               shelfUpdate={handleShelfUpdate}
               shelf={shelf}
             />
           )}
           {props.isLoggedIn ? (
-            <Add ref={buttonRef} onClick={changeModal}>
-              Add Book to Shelf
-            </Add>
+            <AddBookLink buttonRef={buttonRef} toggleModal={toggleModal} />
           ) : (
-            <AuthButtons>
-              <SignUp href="/register">Sign Up</SignUp>/
-              <Login href="/login">Login</Login>
-            </AuthButtons>
+            <AuthLinks />
           )}
           <CentralDiv>
             <Title>{pageState.shelfTitle}</Title>
@@ -208,27 +200,23 @@ function FullShelf(props) {
               shelf={shelf}
               handleModalUpdate={triggerBookModalUpdate}
             />
-            {pageState.showPrevious && (
-              <PreviousButton href={`${props.match.url}?page=${page - 1}`}>
-                Previous
-              </PreviousButton>
-            )}
             <Space />
             <Shelf
               isbns={shelfState.secondShelfIsbn}
               shelf={shelf}
               handleModalUpdate={triggerBookModalUpdate}
             />
-            {pageState.showNext && (
-              <NextButton href={`${props.match.url}?page=${page + 1}`}>
-                Next
-              </NextButton>
-            )}
             <Space />
             <Shelf
               isbns={shelfState.thirdShelfIsbn}
               shelf={shelf}
               handleModalUpdate={triggerBookModalUpdate}
+            />
+            <NextPreviousNavigation
+              prev={pageState.showPrevious}
+              next={pageState.showNext}
+              url={props.match.url}
+              page={page}
             />
           </CentralDiv>
         </MainContainer>
@@ -320,35 +308,5 @@ const NextButton = styled.a`
   &:focus {
     outline: none;
     box-shadow: none;
-  }
-`;
-
-export const AuthButtons = styled.div`
-  margin-left: 80%;
-  margin-top: 20px;
-  display: inline-flex;
-  // flex-direction: row;
-  align-items: flex-start;
-  // background-color: yellow;
-  color: white;
-`;
-
-export const SignUp = styled.a`
-  margin-right: 5px;
-  color: #287bf8;
-  text-decoration: none;
-  &:hover {
-    cursor: pointer;
-    text-decoration: underline;
-  }
-`;
-
-export const Login = styled.a`
-  margin-left: 5px;
-  color: #287bf8;
-  text-decoration: none;
-  &:hover {
-    cursor: pointer;
-    text-decoration: underline;
   }
 `;

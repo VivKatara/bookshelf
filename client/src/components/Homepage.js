@@ -3,18 +3,19 @@ import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import styled from "@emotion/styled";
 
-import { useUsernameValidityCheck } from "../hooks/useUsernameValidityCheck";
-import { useAbilityToGetDisplayBooks } from "../hooks/useAbilityToGetDisplayBooks";
-import { useModal } from "../hooks/useModal";
-
 import Shelf from "./Shelf";
-import AddBookModal from "./modals/AddBookModal";
 import Loading from "./Loading";
 import NotFound from "./NotFound";
 import NotLoggedInHeader from "./headers/NotLoggedInHeader";
-import SeeAll from "./SeeAll";
-import AddBookLink from "./AddBookLink";
-import AuthLinks from "./AuthLinks";
+import AddBookModal from "./modals/AddBookModal";
+import AddBookLink from "./links/AddBookLink";
+import AuthLinks from "./links/AuthLinks";
+import SeeAll from "./links/SeeAll";
+
+import { useUsernameValidityCheck } from "../hooks/useUsernameValidityCheck";
+import { useAbilityToGetDisplayBooks } from "../hooks/useAbilityToGetDisplayBooks";
+import { useModal } from "../hooks/useModal";
+import { useBookModalUpdates } from "../hooks/useBookModalUpdates";
 
 const initialState = {
   currentIsbns: [],
@@ -61,7 +62,7 @@ function Homepage(props) {
   const [currentUpdates, setCurrentUpdates] = useState(0);
   const [pastUpdates, setPastUpdates] = useState(0);
   const [futureUpdates, setFutureUpdates] = useState(0);
-  const [bookModalUpdates, setBookModalUpdates] = useState(0);
+  const [bookModalUpdates, triggerBookModalUpdate] = useBookModalUpdates();
   useAbilityToGetDisplayBooks(
     username,
     validUsername,
@@ -100,10 +101,6 @@ function Homepage(props) {
     if (shelf === "futureBooks") {
       setFutureUpdates((prev) => prev + 1);
     }
-  };
-
-  const triggerBookModalUpdate = () => {
-    setBookModalUpdates((prev) => prev + 1);
   };
 
   if (validUsername === null) {
@@ -181,17 +178,17 @@ export const MainContainer = styled.div`
   flex-direction: column;
 `;
 
+const CentralDiv = styled.div`
+  display: flex;
+  flex-direction: column;
+  // background-color: red;
+`;
+
 const Title = styled.p`
   position: relative;
   margin-left: 10%;
   font-size: 14px;
   color: white;
-`;
-
-const CentralDiv = styled.div`
-  display: flex;
-  flex-direction: column;
-  // background-color: red;
 `;
 
 // This is where you want to use Redux to dispatch an action to udpate the state of the application
