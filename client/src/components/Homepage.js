@@ -13,6 +13,8 @@ import Loading from "./Loading";
 import NotFound from "./NotFound";
 import NotLoggedInHeader from "./headers/NotLoggedInHeader";
 import SeeAll from "./SeeAll";
+import AddBookLink from "./AddBookLink";
+import AuthLinks from "./AuthLinks";
 
 const initialState = {
   currentIsbns: [],
@@ -120,14 +122,9 @@ function Homepage(props) {
               />
             )}
             {props.isLoggedIn ? (
-              <Add ref={buttonRef} onClick={toggleModal}>
-                Add Book to Shelf
-              </Add>
+              <AddBookLink buttonRef={buttonRef} toggleModal={toggleModal} />
             ) : (
-              <AuthButtons>
-                <SignUp href="/register">Sign Up</SignUp>
-                {/* <Divider>/</Divider> */}/<Login href="/login">Login</Login>
-              </AuthButtons>
+              <AuthLinks />
             )}
             <CentralDiv>
               <Title>Currently Reading</Title>
@@ -182,19 +179,8 @@ export const MainContainer = styled.div`
   height: 100vh;
   display: flex;
   flex-direction: column;
-  // background-color: #222222;
-  // background-color: yellow;
 `;
 
-export const Add = styled.a`
-  margin-top: 20px;
-  margin-left: 80%;
-  color: #287bf8;
-  &:hover {
-    cursor: pointer;
-    text-decoration: underline;
-  }
-`;
 const Title = styled.p`
   position: relative;
   margin-left: 10%;
@@ -206,36 +192,6 @@ const CentralDiv = styled.div`
   display: flex;
   flex-direction: column;
   // background-color: red;
-`;
-
-export const AuthButtons = styled.div`
-  margin-left: 80%;
-  margin-top: 20px;
-  display: inline-flex;
-  // flex-direction: row;
-  align-items: flex-start;
-  // background-color: yellow;
-  color: white;
-`;
-
-export const SignUp = styled.a`
-  margin-right: 5px;
-  color: #287bf8;
-  text-decoration: none;
-  &:hover {
-    cursor: pointer;
-    text-decoration: underline;
-  }
-`;
-
-export const Login = styled.a`
-  margin-left: 5px;
-  color: #287bf8;
-  text-decoration: none;
-  &:hover {
-    cursor: pointer;
-    text-decoration: underline;
-  }
 `;
 
 // This is where you want to use Redux to dispatch an action to udpate the state of the application
