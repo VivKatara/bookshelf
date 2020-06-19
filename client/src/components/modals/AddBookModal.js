@@ -1,5 +1,6 @@
 import React, { useState, useReducer, useEffect, useRef } from "react";
 import axios from "axios";
+import { useHistory } from "react-router-dom";
 import styled from "@emotion/styled";
 
 import { useOutsideClick } from "../../hooks/useOutsideClick";
@@ -56,6 +57,8 @@ function AddBookModal(props) {
   // To manage state of the modal
   const [addBookState, dispatch] = useReducer(reducer, initialState);
 
+  const history = useHistory();
+
   // If the shelf is given, define the label title so only that one option will display in modal
   useEffect(() => {
     if (shelf) {
@@ -74,7 +77,7 @@ function AddBookModal(props) {
     e.preventDefault();
     // TODO Implement frontend middleware here to check refresh token if necessary
     try {
-      const response = await axios.post(
+      let response = await axios.post(
         "http://localhost:5000/book/add",
         {
           title: addBookState.title,
@@ -83,12 +86,36 @@ function AddBookModal(props) {
         },
         {
           withCredentials: true,
+          validateStatus: false,
         }
       );
-      shelfUpdate(addBookState.shelf);
-      handleClose();
-    } catch (e) {
-      console.log(e);
+      if (response.status !== 200) {
+        if (response.status === 401) {
+          throw new Error("Unsuccessful attempt to add new book. Please login");
+        } else if (response.status === 403) {
+          await axios.get("http://localhost:5000/auth/token", {
+            withCredentials: true,
+            validateStatus: false,
+          });
+          response = await axios.post(
+            "http://localhost:5000/book/add",
+            {
+              title: addBookState.title,
+              author: addBookState.author,
+              shelf: addBookState.shelf,
+            },
+            { withCredentials: true, validateStatus: false }
+          );
+        }
+      }
+      if (response.status === 200) {
+        shelfUpdate(addBookState.shelf);
+        handleClose();
+      } else {
+        throw new Error("Unsuccessful attempt to add new book. Please login");
+      }
+    } catch (error) {
+      alert(error.message);
     }
   };
 
