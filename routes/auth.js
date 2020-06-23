@@ -101,12 +101,12 @@ router.post("/login", (req, res) => {
         const accessToken = generateAccessToken(
           payload,
           process.env.ACCESS_TOKEN_SECRET,
-          "1d"
+          "5s"
         );
         const refreshToken = generateAccessToken(
           payload,
           process.env.REFRESH_TOKEN_SECRET,
-          "7d"
+          "5s"
         );
 
         // Save the refreshToken in database
@@ -161,7 +161,7 @@ router.get("/token", async (req, res) => {
       const accessToken = generateAccessToken(
         payload,
         process.env.ACCESS_TOKEN_SECRET,
-        "1d"
+        "5s"
       );
       // Rewrite the access token
       res.cookie("accessToken", `Bearer ${accessToken}`, {

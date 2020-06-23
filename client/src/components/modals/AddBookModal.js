@@ -1,9 +1,15 @@
 import React, { useState, useReducer, useEffect, useRef } from "react";
+import PropTypes from "prop-types";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
+import { connect } from "react-redux";
 import styled from "@emotion/styled";
 
+import { logOffUser } from "../../actions/setUser";
+
 import { useOutsideClick } from "../../hooks/useOutsideClick";
+
+import { checkAccessAndRefreshToken } from "../../utils/authMiddleware";
 
 import {
   Form,
@@ -77,45 +83,29 @@ function AddBookModal(props) {
     e.preventDefault();
     // TODO Implement frontend middleware here to check refresh token if necessary
     try {
-      let response = await axios.post(
-        "http://localhost:5000/book/add",
-        {
-          title: addBookState.title,
-          author: addBookState.author,
-          shelf: addBookState.shelf,
-        },
-        {
-          withCredentials: true,
-          validateStatus: false,
-        }
+      const method = "POST";
+      const url = "http://localhost:5000/book/add";
+      const data = {
+        title: addBookState.title,
+        author: addBookState.author,
+        shelf: addBookState.shelf,
+      };
+      const config = { withCredentials: true, validateStatus: false };
+      const error = "Unsuccessful attempt to add new book. Please login";
+      const response = await checkAccessAndRefreshToken(
+        method,
+        url,
+        data,
+        config,
+        error
       );
-      if (response.status !== 200) {
-        if (response.status === 401) {
-          throw new Error("Unsuccessful attempt to add new book. Please login");
-        } else if (response.status === 403) {
-          await axios.get("http://localhost:5000/auth/token", {
-            withCredentials: true,
-            validateStatus: false,
-          });
-          response = await axios.post(
-            "http://localhost:5000/book/add",
-            {
-              title: addBookState.title,
-              author: addBookState.author,
-              shelf: addBookState.shelf,
-            },
-            { withCredentials: true, validateStatus: false }
-          );
-        }
-      }
-      if (response.status === 200) {
-        shelfUpdate(addBookState.shelf);
-        handleClose();
-      } else {
-        throw new Error("Unsuccessful attempt to add new book. Please login");
-      }
+      shelfUpdate(addBookState.shelf);
+      handleClose();
     } catch (error) {
       alert(error.message);
+      handleClose();
+      await props.logOffUser();
+      history.push("/login");
     }
   };
 
@@ -191,7 +181,13 @@ function AddBookModal(props) {
   );
 }
 
-export default AddBookModal;
+AddBookModal.propTypes = {
+  logOffUser: PropTypes.func.isRequired,
+};
+
+const mapStateToProps = (state) => ({});
+
+export default connect(mapStateToProps, { logOffUser })(AddBookModal);
 
 export const MainModal = styled.div`
   width: 50%;

@@ -12,7 +12,11 @@ import styled from "@emotion/styled";
 
 import { ShelfContext } from "../Shelf";
 
+import { logOffUser } from "../../actions/setUser";
+
 import { useOutsideClick } from "../../hooks/useOutsideClick";
+
+import { checkAccessAndRefreshToken } from "../../utils/authMiddleware";
 
 const initialState = {
   shelf: "",
@@ -51,19 +55,32 @@ function BooKModal(props) {
 
   useEffect(() => {
     async function getDisplay() {
-      //TODO Embed in a try catch and apply frontend middleware to check refreshtoken as well
-      const response = await axios.get(
-        "http://localhost:5000/book/getBookDisplay",
-        {
+      try {
+        const method = "GET";
+        const url = "http://localhost:5000/book/getBookDisplay";
+        const data = {};
+        const config = {
           params: { isbn, shelf },
           withCredentials: true,
+          validateStatus: false,
+        };
+        const error =
+          "Your session has expired. Please log back in if you'd like to edit the display settings of this book.";
+        const response = await checkAccessAndRefreshToken(
+          method,
+          url,
+          data,
+          config,
+          error
+        );
+        const responseDisplay = response.data.display;
+        if (responseDisplay !== initialDisplayState) {
+          setInitialDisplayState(responseDisplay);
+          setCurrentDisplayState(responseDisplay);
         }
-      );
-      const responseDisplay = response.data.display;
-      // This means that the responseDisplay was true and initialState should be set to true;
-      if (responseDisplay !== initialDisplayState) {
-        setInitialDisplayState(responseDisplay);
-        setCurrentDisplayState(responseDisplay);
+      } catch (error) {
+        alert(error.message);
+        await props.logOffUser();
       }
     }
     if (props.isLoggedIn) {
@@ -184,9 +201,11 @@ const mapStateToProps = (state) => ({
   isLoggedIn: state.userState.isLoggedIn,
 });
 
-export default connect(mapStateToProps, {})(BooKModal);
+export default connect(mapStateToProps, { logOffUser })(BooKModal);
 
 export const MainModal = styled.div`
+  min-width: 50%;
+  min-height: 50%;
   position: fixed;
   display: flex;
   flex-direction: column;
