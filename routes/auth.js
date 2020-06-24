@@ -106,7 +106,7 @@ router.post("/login", (req, res) => {
         const refreshToken = generateAccessToken(
           payload,
           process.env.REFRESH_TOKEN_SECRET,
-          "1d"
+          "7d"
         );
 
         // Save the refreshToken in database

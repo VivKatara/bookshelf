@@ -93,6 +93,7 @@ function BooKModal(props) {
       } catch (error) {
         alert(error.message);
         await props.logOffUser();
+        return;
       }
     }
     if (props.isLoggedIn) {
@@ -112,31 +113,96 @@ function BooKModal(props) {
     if (currentDisplayState !== initialDisplayState) {
       change = true;
       const desiredDisplay = currentDisplayState;
-      //TODO Refresh Token middleware
-      const response = await axios.post(
-        "http://localhost:5000/book/changebookDisplay",
-        { isbn, shelf, desiredDisplay },
-        { withCredentials: true }
-      );
-      setInitialDisplayState(currentDisplayState);
+      try {
+        const method = "POST";
+        const url = "http://localhost:5000/book/changeBookDisplay";
+        const data = { isbn, shelf, desiredDisplay };
+        const config = { withCredentials: true, validateStatus: false };
+        const error =
+          "Unable to make changes because your session has expired. Please try logging back in";
+        const response = await checkAccessAndRefreshToken(
+          method,
+          url,
+          data,
+          config,
+          error
+        );
+        if (response.status === 200) {
+          setInitialDisplayState(currentDisplayState);
+          dispatchDisplayError({ type: "SUCCESS" });
+        } else {
+          // Server error
+          // If statement because there isn't going to be a shelf change, so this error is true
+          if (shelfState.shelf === shelf) {
+            alert(response.data.msg);
+          }
+        }
+      } catch (error) {
+        alert(error.message);
+        await props.logOffUser();
+        return;
+      }
     }
 
     // If there's a shelf change, delete the book
     // TODO Refresh Token middleware
     if (shelfState.shelf !== shelf) {
       change = true;
-      const response = await axios.delete(
-        "http://localhost:5000/book/deleteFromShelf",
-        { params: { isbn, shelf }, withCredentials: true }
-      );
+      try {
+        const method = "DELETE";
+        const url = "http://localhost:5000/book/deleteFromShelf";
+        const data = {};
+        const config = {
+          params: { isbn, shelf },
+          withCredentials: true,
+          validateStatus: false,
+        };
+        const error =
+          "Unable to make changes because your session has expired. Please try logging back in.";
+        const response = await checkAccessAndRefreshToken(
+          method,
+          url,
+          data,
+          config,
+          error
+        );
+        if (response.status !== 200) {
+          alert(response.data.msg);
+        }
+      } catch (error) {
+        alert(error.message);
+        await props.logOffUser();
+        return;
+      }
 
       // There's been a shelf change, and it's not a delete, so add the book to the new list
       if (shelfState.shelf !== "delete") {
-        const newResponse = await axios.post(
-          "http://localhost:5000/book/addBookToNewShelf",
-          { isbn, shelf: shelfState.shelf, displayState: currentDisplayState },
-          { withCredentials: true }
-        );
+        try {
+          const method = "POST";
+          const url = "http://localhost:5000/book/addBookToNewShelf";
+          const data = {
+            isbn,
+            shelf: shelfState.shelf,
+            displayState: currentDisplayState,
+          };
+          const config = { withCredentials: true, validateStatus: false };
+          const error =
+            "Unable to make changes because your session has expired. Please try logging back in.";
+          const response = await checkAccessAndRefreshToken(
+            method,
+            url,
+            data,
+            config,
+            error
+          );
+          if (response.status !== 200) {
+            alert(error.message);
+          }
+        } catch (error) {
+          alert(error.message);
+          await props.logOffUser();
+          return;
+        }
       }
     }
 

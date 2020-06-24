@@ -87,7 +87,8 @@ module.exports = {
       if (desiredShelf[i].isbn == isbn) {
         return {
           success: false,
-          msg: "This book already exists on the target shelf",
+          msg:
+            "This book already exists on the target shelf. Could not make the requested change.",
         };
       }
     }
@@ -212,14 +213,14 @@ module.exports = {
       return {
         success: false,
         msg:
-          "There are already 6 books on your main display. Please take one off before updating this book",
+          "Your main display is full. Please take one book off before placing this on the main display.",
       };
     }
     if (!desiredDisplay && displayCount <= 0) {
       return {
         success: false,
         msg:
-          "There are no books to take away from the main shelf! This won't work",
+          "There are no books to take away from the main shelf! This won't work.",
       };
     }
     const incrementCount = desiredDisplay ? 1 : -1;
@@ -261,7 +262,11 @@ module.exports = {
 
     // This essentially means that we could not find the book to be deleted
     if (newShelf.length === desiredShelf.length) {
-      return { success: false, msg: "Could not find book to be deleted" };
+      return {
+        success: false,
+        msg:
+          "Could not find book to remove from original shelf. Request unsuccessful.",
+      };
     }
 
     // Update the db
