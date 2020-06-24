@@ -36,7 +36,8 @@ export async function checkAccessAndRefreshToken(
       response = await axios(options);
     }
   } else {
-    // Likely server error, so need to return something here that resembles the server error
+    // Likely server / some other error, so need to return something here that resembles the server error
+    return response;
   }
 
   // If the attempt was retried due to authentication hitting refresh token endpoint, we reach here
@@ -45,5 +46,6 @@ export async function checkAccessAndRefreshToken(
     throw new Error(error);
   } else {
     // Some kind of server error
+    return response;
   }
 }

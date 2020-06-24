@@ -31,7 +31,7 @@ module.exports = {
     const bookApiResponse = await axios.get(googleBooksApiUrl, {
       params: { q: searchTerms, key: process.env.GOOGLE_BOOKS_API_KEY },
     });
-    if (bookApiResponse.status === 200) {
+    if (bookApiResponse.status === 200 && bookApiResponse.data.totalItems > 0) {
       return {
         success: true,
         items: bookApiResponse.data.items,

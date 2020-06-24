@@ -31,8 +31,11 @@ router.post("/add", authenticateToken, async (req, res) => {
   } else {
     // Search google books API for the book
     const googleBook = await searchGoogleBooksAPI(title, author);
+    console.log(googleBook);
     if (!googleBook.success) {
-      return res.status(404).json({ msg: "Could not find book" });
+      return res
+        .status(404)
+        .json({ msg: "Error! Could not find this particular book." });
     }
     const [
       finalTitle,
@@ -44,7 +47,9 @@ router.post("/add", authenticateToken, async (req, res) => {
     ] = extractBookFields(googleBook.items, title, author);
     // Could not find exact match
     if (!matchFound) {
-      return res.status(404).json({ msg: "Could not find book" });
+      return res
+        .status(404)
+        .json({ msg: "Error! Could not find this particular book." });
     }
     // Add found book to the book database
     await addBook(
@@ -122,7 +127,10 @@ router.get("/getBookDisplay", authenticateToken, async (req, res) => {
   if (!success) {
     return res
       .status(400)
-      .json({ msg: "Could not find book. Something unexpected occurred" });
+      .json({
+        msg:
+          "Something unexpected occurred. Cannot show display state of book.",
+      });
   }
   return res.status(200).json({ display });
 });

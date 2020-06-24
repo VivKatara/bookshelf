@@ -8,6 +8,7 @@ import styled from "@emotion/styled";
 import { logOffUser } from "../../actions/setUser";
 
 import { useOutsideClick } from "../../hooks/useOutsideClick";
+import { useErrorMessage } from "../../hooks/useErrorMessage";
 
 import { checkAccessAndRefreshToken } from "../../utils/authMiddleware";
 
@@ -62,6 +63,7 @@ function AddBookModal(props) {
 
   // To manage state of the modal
   const [addBookState, dispatch] = useReducer(reducer, initialState);
+  const [errorState, dispatchError] = useErrorMessage();
 
   const history = useHistory();
 
@@ -99,9 +101,20 @@ function AddBookModal(props) {
         config,
         error
       );
-      shelfUpdate(addBookState.shelf);
-      handleClose();
+      if (response.status === 200) {
+        // Success
+        dispatchError({ type: "SUCCESS" });
+        shelfUpdate(addBookState.shelf);
+        handleClose();
+      } else {
+        // Server error
+        dispatchError({
+          type: "FAIL",
+          payload: { errorMsg: response.data.msg },
+        });
+      }
     } catch (error) {
+      // Authentication error
       alert(error.message);
       handleClose();
       await props.logOffUser();
@@ -173,6 +186,7 @@ function AddBookModal(props) {
             {shelfOptions}
           </Select>
         </FormDiv>
+        {errorState.error && <ErrorMessage>{errorState.errorMsg}</ErrorMessage>}
         <FormDiv>
           <SubmitButton type="Submit">Add</SubmitButton>
         </FormDiv>
@@ -240,4 +254,11 @@ const CloseButton = styled.button`
     cursor: pointer;
     color: #287bf8;
   }
+`;
+
+const ErrorMessage = styled.p`
+  position: absolute;
+  margin-top: 130px;
+  font-size: 12px;
+  color: red;
 `;

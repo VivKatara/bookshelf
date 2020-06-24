@@ -15,6 +15,7 @@ import { ShelfContext } from "../Shelf";
 import { logOffUser } from "../../actions/setUser";
 
 import { useOutsideClick } from "../../hooks/useOutsideClick";
+import { useErrorMessage } from "../../hooks/useErrorMessage";
 
 import { checkAccessAndRefreshToken } from "../../utils/authMiddleware";
 
@@ -51,6 +52,8 @@ function BooKModal(props) {
   const modalRef = useRef(null);
   useOutsideClick(modalRef, buttonRef, handleClose);
 
+  const [displayError, dispatchDisplayError] = useErrorMessage();
+
   const shelf = useContext(ShelfContext);
 
   useEffect(() => {
@@ -73,10 +76,19 @@ function BooKModal(props) {
           config,
           error
         );
-        const responseDisplay = response.data.display;
-        if (responseDisplay !== initialDisplayState) {
-          setInitialDisplayState(responseDisplay);
-          setCurrentDisplayState(responseDisplay);
+        if (response.status === 200) {
+          const responseDisplay = response.data.display;
+          if (responseDisplay !== initialDisplayState) {
+            setInitialDisplayState(responseDisplay);
+            setCurrentDisplayState(responseDisplay);
+          }
+          dispatchDisplayError({ type: "SUCCESS" });
+        } else {
+          // Server error
+          dispatchDisplayError({
+            type: "FAIL",
+            payload: { errorMsg: response.data.msg },
+          });
         }
       } catch (error) {
         alert(error.message);
@@ -177,12 +189,21 @@ function BooKModal(props) {
             </Select>
           </FormDiv>
           <FormDiv>
-            <Label>Display on homepage:</Label>
-            <Checkbox
-              type="checkbox"
-              checked={currentDisplayState}
-              onChange={handleCheckChange}
-            ></Checkbox>
+            {displayError.error ? (
+              <ErrorMessage>
+                {/* Error! Something unexpected occurred. Can't show book display. */}
+                {displayError.errorMsg}
+              </ErrorMessage>
+            ) : (
+              <>
+                <Label>Display on homepage:</Label>
+                <Checkbox
+                  type="checkbox"
+                  checked={currentDisplayState}
+                  onChange={handleCheckChange}
+                ></Checkbox>
+              </>
+            )}
           </FormDiv>
           <FormDiv>
             <SaveChangesButton type="Submit">Save Changes</SaveChangesButton>
@@ -305,4 +326,11 @@ const CloseButton = styled.button`
     cursor: pointer;
     color: #287bf8;
   }
+`;
+
+const ErrorMessage = styled.p`
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 12px;
+  color: red;
 `;
