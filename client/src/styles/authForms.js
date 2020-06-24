@@ -59,3 +59,8 @@ export const SubmitButton = styled.button`
     width: 200px;
   }
 `;
+
+export const DisplayedErrorMessage = styled.p`
+  font-size: 12px;
+  color: red;
+`;

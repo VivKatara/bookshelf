@@ -9,7 +9,6 @@ const User = require("../models/User");
 const UserBooks = require("../models/UserBooks");
 const Token = require("../models/Token");
 
-const validateLoginInput = require("../validation/login");
 const validateRegisterInput = require("../validation/register");
 const createUsername = require("../utils/createUsername");
 
@@ -78,10 +77,6 @@ router.post("/register", async (req, res) => {
 
 // Login route, you have to add access tokens and refresh tokens to this
 router.post("/login", (req, res) => {
-  const { errors, isValid, validatedData } = validateLoginInput(req.body);
-  if (!isValid) {
-    return res.status(400).json({ msg: errors[Object.keys(errors)[0]] });
-  }
   passport.authenticate("local", (err, user, info) => {
     if (err) {
       return res

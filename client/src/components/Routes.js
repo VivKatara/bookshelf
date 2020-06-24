@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import {
   BrowserRouter as Router,
@@ -14,23 +14,34 @@ import FullShelf from "./FullShelf";
 import LandingPage from "./LandingPage";
 import Login from "./Login";
 import Register from "./Register";
+import Loading from "./Loading";
 import NotFound from "./NotFound";
 
 import { setUser } from "../actions/setUser";
 
 const Routes = (props) => {
   const { isLoggedIn, username, setUser } = props;
+
+  // This state is essential such that we're not updating the state of an unmounted React component
+  // Which could occur in the Homepage of PrivateRoutes since isLoggedIn always defaults to false before setUser is called
+  const [userSet, setUserSet] = useState(false);
+
   useEffect(() => {
     async function setUserOnMount() {
       await setUser();
+      setUserSet(true);
     }
     setUserOnMount();
   }, []);
-  return (
-    <Router>
-      {isLoggedIn ? <PrivateRoutes username={username} /> : <AuthRoutes />}
-    </Router>
-  );
+  if (userSet) {
+    return (
+      <Router>
+        {isLoggedIn ? <PrivateRoutes username={username} /> : <AuthRoutes />}
+      </Router>
+    );
+  } else {
+    return <Loading />;
+  }
 };
 
 const mapStateToProps = (state) => ({
@@ -63,6 +74,7 @@ const PrivateRoutes = (props) => {
 };
 
 const AuthRoutes = () => {
+  console.log("Somehow here in auth");
   return (
     <>
       <Switch>

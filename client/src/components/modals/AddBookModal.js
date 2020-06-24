@@ -1,6 +1,5 @@
-import React, { useState, useReducer, useEffect, useRef } from "react";
+import React, { useReducer, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
-import axios from "axios";
 import { useHistory } from "react-router-dom";
 import { connect } from "react-redux";
 import styled from "@emotion/styled";

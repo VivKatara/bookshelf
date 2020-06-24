@@ -3,58 +3,43 @@ import PropTypes from "prop-types";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
 import { connect } from "react-redux";
+import { Formik, Form, Field, ErrorMessage } from "formik";
 import styled from "@emotion/styled";
+
+import TextError from "./TextError";
 
 import { setUser } from "../actions/setUser";
 
 import { useErrorMessage } from "../hooks/useErrorMessage";
 
+import { LoginSchema } from "../validation/schemas";
+
 import { MainContainer, CentralDiv } from "../styles/mainPages";
 import {
-  Form,
   FormDiv,
   FormHeader,
   Label,
   Input,
   SubmitButton,
+  DisplayedErrorMessage,
 } from "../styles/authForms";
 
-const initialState = {
+const initialValues = {
   email: "",
   password: "",
 };
 
-const reducer = (state, action) => {
-  switch (action.type) {
-    case "EMAIL_CHANGE":
-      return {
-        ...state,
-        email: action.payload.email,
-      };
-    case "PASSWORD_CHANGE":
-      return {
-        ...state,
-        password: action.payload.password,
-      };
-    default:
-      return state;
-  }
-};
-
 const Login = (props) => {
-  const [loginState, dispatch] = useReducer(reducer, initialState);
-  const [errorState, dispatchError] = useErrorMessage();
+  const [loginError, dispatchLoginError] = useErrorMessage();
 
   const history = useHistory();
 
   const { setUser } = props;
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const { email, password } = loginState;
-
+  const onSubmit = async (values) => {
+    const { email, password } = values;
     try {
-      const response = await axios.post(
+      await axios.post(
         "http://localhost:5000/auth/login",
         {
           email,
@@ -62,70 +47,61 @@ const Login = (props) => {
         },
         { withCredentials: true }
       );
-
-      // If the error is set, turn it off again
-      if (loginState.error) {
-        dispatchError({ type: "SUCCESS" });
-      }
+      if (loginError.error) dispatchLoginError({ type: "SUCCESS" });
       await setUser();
       history.push("/");
     } catch (error) {
-      // Set the error to true and update the message
       console.log(error.response.data.msg);
-      dispatchError({
+      dispatchLoginError({
         type: "FAIL",
         payload: { errorMsg: error.response.data.msg },
       });
     }
   };
 
+  console.log(loginError);
+
   return (
     <MainContainer>
-      <CentralDiv>
-        <Form onSubmit={handleSubmit}>
-          <FormDiv>
-            <FormHeader>Sign into your Bookshelf account</FormHeader>
-          </FormDiv>
-          <FormDiv>
-            <Label>Email</Label>
-            <Input
-              type="text"
-              name="email"
-              id="email"
-              value={loginState.email}
-              onChange={(e) =>
-                dispatch({
-                  type: "EMAIL_CHANGE",
-                  payload: { email: e.target.value },
-                })
-              }
-              required
-            />
-          </FormDiv>
-          <FormDiv>
-            <Label>Password</Label>
-            <Input
-              type="text"
-              name="password"
-              id="password"
-              value={loginState.password}
-              onChange={(e) =>
-                dispatch({
-                  type: "PASSWORD_CHANGE",
-                  payload: { password: e.target.value },
-                })
-              }
-              required
-            />
-          </FormDiv>
-          {errorState.error && (
-            <ErrorMessage>{errorState.errorMsg}</ErrorMessage>
-          )}
-          <FormDiv>
-            <SubmitButton type="Submit">Continue</SubmitButton>
-          </FormDiv>
-        </Form>
-      </CentralDiv>
+      <Formik
+        initialValues={initialValues}
+        onSubmit={onSubmit}
+        validationSchema={LoginSchema}
+        validateOnBlur={false}
+        validateOnChange={false}
+      >
+        <CentralDiv>
+          <Form>
+            <FormDiv>
+              <FormHeader>Sign into your Bookshelf account</FormHeader>
+            </FormDiv>
+            <FormDiv>
+              <Label>Email</Label>
+              <Field type="text" as={Input} name="email" id="email" required />
+              <ErrorMessage name="email" component={DisplayedErrorMessage} />
+            </FormDiv>
+            <FormDiv>
+              <Label>Password</Label>
+              <Field
+                type="text"
+                as={Input}
+                name="password"
+                id="password"
+                required
+              />
+              <ErrorMessage name="password" component={DisplayedErrorMessage} />
+            </FormDiv>
+            <FormDiv>
+              {loginError.error && (
+                <DisplayedErrorMessage>
+                  {loginError.errorMsg}
+                </DisplayedErrorMessage>
+              )}
+              <SubmitButton type="Submit">Continue</SubmitButton>
+            </FormDiv>
+          </Form>
+        </CentralDiv>
+      </Formik>
     </MainContainer>
   );
 };
@@ -137,10 +113,3 @@ Login.propTypes = {
 const mapStateToProps = (state) => ({});
 
 export default connect(mapStateToProps, { setUser })(Login);
-
-export const ErrorMessage = styled.p`
-  position: absolute;
-  margin-top: 90px;
-  font-size: 12px;
-  color: red;
-`;

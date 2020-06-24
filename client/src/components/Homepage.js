@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useReducer, useRef } from "react";
+import React, { useState, useReducer, useRef } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import styled from "@emotion/styled";
@@ -44,8 +44,6 @@ const reducer = (state, action) => {
       return state;
   }
 };
-
-export const UserContext = React.createContext();
 
 function Homepage(props) {
   // Acquire the username from route parameters and check if it is valid
@@ -110,46 +108,44 @@ function Homepage(props) {
       <>
         {!props.isLoggedIn && <NotLoggedInHeader username={username} />}
         <MainContainer>
-          <UserContext.Provider value={username}>
-            {showModal && (
-              <AddBookModal
-                buttonRef={buttonRef}
-                handleClose={toggleModal}
-                shelfUpdate={handleShelfUpdate}
-              />
-            )}
-            {props.isLoggedIn ? (
-              <AddBookLink buttonRef={buttonRef} toggleModal={toggleModal} />
-            ) : (
-              <AuthLinks />
-            )}
-            <CentralDiv>
-              <Title>Currently Reading</Title>
-              <Shelf
-                isbns={isbnState.currentIsbns}
-                shelf="currentBooks"
-                handleModalUpdate={triggerBookModalUpdate}
-              >
-                <SeeAll route={`/${username}/shelf/current?page=1`} />
-              </Shelf>
-              <Title>Have Read</Title>
-              <Shelf
-                isbns={isbnState.pastIsbns}
-                shelf="pastBooks"
-                handleModalUpdate={triggerBookModalUpdate}
-              >
-                <SeeAll route={`/${username}/shelf/past?page=1`} />
-              </Shelf>
-              <Title>Want to Read</Title>
-              <Shelf
-                isbns={isbnState.futureIsbns}
-                shelf="futureBooks"
-                handleModalUpdate={triggerBookModalUpdate}
-              >
-                <SeeAll route={`/${username}/shelf/future?page=1`} />
-              </Shelf>
-            </CentralDiv>
-          </UserContext.Provider>
+          {showModal && (
+            <AddBookModal
+              buttonRef={buttonRef}
+              handleClose={toggleModal}
+              shelfUpdate={handleShelfUpdate}
+            />
+          )}
+          {props.isLoggedIn ? (
+            <AddBookLink buttonRef={buttonRef} toggleModal={toggleModal} />
+          ) : (
+            <AuthLinks />
+          )}
+          <CentralDiv>
+            <Title>Currently Reading</Title>
+            <Shelf
+              isbns={isbnState.currentIsbns}
+              shelf="currentBooks"
+              handleModalUpdate={triggerBookModalUpdate}
+            >
+              <SeeAll route={`/${username}/shelf/current?page=1`} />
+            </Shelf>
+            <Title>Have Read</Title>
+            <Shelf
+              isbns={isbnState.pastIsbns}
+              shelf="pastBooks"
+              handleModalUpdate={triggerBookModalUpdate}
+            >
+              <SeeAll route={`/${username}/shelf/past?page=1`} />
+            </Shelf>
+            <Title>Want to Read</Title>
+            <Shelf
+              isbns={isbnState.futureIsbns}
+              shelf="futureBooks"
+              handleModalUpdate={triggerBookModalUpdate}
+            >
+              <SeeAll route={`/${username}/shelf/future?page=1`} />
+            </Shelf>
+          </CentralDiv>
         </MainContainer>
       </>
     );

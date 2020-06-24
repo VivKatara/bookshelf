@@ -26,6 +26,8 @@ const reducer = (state, action) => {
         coverImage: action.payload.coverImage,
       };
     }
+    default:
+      return state;
   }
 };
 
