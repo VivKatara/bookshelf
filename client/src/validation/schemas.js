@@ -32,3 +32,9 @@ export const RegisterSchema = Yup.object({
     })
     .required("This field is required!"),
 });
+
+export const AddBookModalSchema = Yup.object({
+  title: Yup.string().required("This field is required!"),
+  author: Yup.string(),
+  shelf: Yup.string().required("This field is required!"),
+});

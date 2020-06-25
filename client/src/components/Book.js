@@ -6,6 +6,19 @@ import BookModal from "./modals/BookModal";
 
 import { useModal } from "../hooks/useModal";
 
+// type BookProps = {
+//   isbn: string;
+//   handleModalUpdate: () => void;
+// };
+
+// type initialBookState = {
+//   foundBook: boolean;
+//   title: string;
+//   authors: string;
+//   description: string;
+//   coverImage: string;
+// };
+
 const initialState = {
   foundBook: false,
   title: "",
