@@ -1,12 +1,7 @@
-import React, {
-  useState,
-  useReducer,
-  useEffect,
-  useContext,
-  useRef,
-} from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
+import { Formik, Form, Field, ErrorMessage } from "formik";
 import styled from "@emotion/styled";
 
 import { ShelfContext } from "../Shelf";
@@ -16,22 +11,14 @@ import { logOffUser } from "../../actions/setUser";
 import { useOutsideClick } from "../../hooks/useOutsideClick";
 import { useErrorMessage } from "../../hooks/useErrorMessage";
 
+import { BookModalSchema } from "../../validation/schemas";
 import { checkAccessAndRefreshToken } from "../../utils/authMiddleware";
 
-const initialState = {
-  shelf: "",
-};
+import { DisplayedErrorMessage } from "../../styles/authForms";
 
-const reducer = (state, action) => {
-  switch (action.type) {
-    case "UPDATE_SHELF":
-      return {
-        ...state,
-        shelf: action.payload.shelf,
-      };
-    default:
-      return state;
-  }
+const initialValues = {
+  shelf: "",
+  display: false,
 };
 
 function BooKModal(props) {
@@ -46,9 +33,8 @@ function BooKModal(props) {
   } = props;
 
   const [initialDisplayState, setInitialDisplayState] = useState(false);
-  const [currentDisplayState, setCurrentDisplayState] = useState(false);
-  const [shelfState, dispatch] = useReducer(reducer, initialState);
   const modalRef = useRef(null);
+  const formikRef = useRef(null);
   useOutsideClick(modalRef, buttonRef, handleClose);
 
   const [displayError, dispatchDisplayError] = useErrorMessage();
@@ -79,7 +65,9 @@ function BooKModal(props) {
           const responseDisplay = response.data.display;
           if (responseDisplay !== initialDisplayState) {
             setInitialDisplayState(responseDisplay);
-            setCurrentDisplayState(responseDisplay);
+            if (formikRef.current) {
+              formikRef.current.setFieldValue("display", responseDisplay);
+            }
           }
           dispatchDisplayError({ type: "SUCCESS" });
         } else {
@@ -98,20 +86,16 @@ function BooKModal(props) {
     if (props.isLoggedIn) {
       getDisplay();
     }
-    dispatch({ type: "UPDATE_SHELF", payload: { shelf } });
+    if (formikRef.current) {
+      formikRef.current.setFieldValue("shelf", shelf);
+    }
   }, []);
 
-  const handleCheckChange = (event) => {
-    setCurrentDisplayState(event.target.checked);
-  };
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+  const onSubmit = async (values) => {
     let change = false;
-    // Changing the displayState on the current shelf
-    if (currentDisplayState !== initialDisplayState) {
+    if (values.display !== initialDisplayState) {
       change = true;
-      const desiredDisplay = currentDisplayState;
+      const desiredDisplay = values.display;
       try {
         const method = "POST";
         const url = "http://localhost:5000/book/changeBookDisplay";
@@ -127,12 +111,12 @@ function BooKModal(props) {
           error
         );
         if (response.status === 200) {
-          setInitialDisplayState(currentDisplayState);
+          setInitialDisplayState(values.display);
           dispatchDisplayError({ type: "SUCCESS" });
         } else {
           // Server error
           // If statement because there isn't going to be a shelf change, so this error is true
-          if (shelfState.shelf === shelf) {
+          if (values.shelf === shelf) {
             alert(response.data.msg);
           }
         }
@@ -143,9 +127,8 @@ function BooKModal(props) {
       }
     }
 
-    // If there's a shelf change, delete the book
-    // TODO Refresh Token middleware
-    if (shelfState.shelf !== shelf) {
+    // If there's a shelf change, delete the book from its current shelf
+    if (values.shelf !== shelf) {
       change = true;
       try {
         const method = "DELETE";
@@ -174,15 +157,15 @@ function BooKModal(props) {
         return;
       }
 
-      // There's been a shelf change, and it's not a delete, so add the book to the new list
-      if (shelfState.shelf !== "delete") {
+      // There's been a shelf change, and it's not a delete, so add the book to the new shelf
+      if (values.shelf !== "delete") {
         try {
           const method = "POST";
           const url = "http://localhost:5000/book/addBookToNewShelf";
           const data = {
             isbn,
-            shelf: shelfState.shelf,
-            displayState: currentDisplayState,
+            shelf: values.shelf,
+            displayState: values.display,
           };
           const config = { withCredentials: true, validateStatus: false };
           const error =
@@ -230,50 +213,58 @@ function BooKModal(props) {
         </BookDescriptionDiv>
       </BookDescription>
       {props.isLoggedIn && (
-        <BookSettingsForm onSubmit={handleSubmit}>
-          <FormDiv>
-            <SettingsLabel>Shelf Settings</SettingsLabel>
-          </FormDiv>
-          <FormDiv>
-            <Label>Shelf:</Label>
-            <Select
-              id="shelf"
-              name="shelf"
-              value={shelfState.shelf}
-              onChange={(e) =>
-                dispatch({
-                  type: "UPDATE_SHELF",
-                  payload: { shelf: e.target.value },
-                })
-              }
-            >
-              <option value="currentBooks">Currently Reading</option>
-              <option value="pastBooks">Have Read</option>
-              <option value="futureBooks">Want to Read</option>
-              <option value="delete">Remove book from this shelf</option>
-            </Select>
-          </FormDiv>
-          <FormDiv>
-            {displayError.error ? (
-              <ErrorMessage>
-                {/* Error! Something unexpected occurred. Can't show book display. */}
-                {displayError.errorMsg}
-              </ErrorMessage>
-            ) : (
-              <>
-                <Label>Display on homepage:</Label>
-                <Checkbox
-                  type="checkbox"
-                  checked={currentDisplayState}
-                  onChange={handleCheckChange}
-                ></Checkbox>
-              </>
-            )}
-          </FormDiv>
-          <FormDiv>
-            <SaveChangesButton type="Submit">Save Changes</SaveChangesButton>
-          </FormDiv>
-        </BookSettingsForm>
+        <Formik
+          innerRef={formikRef}
+          initialValues={initialValues}
+          onSubmit={onSubmit}
+          validationSchema={BookModalSchema}
+          validateOnBlur={false}
+          validateOnChange={false}
+        >
+          <Form as={BookSettingsForm}>
+            <FormDiv>
+              <SettingsLabel>Shelf Settings</SettingsLabel>
+            </FormDiv>
+            <FormDiv>
+              <Label>Shelf:</Label>
+              <Field as={Select} name="shelf">
+                <option value="currentBooks">Currently Reading</option>
+                <option value="pastBooks">Have Read</option>
+                <option value="futureBooks">Want to Read</option>
+                <option value="delete">Remove book from this shelf</option>
+              </Field>
+              <ErrorMessage name="shelf" as={DisplayedErrorMessage} />
+            </FormDiv>
+            <FormDiv>
+              {displayError.error ? (
+                <DisplayedErrorMessage>
+                  Error! Something unexpected occurred. Can't show book display.
+                  {displayError.errorMsg}
+                </DisplayedErrorMessage>
+              ) : (
+                <>
+                  <Label>Display on homepage:</Label>
+                  <Field
+                    name="display"
+                    render={({ field, form }) => {
+                      return (
+                        <Checkbox
+                          type="checkbox"
+                          checked={field.value}
+                          {...field}
+                        />
+                      );
+                    }}
+                  />
+                  <ErrorMessage name="display" as={DisplayedErrorMessage} />
+                </>
+              )}
+            </FormDiv>
+            <FormDiv>
+              <SaveChangesButton type="Submit">Save Changes</SaveChangesButton>
+            </FormDiv>
+          </Form>
+        </Formik>
       )}
     </MainModal>
   );
@@ -391,11 +382,4 @@ const CloseButton = styled.button`
     cursor: pointer;
     color: #287bf8;
   }
-`;
-
-const ErrorMessage = styled.p`
-  margin-left: auto;
-  margin-right: auto;
-  font-size: 12px;
-  color: red;
 `;

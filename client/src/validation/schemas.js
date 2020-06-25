@@ -38,3 +38,8 @@ export const AddBookModalSchema = Yup.object({
   author: Yup.string(),
   shelf: Yup.string().required("This field is required!"),
 });
+
+export const BookModalSchema = Yup.object({
+  shelf: Yup.string().required("This field is required!"),
+  display: Yup.boolean().required("This field is required!"),
+});
