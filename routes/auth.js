@@ -9,15 +9,10 @@ const User = require("../models/User");
 const UserBooks = require("../models/UserBooks");
 const Token = require("../models/Token");
 
-const validateRegisterInput = require("../validation/register");
 const createUsername = require("../utils/createUsername");
 
 // TODO Refactor all of these routes to make it a bit easier to read
 router.post("/register", async (req, res) => {
-  // const { errors, isValid, validatedData } = validateRegisterInput(req.body);
-  // if (!isValid) {
-  //   return res.status(400).json({ msg: errors[Object.keys(errors)[0]] });
-  // }
   const { email, fullName, password } = req.body;
   const user = await User.findOne({ email });
   if (user) {
