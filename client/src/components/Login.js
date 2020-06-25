@@ -1,12 +1,9 @@
-import React, { useReducer } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
 import { connect } from "react-redux";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import styled from "@emotion/styled";
-
-import TextError from "./TextError";
 
 import { setUser } from "../actions/setUser";
 
