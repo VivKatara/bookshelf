@@ -2,12 +2,11 @@
   "name": "book_shelf",
   "version": "1.0.0",
   "description": "Virtual bookshelf to share what you're currently reading, have read, or want to read in the future",
-  "main": "server.js",
+  "main": "server/server.js",
   "scripts": {
     "client": "cd client && npm run start",
-    "dev": "concurrently \"nodemon server.js\" \"nodemon authServer.js\" \"npm run client\"",
-    "devServer": "nodemon server.js",
-    "devAuthServer": "nodemon authServer.js"
+    "server": "cd server && nodemon server.js",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
   },
   "author": "Vivek Katara",
   "license": "ISC",
