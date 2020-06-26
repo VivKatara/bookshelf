@@ -1,7 +1,14 @@
 import React from "react";
 import styled from "@emotion/styled";
 
-function NextPreviousNavigation(props) {
+interface Props {
+  prev: boolean;
+  next: boolean;
+  url: string;
+  page: number;
+}
+
+const NextPreviousNavigation: React.FC<Props> = (props) => {
   const { prev, next, url, page } = props;
   return (
     <>
@@ -11,7 +18,7 @@ function NextPreviousNavigation(props) {
       {next && <NextLink href={`${url}?page=${page + 1}`}>Next</NextLink>}
     </>
   );
-}
+};
 
 export default React.memo(NextPreviousNavigation);
 

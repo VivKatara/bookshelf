@@ -1,9 +1,6 @@
 import React, { useRef } from "react";
-
 import ProfileModal from "../modals/ProfileModal";
-
 import { useModal } from "../../hooks/useModal";
-
 import {
   HeaderContainer,
   HyperLink,

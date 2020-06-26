@@ -1,14 +1,19 @@
 import React from "react";
 import styled from "@emotion/styled";
 
-function AddBookLink(props) {
+interface Props {
+  buttonRef: React.MutableRefObject<null>;
+  toggleModal: () => void;
+}
+
+const AddBookLink: React.FC<Props> = (props) => {
   const { buttonRef, toggleModal } = props;
   return (
     <AddBookLinkContainer ref={buttonRef} onClick={toggleModal}>
       Add Book to Shelf
     </AddBookLinkContainer>
   );
-}
+};
 
 export default AddBookLink;
 

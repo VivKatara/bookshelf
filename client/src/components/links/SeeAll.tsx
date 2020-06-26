@@ -1,14 +1,18 @@
 import React from "react";
 import styled from "@emotion/styled";
 
-function SeeAll(props) {
+interface SeeAllProps {
+  route: string;
+}
+
+const SeeAll: React.FC<SeeAllProps> = (props) => {
   const { route } = props;
   return (
     <LinkContainer>
       <Link href={route}>See All</Link>
     </LinkContainer>
   );
-}
+};
 
 export default SeeAll;
 

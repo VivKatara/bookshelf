@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-
 import {
   HeaderContainer,
   HyperLink,
@@ -9,7 +8,11 @@ import {
   Profile,
 } from "../../styles/headers";
 
-function NotLoggedInHeader(props) {
+interface NotLoggedInProps {
+  username: string;
+}
+
+const NotLoggedInHeader: React.FC<NotLoggedInProps> = (props) => {
   const { username } = props;
   const [userFullName, setUserFullName] = useState("");
 
@@ -40,6 +43,6 @@ function NotLoggedInHeader(props) {
       </User>
     </HeaderContainer>
   );
-}
+};
 
 export default React.memo(NotLoggedInHeader);
