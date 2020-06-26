@@ -1,10 +1,12 @@
 import React from "react";
-import styled from "@emotion/styled";
 import { Provider } from "react-redux";
 import Routes from "./components/Routes";
-import store from "./store";
+import store from "./store/configureStore";
+import styled from "@emotion/styled";
 
-const App = () => {
+interface Props {}
+
+const App: React.FC<Props> = () => {
   return (
     <Provider store={store}>
       <AppContainer>
