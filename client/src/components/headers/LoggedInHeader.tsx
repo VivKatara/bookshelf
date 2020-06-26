@@ -1,6 +1,4 @@
 import React, { useRef } from "react";
-import PropTypes from "prop-types";
-import { connect } from "react-redux";
 
 import ProfileModal from "../modals/ProfileModal";
 
@@ -13,11 +11,16 @@ import {
   Username,
   Profile,
 } from "../../styles/headers";
+import { ModalHook } from "../../types/ModalHook";
 
-function LoggedInHeader(props) {
-  const [show, toggleModal] = useModal();
+interface LoggedInProps {
+  userFullName: string;
+}
+
+const LoggedInHeader: React.FC<LoggedInProps> = (props) => {
+  const { userFullName } = props;
+  const [show, toggleModal]: ModalHook = useModal();
   const buttonRef = useRef(null);
-
   return (
     <>
       <HeaderContainer>
@@ -25,23 +28,15 @@ function LoggedInHeader(props) {
           <p>Bookshelf</p>
         </HyperLink>
         <User>
-          <Username>{props.userFullName}</Username>
+          <Username>{userFullName}</Username>
           <Profile ref={buttonRef} onClick={toggleModal}>
-            {props.userFullName[0]}
+            {userFullName[0]}
           </Profile>
         </User>
       </HeaderContainer>
       {show && <ProfileModal buttonRef={buttonRef} handleClose={toggleModal} />}
     </>
   );
-}
-
-LoggedInHeader.propTypes = {
-  userFullName: PropTypes.string.isRequired,
 };
 
-const mapStateToProps = (state) => ({
-  userFullName: state.userState.userFullName,
-});
-
-export default connect(mapStateToProps, {})(React.memo(LoggedInHeader));
+export default React.memo(LoggedInHeader);

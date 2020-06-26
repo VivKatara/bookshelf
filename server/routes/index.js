@@ -14,7 +14,7 @@ router.get("/profile", authenticateToken, (req, res) => {
   return res.status(200).json({
     user: {
       email: req.user.email,
-      fullName: req.user.fullName,
+      userFullName: req.user.fullName,
       username: req.user.username,
     },
     msg: "Returning user",

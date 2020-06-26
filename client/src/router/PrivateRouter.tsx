@@ -7,17 +7,19 @@ import FullShelf from "../components/FullShelf";
 import NotFound from "../components/NotFound";
 
 interface PrivateProps {
+  userFullName: string;
   username: string;
 }
 
 const PrivateRouter: React.FC<PrivateProps> = (props) => {
+  const { userFullName, username } = props;
   return (
     <>
-      <LoggedInHeader />
+      <LoggedInHeader userFullName={userFullName} />
       <Switch>
-        <Redirect exact from="/" to={`/${props.username}`} />
-        <Redirect exact from="/login" to={`/${props.username}`} />
-        <Redirect exact from="/register" to={`/${props.username}`} />
+        <Redirect exact from="/" to={`/${username}`} />
+        <Redirect exact from="/login" to={`/${username}`} />
+        <Redirect exact from="/register" to={`/${username}`} />
         <Route exact path={"/:username"} component={Homepage} />
         <Route exact path="/:username/shelf/:type" component={FullShelf} />
         <Route path="*" component={NotFound} />

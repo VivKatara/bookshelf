@@ -1,23 +1,10 @@
 import React, { useState, useEffect } from "react";
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Redirect,
-} from "react-router-dom";
+import { BrowserRouter as Router } from "react-router-dom";
 import { connect } from "react-redux";
 
 import PrivateRouter from "./PrivateRouter";
 import AuthRouter from "./AuthRouter";
-
-// import LoggedInHeader from "../components/headers/LoggedInHeader";
-// import Homepage from "../components/Homepage";
-// import FullShelf from "../components/FullShelf";
-// import LandingPage from "../components/LandingPage";
-// import Login from "../components/Login";
-// import Register from "../components/Register";
 import Loading from "../components/Loading";
-// import NotFound from "../components/NotFound";
 
 import { startSetUser } from "../actions/user";
 import { User } from "../types/User";
@@ -45,10 +32,17 @@ const AppRouter: React.FC<Props> = (props) => {
     setUserOnMount();
   }, [userSet]);
 
+  console.log("Routing");
+  console.log(props.user);
+
   if (userSet) {
     return (
       <Router>
-        {isLoggedIn ? <PrivateRouter username={username} /> : <AuthRouter />}
+        {isLoggedIn ? (
+          <PrivateRouter userFullName={userFullName} username={username} />
+        ) : (
+          <AuthRouter />
+        )}
       </Router>
     );
   } else return <Loading />;
@@ -76,40 +70,3 @@ const mapDispatchToProps = (
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AppRouter);
-
-// interface PrivateProps {
-//   username: string;
-// }
-
-// const PrivateRoutes: React.FC<PrivateProps> = (props) => {
-//   return (
-//     <>
-//       <LoggedInHeader />
-//       <Switch>
-//         <Redirect exact from="/" to={`/${props.username}`} />
-//         <Redirect exact from="/login" to={`/${props.username}`} />
-//         <Redirect exact from="/register" to={`/${props.username}`} />
-//         <Route exact path={"/:username"} component={Homepage} />
-//         <Route exact path="/:username/shelf/:type" component={FullShelf} />
-//         <Route path="*" component={NotFound} />
-//       </Switch>
-//     </>
-//   );
-// };
-
-// interface AuthProps {}
-
-// const AuthRoutes: React.FC<AuthProps> = (props) => {
-//   return (
-//     <>
-//       <Switch>
-//         <Route exact path="/" component={LandingPage} />
-//         <Route exact path="/login" component={Login} />
-//         <Route exact path="/register" component={Register} />
-//         <Route exact path={"/:username"} component={Homepage} />
-//         <Route exact path="/:username/shelf/:type" component={FullShelf} />
-//         <Route path="*" component={NotFound} />
-//       </Switch>
-//     </>
-//   );
-// };
