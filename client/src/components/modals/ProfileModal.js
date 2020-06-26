@@ -6,10 +6,10 @@ import styled from "@emotion/styled";
 
 import { useOutsideClick } from "../../hooks/useOutsideClick";
 
-import { logOffUser } from "../../actions/setUser";
+import { startLogOffUser } from "../../actions/user";
 
 function ProfileModal(props) {
-  const { buttonRef, handleClose, logOffUser } = props;
+  const { buttonRef, handleClose, startLogOffUser } = props;
   const history = useHistory();
 
   // Closes modal window when there's an outside click
@@ -17,7 +17,7 @@ function ProfileModal(props) {
   useOutsideClick(modalRef, buttonRef, handleClose);
 
   const logOut = async () => {
-    await logOffUser();
+    await startLogOffUser();
     history.push("/");
   };
 
@@ -31,12 +31,12 @@ function ProfileModal(props) {
 }
 
 ProfileModal.propTypes = {
-  logOffUser: PropTypes.func.isRequired,
+  startLogOffUser: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => ({});
 
-export default connect(mapStateToProps, { logOffUser })(ProfileModal);
+export default connect(mapStateToProps, { startLogOffUser })(ProfileModal);
 
 export const ModalContainer = styled.div`
   position: absolute;

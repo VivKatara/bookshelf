@@ -5,7 +5,7 @@ import { useHistory } from "react-router-dom";
 import { connect } from "react-redux";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 
-import { setUser } from "../actions/setUser";
+import { startSetUser } from "../actions/user";
 
 import { useErrorMessage } from "../hooks/useErrorMessage";
 
@@ -31,7 +31,7 @@ const Login = (props) => {
 
   const history = useHistory();
 
-  const { setUser } = props;
+  const { startSetUser } = props;
 
   const onSubmit = async (values) => {
     const { email, password } = values;
@@ -45,7 +45,7 @@ const Login = (props) => {
         { withCredentials: true }
       );
       if (loginError.error) dispatchLoginError({ type: "SUCCESS" });
-      await setUser();
+      await startSetUser();
       history.push("/");
     } catch (error) {
       console.log(error.response.data.msg);
@@ -104,9 +104,9 @@ const Login = (props) => {
 };
 
 Login.propTypes = {
-  setUser: PropTypes.func.isRequired,
+  startSetUser: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => ({});
 
-export default connect(mapStateToProps, { setUser })(Login);
+export default connect(mapStateToProps, { startSetUser })(Login);

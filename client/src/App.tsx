@@ -1,6 +1,7 @@
 import React from "react";
 import { Provider } from "react-redux";
 import Routes from "./components/Routes";
+import AppRouter from "./router";
 import store from "./store/configureStore";
 import styled from "@emotion/styled";
 
@@ -10,7 +11,8 @@ const App: React.FC<Props> = () => {
   return (
     <Provider store={store}>
       <AppContainer>
-        <Routes />
+        {/* <Routes /> */}
+        <AppRouter />
       </AppContainer>
     </Provider>
   );

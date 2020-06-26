@@ -6,7 +6,7 @@ import styled from "@emotion/styled";
 
 import { ShelfContext } from "../Shelf";
 
-import { logOffUser } from "../../actions/setUser";
+import { startLogOffUser } from "../../actions/user";
 
 import { useOutsideClick } from "../../hooks/useOutsideClick";
 import { useErrorMessage } from "../../hooks/useErrorMessage";
@@ -79,7 +79,7 @@ function BooKModal(props) {
         }
       } catch (error) {
         alert(error.message);
-        await props.logOffUser();
+        await props.startLogOffUser();
         return;
       }
     }
@@ -122,7 +122,7 @@ function BooKModal(props) {
         }
       } catch (error) {
         alert(error.message);
-        await props.logOffUser();
+        await props.startLogOffUser();
         return;
       }
     }
@@ -153,7 +153,7 @@ function BooKModal(props) {
         }
       } catch (error) {
         alert(error.message);
-        await props.logOffUser();
+        await props.startLogOffUser();
         return;
       }
 
@@ -182,7 +182,7 @@ function BooKModal(props) {
           }
         } catch (error) {
           alert(error.message);
-          await props.logOffUser();
+          await props.startLogOffUser();
           return;
         }
       }
@@ -278,7 +278,7 @@ const mapStateToProps = (state) => ({
   isLoggedIn: state.userState.isLoggedIn,
 });
 
-export default connect(mapStateToProps, { logOffUser })(BooKModal);
+export default connect(mapStateToProps, { startLogOffUser })(BooKModal);
 
 export const MainModal = styled.div`
   min-width: 50%;

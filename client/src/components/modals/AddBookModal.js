@@ -5,7 +5,7 @@ import { connect } from "react-redux";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import styled from "@emotion/styled";
 
-import { logOffUser } from "../../actions/setUser";
+import { startLogOffUser } from "../../actions/user";
 
 import { useOutsideClick } from "../../hooks/useOutsideClick";
 import { useErrorMessage } from "../../hooks/useErrorMessage";
@@ -85,7 +85,7 @@ function AddBookModal(props) {
       // Authentication error
       alert(error.message);
       handleClose();
-      await props.logOffUser();
+      await props.startLogOffUser();
       history.push("/login");
     }
   };
@@ -146,12 +146,12 @@ function AddBookModal(props) {
 }
 
 AddBookModal.propTypes = {
-  logOffUser: PropTypes.func.isRequired,
+  startLogOffUser: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => ({});
 
-export default connect(mapStateToProps, { logOffUser })(AddBookModal);
+export default connect(mapStateToProps, { startLogOffUser })(AddBookModal);
 
 export const MainModal = styled.div`
   width: 50%;
