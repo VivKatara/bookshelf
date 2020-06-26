@@ -4,7 +4,9 @@ import { Link } from "react-router-dom";
 
 import { MainContainer, CentralDiv, Button } from "../styles/mainPages";
 
-function LandingPage() {
+interface Props {}
+
+const LandingPage: React.FC<Props> = () => {
   return (
     <MainContainer>
       <CentralDiv>
@@ -26,7 +28,7 @@ function LandingPage() {
       </CentralDiv>
     </MainContainer>
   );
-}
+};
 
 export default LandingPage;
 

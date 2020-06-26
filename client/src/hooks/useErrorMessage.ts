@@ -1,11 +1,16 @@
 import { useReducer } from "react";
+import {
+  ErrorMessageState,
+  ErrorMessageHook,
+  ErrorMessageHookActions,
+} from "../types/ErrorMessageHook";
 
-const initialState = {
+const initialState: ErrorMessageState = {
   error: false,
   errorMsg: "",
 };
 
-const reducer = (state, action) => {
+const reducer = (state: ErrorMessageState, action: ErrorMessageHookActions) => {
   switch (action.type) {
     case "SUCCESS":
       return {
@@ -17,12 +22,14 @@ const reducer = (state, action) => {
       return {
         ...state,
         error: true,
-        errorMsg: action.payload.errorMsg,
+        errorMsg: action.payload!.errorMsg,
       };
+    default:
+      return state;
   }
 };
 
-export function useErrorMessage() {
+export const useErrorMessage = (): ErrorMessageHook => {
   const [errorState, dispatchError] = useReducer(reducer, initialState);
   return [errorState, dispatchError];
-}
+};

@@ -32,9 +32,6 @@ const AppRouter: React.FC<Props> = (props) => {
     setUserOnMount();
   }, [userSet]);
 
-  console.log("Routing");
-  console.log(props.user);
-
   if (userSet) {
     return (
       <Router>

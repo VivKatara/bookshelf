@@ -2,11 +2,8 @@ import React from "react";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-
 import { useErrorMessage } from "../hooks/useErrorMessage";
-
 import { RegisterSchema } from "../validation/schemas";
-
 import { MainContainer, CentralDiv } from "../styles/mainPages";
 import {
   FormDiv,
@@ -16,19 +13,32 @@ import {
   SubmitButton,
   DisplayedErrorMessage,
 } from "../styles/authForms";
+import { ErrorMessageHook } from "../types/ErrorMessageHook";
 
-const initalValues = {
+interface RegisterFormState {
+  email: string;
+  fullName: string;
+  password: string;
+  passwordConfirm: string;
+}
+
+const initalValues: RegisterFormState = {
   email: "",
   fullName: "",
   password: "",
   passwordConfirm: "",
 };
 
-const Register = () => {
-  const [registerError, dispatchRegisterError] = useErrorMessage();
+interface Props {}
+
+const Register: React.FC<Props> = (props) => {
+  const [
+    registerError,
+    dispatchRegisterError,
+  ]: ErrorMessageHook = useErrorMessage();
   const history = useHistory();
 
-  const onSubmit = async (values) => {
+  const onSubmit = async (values: RegisterFormState) => {
     const { email, fullName, password, passwordConfirm } = values;
     try {
       await axios.post("http://localhost:5000/auth/register", {
@@ -37,7 +47,8 @@ const Register = () => {
         password,
         passwordConfirm,
       });
-      if (registerError.error) dispatchRegisterError({ type: "SUCCESS" });
+      if (registerError.error)
+        dispatchRegisterError({ type: "SUCCESS", payload: null });
       history.push("/login");
     } catch (error) {
       console.log(error.response.data.msg);
@@ -109,7 +120,7 @@ const Register = () => {
                   {registerError.errorMsg}
                 </DisplayedErrorMessage>
               )}
-              <SubmitButton type="Submit">Sign Up</SubmitButton>
+              <SubmitButton type="submit">Sign Up</SubmitButton>
             </FormDiv>
           </Form>
         </CentralDiv>

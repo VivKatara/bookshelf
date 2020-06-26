@@ -1,16 +1,11 @@
 import React from "react";
-import PropTypes from "prop-types";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
 import { connect } from "react-redux";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-
 import { startSetUser } from "../actions/user";
-
 import { useErrorMessage } from "../hooks/useErrorMessage";
-
 import { LoginSchema } from "../validation/schemas";
-
 import { MainContainer, CentralDiv } from "../styles/mainPages";
 import {
   FormDiv,
@@ -20,20 +15,32 @@ import {
   SubmitButton,
   DisplayedErrorMessage,
 } from "../styles/authForms";
+import { ErrorMessageHook } from "../types/ErrorMessageHook";
+import { ThunkDispatch } from "redux-thunk";
+import { AppActions } from "../types/actions";
+import { bindActionCreators } from "redux";
 
-const initialValues = {
+interface LoginFormState {
+  email: string;
+  password: string;
+}
+
+const initialValues: LoginFormState = {
   email: "",
   password: "",
 };
 
-const Login = (props) => {
-  const [loginError, dispatchLoginError] = useErrorMessage();
+interface LoginProps {}
 
+type Props = LoginProps & LinkDispatchProps;
+
+const Login: React.FC<Props> = (props) => {
+  const [loginError, dispatchLoginError]: ErrorMessageHook = useErrorMessage();
   const history = useHistory();
 
   const { startSetUser } = props;
 
-  const onSubmit = async (values) => {
+  const onSubmit = async (values: LoginFormState) => {
     const { email, password } = values;
     try {
       await axios.post(
@@ -44,7 +51,8 @@ const Login = (props) => {
         },
         { withCredentials: true }
       );
-      if (loginError.error) dispatchLoginError({ type: "SUCCESS" });
+      if (loginError.error)
+        dispatchLoginError({ type: "SUCCESS", payload: null });
       await startSetUser();
       history.push("/");
     } catch (error) {
@@ -55,8 +63,6 @@ const Login = (props) => {
       });
     }
   };
-
-  console.log(loginError);
 
   return (
     <MainContainer>
@@ -94,7 +100,7 @@ const Login = (props) => {
                   {loginError.errorMsg}
                 </DisplayedErrorMessage>
               )}
-              <SubmitButton type="Submit">Continue</SubmitButton>
+              <SubmitButton type="submit">Continue</SubmitButton>
             </FormDiv>
           </Form>
         </CentralDiv>
@@ -103,10 +109,15 @@ const Login = (props) => {
   );
 };
 
-Login.propTypes = {
-  startSetUser: PropTypes.func.isRequired,
-};
+interface LinkDispatchProps {
+  startSetUser: () => void;
+}
 
-const mapStateToProps = (state) => ({});
+const mapDispatchToProps = (
+  dispatch: ThunkDispatch<any, any, AppActions>,
+  ownProps: LoginProps
+) => ({
+  startSetUser: bindActionCreators(startSetUser, dispatch),
+});
 
-export default connect(mapStateToProps, { startSetUser })(Login);
+export default connect(null, mapDispatchToProps)(Login);
