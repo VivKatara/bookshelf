@@ -1,7 +1,10 @@
 import { useEffect } from "react";
 import axios from "axios";
 
-export function useUsernameValidityCheck(username, setValidUsername) {
+export const useUsernameValidityCheck = (
+  username: string | null,
+  setValidUsername: any
+): void => {
   useEffect(() => {
     async function checkUsername() {
       try {
@@ -18,4 +21,4 @@ export function useUsernameValidityCheck(username, setValidUsername) {
     }
     checkUsername();
   }, [username]);
-}
+};

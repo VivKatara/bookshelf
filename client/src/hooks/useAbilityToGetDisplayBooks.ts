@@ -1,15 +1,16 @@
-import { useEffect } from "react";
+import { useEffect, Dispatch } from "react";
 import axios from "axios";
+import { HomepageIsbnType, HomepageIsbnsActionTypes } from "../types/actions";
 
-export async function useAbilityToGetDisplayBooks(
-  username,
-  validUsername,
-  shelf,
-  dispatch,
-  type,
-  shelfUpdates,
-  bookModalUpdates
-) {
+export const useAbilityToGetDisplayBooks = async (
+  username: string,
+  validUsername: boolean | null,
+  shelf: string,
+  dispatch: Dispatch<HomepageIsbnsActionTypes>,
+  type: HomepageIsbnType,
+  shelfUpdates: number,
+  bookModalUpdates: number
+) => {
   useEffect(() => {
     async function getBookIsbns() {
       try {
@@ -20,7 +21,7 @@ export async function useAbilityToGetDisplayBooks(
             withCredentials: true,
           }
         );
-        dispatch({ type, payload: response.data.isbn.slice(0, 6) });
+        dispatch({ type, payload: { isbns: response.data.isbn.slice(0, 6) } });
       } catch (e) {
         console.log(
           `Failed at getting books for the following shelf: ${shelf}`
@@ -32,4 +33,4 @@ export async function useAbilityToGetDisplayBooks(
       getBookIsbns();
     }
   }, [username, validUsername, shelfUpdates, bookModalUpdates]);
-}
+};

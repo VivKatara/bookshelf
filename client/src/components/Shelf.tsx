@@ -1,10 +1,17 @@
-import React from "react";
+import React, { FunctionComponent } from "react";
 import styled from "@emotion/styled";
 import Book from "./Book";
 
-export const ShelfContext = React.createContext();
+export const ShelfContext = React.createContext("");
 
-function Shelf(props) {
+interface Props {
+  isbns: Array<string>;
+  shelf: string;
+  children: any;
+  handleModalUpdate: () => void;
+}
+
+const Shelf: FunctionComponent<Props> = (props) => {
   const { isbns, shelf, children, handleModalUpdate } = props;
   const books = isbns.map((isbn) => (
     <Book key={isbn} isbn={isbn} handleModalUpdate={handleModalUpdate} />
@@ -20,7 +27,7 @@ function Shelf(props) {
       </ShelfItems>
     </ShelfContainer>
   );
-}
+};
 
 export default React.memo(Shelf);
 

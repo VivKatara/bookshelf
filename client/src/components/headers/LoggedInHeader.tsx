@@ -8,7 +8,7 @@ import {
   Username,
   Profile,
 } from "../../styles/headers";
-import { ModalHook } from "../../types/ModalHook";
+import { ModalDisplayHook } from "../../types/hooks";
 
 interface LoggedInProps {
   userFullName: string;
@@ -16,7 +16,7 @@ interface LoggedInProps {
 
 const LoggedInHeader: React.FC<LoggedInProps> = (props) => {
   const { userFullName } = props;
-  const [show, toggleModal]: ModalHook = useModal();
+  const [show, toggleModal]: ModalDisplayHook = useModal();
   const buttonRef = useRef(null);
   return (
     <>

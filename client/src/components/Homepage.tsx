@@ -1,8 +1,6 @@
-import React, { useState, useReducer, useRef } from "react";
-import PropTypes from "prop-types";
+import React, { useState, useReducer, useRef, FunctionComponent } from "react";
 import { connect } from "react-redux";
 import styled from "@emotion/styled";
-
 import Shelf from "./Shelf";
 import Loading from "./Loading";
 import NotFound from "./NotFound";
@@ -11,42 +9,65 @@ import AddBookModal from "./modals/AddBookModal";
 import AddBookLink from "./links/AddBookLink";
 import AuthLinks from "./links/AuthLinks";
 import SeeAll from "./links/SeeAll";
-
 import { useUsernameValidityCheck } from "../hooks/useUsernameValidityCheck";
 import { useAbilityToGetDisplayBooks } from "../hooks/useAbilityToGetDisplayBooks";
 import { useModal } from "../hooks/useModal";
 import { useBookModalUpdates } from "../hooks/useBookModalUpdates";
+import { AppState } from "../store/configureStore";
+import {
+  UPDATE_CURRENT,
+  UPDATE_PAST,
+  UPDATE_FUTURE,
+  HomepageIsbnsActionTypes,
+} from "../types/actions";
+import { User } from "../types/User";
+import { RouteComponentProps } from "react-router-dom";
 
-const initialState = {
+interface HomepageIsbnState {
+  currentIsbns: Array<string>;
+  pastIsbns: Array<string>;
+  futureIsbns: Array<string>;
+}
+
+const initialState: HomepageIsbnState = {
   currentIsbns: [],
   pastIsbns: [],
   futureIsbns: [],
 };
 
-const reducer = (state, action) => {
+const reducer = (
+  state: HomepageIsbnState,
+  action: HomepageIsbnsActionTypes
+): HomepageIsbnState => {
   switch (action.type) {
-    case "UPDATE_CURRENT":
+    case UPDATE_CURRENT:
       return {
         ...state,
-        currentIsbns: action.payload,
+        currentIsbns: action.payload.isbns,
       };
-    case "UPDATE_PAST":
+    case UPDATE_PAST:
       return {
         ...state,
-        pastIsbns: action.payload,
+        pastIsbns: action.payload.isbns,
       };
-    case "UPDATE_FUTURE":
+    case UPDATE_FUTURE:
       return {
         ...state,
-        futureIsbns: action.payload,
+        futureIsbns: action.payload.isbns,
       };
     default:
       return state;
   }
 };
 
-function Homepage(props) {
-  // Acquire the username from route parameters and check if it is valid
+interface RouteParams {
+  username: string;
+}
+
+interface HomepageProps {}
+type Props = HomepageProps & LinkStateProps & RouteComponentProps<RouteParams>;
+
+const Homepage: FunctionComponent<Props> = (props) => {
   const username = props.match.params.username;
   const [validUsername, setValidUsername] = useState(null);
   useUsernameValidityCheck(username, setValidUsername);
@@ -61,12 +82,15 @@ function Homepage(props) {
   const [pastUpdates, setPastUpdates] = useState(0);
   const [futureUpdates, setFutureUpdates] = useState(0);
   const [bookModalUpdates, triggerBookModalUpdate] = useBookModalUpdates();
+  // Get user from Redux
+  const { user } = props;
+
   useAbilityToGetDisplayBooks(
     username,
     validUsername,
     "currentBooks",
     dispatch,
-    "UPDATE_CURRENT",
+    UPDATE_CURRENT,
     currentUpdates,
     bookModalUpdates
   );
@@ -75,7 +99,7 @@ function Homepage(props) {
     validUsername,
     "pastBooks",
     dispatch,
-    "UPDATE_PAST",
+    UPDATE_PAST,
     pastUpdates,
     bookModalUpdates
   );
@@ -84,12 +108,12 @@ function Homepage(props) {
     validUsername,
     "futureBooks",
     dispatch,
-    "UPDATE_FUTURE",
+    UPDATE_FUTURE,
     futureUpdates,
     bookModalUpdates
   );
 
-  const handleShelfUpdate = (shelf) => {
+  const handleShelfUpdate = (shelf: string) => {
     if (shelf === "currentBooks") {
       setCurrentUpdates((prev) => prev + 1);
     }
@@ -106,7 +130,7 @@ function Homepage(props) {
   } else if (validUsername) {
     return (
       <>
-        {!props.isLoggedIn && <NotLoggedInHeader username={username} />}
+        {!user.isLoggedIn && <NotLoggedInHeader username={username} />}
         <MainContainer>
           {showModal && (
             <AddBookModal
@@ -115,7 +139,7 @@ function Homepage(props) {
               shelfUpdate={handleShelfUpdate}
             />
           )}
-          {props.isLoggedIn ? (
+          {user.isLoggedIn ? (
             <AddBookLink buttonRef={buttonRef} toggleModal={toggleModal} />
           ) : (
             <AuthLinks />
@@ -150,24 +174,24 @@ function Homepage(props) {
       </>
     );
   } else {
-    // Here, we will make a not found component to display
     return <NotFound />;
   }
-}
-
-Homepage.propTypes = {
-  username: PropTypes.string.isRequired,
-  isLoggedIn: PropTypes.bool.isRequired,
 };
 
-const mapStateToProps = (state) => ({
-  username: state.userState.username,
-  isLoggedIn: state.userState.isLoggedIn,
+interface LinkStateProps {
+  user: User;
+}
+
+const mapStateToProps = (
+  state: AppState,
+  ownProps: HomepageProps
+): LinkStateProps => ({
+  user: state.userState,
 });
 
-export default connect(mapStateToProps, {})(Homepage);
+export default connect(mapStateToProps, null)(Homepage);
 
-export const MainContainer = styled.div`
+const MainContainer = styled.div`
   width: 100vw;
   height: 100vh;
   display: flex;
@@ -187,35 +211,3 @@ const Title = styled.p`
   font-size: 14px;
   color: white;
 `;
-
-// This is where you want to use Redux to dispatch an action to udpate the state of the application
-// async function fetchProfileData() {
-//   try {
-//     let response = await axios.get("http://localhost:5000/profile", {
-//       withCredentials: true,
-//       validateStatus: false,
-//     });
-//     if (response.status === 200) {
-//       console.log(response.data.user);
-//       return { success: true, data: response.data.user };
-//     }
-//     if (response.status === 403 && response.data.msg === "Invalid token") {
-//       // Reset the access token based on refresh token
-//       await axios.get("http://localhost:5000/auth/token", {
-//         withCredentials: true,
-//       });
-//       response = await axios.get("http://localhost:5000/profile", {
-//         withCredentials: true,
-//         validateStatus: false,
-//       });
-//       if (response.status === 200) {
-//         console.log(response.data.user);
-//         return { success: true, data: response.data.user };
-//       } else throw response.data.msg;
-//     } else throw response.data.msg;
-//   } catch (e) {
-//     console.log(e);
-//     return { success: false, error: e };
-//   }
-// }
-// fetchProfileData();
