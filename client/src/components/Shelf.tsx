@@ -7,7 +7,7 @@ export const ShelfContext = React.createContext("");
 interface Props {
   isbns: Array<string>;
   shelf: string;
-  children: any;
+  children?: any;
   handleModalUpdate: () => void;
 }
 

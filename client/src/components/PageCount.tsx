@@ -1,7 +1,13 @@
-import React from "react";
+import React, { FunctionComponent } from "react";
 import styled from "@emotion/styled";
 
-function PageCount(props) {
+interface Props {
+  show: boolean;
+  page: number;
+  totalPages: number;
+}
+
+const PageCount: FunctionComponent<Props> = (props) => {
   const { show, page, totalPages } = props;
   return (
     <>
@@ -12,7 +18,7 @@ function PageCount(props) {
       )}
     </>
   );
-}
+};
 
 export default React.memo(PageCount);
 

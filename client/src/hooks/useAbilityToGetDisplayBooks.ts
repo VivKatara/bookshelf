@@ -1,12 +1,12 @@
 import { useEffect, Dispatch } from "react";
 import axios from "axios";
-import { HomepageIsbnType, HomepageIsbnsActionTypes } from "../types/actions";
+import { HomepageIsbnType, HomepageActionTypes } from "../types/actions";
 
 export const useAbilityToGetDisplayBooks = async (
   username: string,
   validUsername: boolean | null,
   shelf: string,
-  dispatch: Dispatch<HomepageIsbnsActionTypes>,
+  dispatch: Dispatch<HomepageActionTypes>,
   type: HomepageIsbnType,
   shelfUpdates: number,
   bookModalUpdates: number

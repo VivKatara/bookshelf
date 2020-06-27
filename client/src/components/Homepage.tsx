@@ -18,7 +18,7 @@ import {
   UPDATE_CURRENT,
   UPDATE_PAST,
   UPDATE_FUTURE,
-  HomepageIsbnsActionTypes,
+  HomepageActionTypes,
 } from "../types/actions";
 import { User } from "../types/User";
 import { RouteComponentProps } from "react-router-dom";
@@ -37,7 +37,7 @@ const initialState: HomepageIsbnState = {
 
 const reducer = (
   state: HomepageIsbnState,
-  action: HomepageIsbnsActionTypes
+  action: HomepageActionTypes
 ): HomepageIsbnState => {
   switch (action.type) {
     case UPDATE_CURRENT:

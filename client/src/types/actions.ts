@@ -15,7 +15,7 @@ export interface LogOffAction {
 
 export type UserActionTypes = SetUserAction | LogOffAction;
 
-// Homepage Isbn Reducer Actions
+// Homepage Reducer Actions
 export const UPDATE_CURRENT = "UPDATE_CURRENT";
 export const UPDATE_PAST = "UPDATE_PAST";
 export const UPDATE_FUTURE = "UPDATE_FUTURE";
@@ -30,7 +30,38 @@ export interface HomepageUpdateIsbnsAction {
   payload: { isbns: Array<string> };
 }
 
-export type HomepageIsbnsActionTypes = HomepageUpdateIsbnsAction;
+export type HomepageActionTypes = HomepageUpdateIsbnsAction;
+
+// FullShelf Reducer Actions
+export const UPDATE_ISBNS = "UPDATE_ISBNS";
+export const PAGE_MOUNT = "PAGE_MOUNT";
+
+export interface FullShelfUpdateIsbnsAction {
+  type: typeof UPDATE_ISBNS;
+  payload: {
+    firstShelf: Array<string>;
+    secondShelf: Array<string>;
+    thirdShelf: Array<string>;
+  };
+}
+
+export interface FullShelfPageMountAction {
+  type: typeof PAGE_MOUNT;
+  payload: {
+    totalPages: number;
+    showPrevious: boolean;
+    showNext: boolean;
+    showPageCount: boolean;
+    shelfTitle: string;
+  };
+}
+
+export type FullShelfActionTypes =
+  | FullShelfUpdateIsbnsAction
+  | FullShelfPageMountAction;
 
 // All actions aggregator
-export type AppActions = UserActionTypes | HomepageIsbnsActionTypes;
+export type AppActions =
+  | UserActionTypes
+  | HomepageActionTypes
+  | FullShelfActionTypes;
