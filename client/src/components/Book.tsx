@@ -1,25 +1,12 @@
-import React, { useReducer, useEffect, useRef } from "react";
+import React, { useReducer, useEffect, useRef, FunctionComponent } from "react";
 import axios from "axios";
 import styled from "@emotion/styled";
-
 import BookModal from "./modals/BookModal";
-
+import { BookDetailsState } from "../types/Book";
+import { BookActionTypes, FOUND_BOOK } from "../types/actions";
 import { useModal } from "../hooks/useModal";
 
-// type BookProps = {
-//   isbn: string;
-//   handleModalUpdate: () => void;
-// };
-
-// type initialBookState = {
-//   foundBook: boolean;
-//   title: string;
-//   authors: string;
-//   description: string;
-//   coverImage: string;
-// };
-
-const initialState = {
+const initialState: BookDetailsState = {
   foundBook: false,
   title: "",
   authors: "",
@@ -27,9 +14,12 @@ const initialState = {
   coverImage: "",
 };
 
-const reducer = (state, action) => {
+const reducer = (
+  state: BookDetailsState,
+  action: BookActionTypes
+): BookDetailsState => {
   switch (action.type) {
-    case "FOUND_BOOK": {
+    case FOUND_BOOK: {
       return {
         ...state,
         foundBook: action.payload.foundBook,
@@ -44,7 +34,12 @@ const reducer = (state, action) => {
   }
 };
 
-function Book(props) {
+type Props = {
+  isbn: string;
+  handleModalUpdate: () => void;
+};
+
+const Book: FunctionComponent<Props> = (props) => {
   const { isbn, handleModalUpdate } = props;
   const [bookState, dispatch] = useReducer(reducer, initialState);
   const [showModal, toggleModal] = useModal();
@@ -62,11 +57,11 @@ function Book(props) {
         }
       );
       if (response.status === 200) {
-        let splitAuthors = response.data.authors;
+        let splitAuthors: string = response.data.authors;
         if (response.data.authors.length > 1)
           splitAuthors = response.data.authors.join(", ");
-        dispatch({
-          type: "FOUND_BOOK",
+        const action: BookActionTypes = {
+          type: FOUND_BOOK,
           payload: {
             foundBook: true,
             title: response.data.title,
@@ -74,7 +69,8 @@ function Book(props) {
             description: response.data.description,
             coverImage: response.data.coverImage,
           },
-        });
+        };
+        dispatch(action);
       }
     }
     getBookDetails();
@@ -105,7 +101,7 @@ function Book(props) {
       )}
     </>
   );
-}
+};
 
 export default React.memo(Book);
 

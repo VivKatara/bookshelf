@@ -60,6 +60,22 @@ export type FullShelfActionTypes =
   | FullShelfUpdateIsbnsAction
   | FullShelfPageMountAction;
 
+// Book Reducer Actions
+export const FOUND_BOOK = "FOUND_BOOK";
+
+export interface BookFoundBookAction {
+  type: typeof FOUND_BOOK;
+  payload: {
+    foundBook: boolean;
+    title: string;
+    authors: string;
+    description: string;
+    coverImage: string;
+  };
+}
+
+export type BookActionTypes = BookFoundBookAction;
+
 // All actions aggregator
 export type AppActions =
   | UserActionTypes
