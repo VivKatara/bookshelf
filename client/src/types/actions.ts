@@ -76,8 +76,25 @@ export interface BookFoundBookAction {
 
 export type BookActionTypes = BookFoundBookAction;
 
+// Error Message Hook Reducer Actions
+export const SUCCESS = "SUCCESS";
+export const FAIL = "FAIL";
+
+export interface SuccessAction {
+  type: typeof SUCCESS;
+  payload: null;
+}
+
+export interface FailAction {
+  type: typeof FAIL;
+  payload: { errorMsg: string };
+}
+
+export type ErrorMessageHookActionTypes = SuccessAction | FailAction;
+
 // All actions aggregator
 export type AppActions =
   | UserActionTypes
   | HomepageActionTypes
-  | FullShelfActionTypes;
+  | FullShelfActionTypes
+  | ErrorMessageHookActionTypes;

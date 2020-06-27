@@ -1,27 +1,50 @@
-import React, { useState, useEffect, useContext, useRef } from "react";
-import PropTypes from "prop-types";
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  useRef,
+  FunctionComponent,
+} from "react";
 import { connect } from "react-redux";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import styled from "@emotion/styled";
-
 import { ShelfContext } from "../Shelf";
-
 import { startLogOffUser } from "../../actions/user";
-
 import { useOutsideClick } from "../../hooks/useOutsideClick";
 import { useErrorMessage } from "../../hooks/useErrorMessage";
-
 import { BookModalSchema } from "../../validation/schemas";
 import { checkAccessAndRefreshToken } from "../../utils/authMiddleware";
-
 import { DisplayedErrorMessage } from "../../styles/authForms";
+import { BookModalFormState } from "../../types/BookModal";
+import {
+  ErrorMessageHookActionTypes,
+  SUCCESS,
+  FAIL,
+  AppActions,
+} from "../../types/actions";
+import { AppState } from "../../store/configureStore";
+import { User } from "../../types/User";
+import { ThunkDispatch } from "redux-thunk";
+import { bindActionCreators } from "redux";
 
-const initialValues = {
+const initialValues: BookModalFormState = {
   shelf: "",
   display: false,
 };
 
-function BooKModal(props) {
+type BookModalProps = {
+  title: string;
+  authors: string;
+  description: string;
+  isbn: string;
+  handleClose: () => void;
+  buttonRef: React.MutableRefObject<HTMLElement | null>;
+  handleModalUpdate: () => void;
+};
+
+type Props = BookModalProps & LinkStateProps & LinkDispatchProps;
+
+const BookModal: FunctionComponent<Props> = (props) => {
   const {
     title,
     authors,
@@ -30,11 +53,13 @@ function BooKModal(props) {
     handleClose,
     buttonRef,
     handleModalUpdate,
+    user,
+    startLogOffUser,
   } = props;
 
   const [initialDisplayState, setInitialDisplayState] = useState(false);
   const modalRef = useRef(null);
-  const formikRef = useRef(null);
+  const formikRef: any = useRef(null);
   useOutsideClick(modalRef, buttonRef, handleClose);
 
   const [displayError, dispatchDisplayError] = useErrorMessage();
@@ -69,21 +94,26 @@ function BooKModal(props) {
               formikRef.current.setFieldValue("display", responseDisplay);
             }
           }
-          dispatchDisplayError({ type: "SUCCESS" });
+          const action: ErrorMessageHookActionTypes = {
+            type: SUCCESS,
+            payload: null,
+          };
+          dispatchDisplayError(action);
         } else {
           // Server error
-          dispatchDisplayError({
-            type: "FAIL",
+          const action: ErrorMessageHookActionTypes = {
+            type: FAIL,
             payload: { errorMsg: response.data.msg },
-          });
+          };
+          dispatchDisplayError(action);
         }
       } catch (error) {
         alert(error.message);
-        await props.startLogOffUser();
+        await startLogOffUser();
         return;
       }
     }
-    if (props.isLoggedIn) {
+    if (user.isLoggedIn) {
       getDisplay();
     }
     if (formikRef.current) {
@@ -91,7 +121,7 @@ function BooKModal(props) {
     }
   }, []);
 
-  const onSubmit = async (values) => {
+  const onSubmit = async (values: BookModalFormState) => {
     let change = false;
     if (values.display !== initialDisplayState) {
       change = true;
@@ -112,7 +142,11 @@ function BooKModal(props) {
         );
         if (response.status === 200) {
           setInitialDisplayState(values.display);
-          dispatchDisplayError({ type: "SUCCESS" });
+          const action: ErrorMessageHookActionTypes = {
+            type: SUCCESS,
+            payload: null,
+          };
+          dispatchDisplayError(action);
         } else {
           // Server error
           // If statement because there isn't going to be a shelf change, so this error is true
@@ -122,7 +156,7 @@ function BooKModal(props) {
         }
       } catch (error) {
         alert(error.message);
-        await props.startLogOffUser();
+        await startLogOffUser();
         return;
       }
     }
@@ -153,7 +187,7 @@ function BooKModal(props) {
         }
       } catch (error) {
         alert(error.message);
-        await props.startLogOffUser();
+        await startLogOffUser();
         return;
       }
 
@@ -178,11 +212,11 @@ function BooKModal(props) {
             error
           );
           if (response.status !== 200) {
-            alert(error.message);
+            alert(response.data.msg);
           }
         } catch (error) {
           alert(error.message);
-          await props.startLogOffUser();
+          await startLogOffUser();
           return;
         }
       }
@@ -212,7 +246,7 @@ function BooKModal(props) {
           <Value>{description}</Value>
         </BookDescriptionDiv>
       </BookDescription>
-      {props.isLoggedIn && (
+      {user.isLoggedIn && (
         <Formik
           innerRef={formikRef}
           initialValues={initialValues}
@@ -221,64 +255,86 @@ function BooKModal(props) {
           validateOnBlur={false}
           validateOnChange={false}
         >
-          <Form as={BookSettingsForm}>
-            <FormDiv>
-              <SettingsLabel>Shelf Settings</SettingsLabel>
-            </FormDiv>
-            <FormDiv>
-              <Label>Shelf:</Label>
-              <Field as={Select} name="shelf">
-                <option value="currentBooks">Currently Reading</option>
-                <option value="pastBooks">Have Read</option>
-                <option value="futureBooks">Want to Read</option>
-                <option value="delete">Remove book from this shelf</option>
-              </Field>
-              <ErrorMessage name="shelf" as={DisplayedErrorMessage} />
-            </FormDiv>
-            <FormDiv>
-              {displayError.error ? (
-                <DisplayedErrorMessage>
-                  Error! Something unexpected occurred. Can't show book display.
-                  {displayError.errorMsg}
-                </DisplayedErrorMessage>
-              ) : (
-                <>
-                  <Label>Display on homepage:</Label>
-                  <Field
-                    name="display"
-                    render={({ field, form }) => {
-                      return (
-                        <Checkbox
-                          type="checkbox"
-                          checked={field.value}
-                          {...field}
-                        />
-                      );
-                    }}
-                  />
-                  <ErrorMessage name="display" as={DisplayedErrorMessage} />
-                </>
-              )}
-            </FormDiv>
-            <FormDiv>
-              <SaveChangesButton type="Submit">Save Changes</SaveChangesButton>
-            </FormDiv>
-          </Form>
+          <BookSettingsForm>
+            <Form>
+              <FormDiv>
+                <SettingsLabel>Shelf Settings</SettingsLabel>
+              </FormDiv>
+              <FormDiv>
+                <Label>Shelf:</Label>
+                <Field as={Select} name="shelf">
+                  <option value="currentBooks">Currently Reading</option>
+                  <option value="pastBooks">Have Read</option>
+                  <option value="futureBooks">Want to Read</option>
+                  <option value="delete">Remove book from this shelf</option>
+                </Field>
+                <ErrorMessage name="shelf" component={DisplayedErrorMessage} />
+              </FormDiv>
+              <FormDiv>
+                {displayError.error ? (
+                  <DisplayedErrorMessage>
+                    Error! Something unexpected occurred. Can't show book
+                    display.
+                    {displayError.errorMsg}
+                  </DisplayedErrorMessage>
+                ) : (
+                  <>
+                    <Label>Display on homepage:</Label>
+                    <Field
+                      name="display"
+                      render={({ field, form }: { field: any; form: any }) => {
+                        return (
+                          <Checkbox
+                            type="checkbox"
+                            checked={field.value}
+                            {...field}
+                          />
+                        );
+                      }}
+                    />
+                    <ErrorMessage
+                      name="display"
+                      component={DisplayedErrorMessage}
+                    />
+                  </>
+                )}
+              </FormDiv>
+              <FormDiv>
+                <SaveChangesButton type="submit">
+                  Save Changes
+                </SaveChangesButton>
+              </FormDiv>
+            </Form>
+          </BookSettingsForm>
         </Formik>
       )}
     </MainModal>
   );
-}
-
-BooKModal.propTypes = {
-  isLoggedIn: PropTypes.bool.isRequired,
 };
 
-const mapStateToProps = (state) => ({
-  isLoggedIn: state.userState.isLoggedIn,
+interface LinkStateProps {
+  user: User;
+}
+
+interface LinkDispatchProps {
+  startLogOffUser: () => void;
+}
+
+const mapStateToProps = (
+  state: AppState,
+  ownProps: BookModalProps
+): LinkStateProps => ({
+  user: state.userState,
 });
 
-export default connect(mapStateToProps, { startLogOffUser })(BooKModal);
+const mapDispatchToProps = (
+  dispatch: ThunkDispatch<any, any, AppActions>,
+  ownProps: BookModalProps
+): LinkDispatchProps => ({
+  startLogOffUser: bindActionCreators(startLogOffUser, dispatch),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(BookModal);
 
 export const MainModal = styled.div`
   min-width: 50%;
@@ -319,7 +375,7 @@ export const Value = styled.p`
   // background-color: green;
 `;
 
-export const BookSettingsForm = styled.form`
+export const BookSettingsForm = styled.div`
   display: flex;
   flex-direction: column;
   font-size: 14px;

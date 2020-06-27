@@ -1,11 +1,11 @@
 import axios from "axios";
 
 export async function checkAccessAndRefreshToken(
-  method,
-  url,
-  data,
-  config,
-  error
+  method: string,
+  url: string,
+  data: any,
+  config: any,
+  error: string
 ) {
   let options = {};
   if (method === "GET") {
@@ -29,10 +29,7 @@ export async function checkAccessAndRefreshToken(
     if (response.status === 401) {
       throw new Error(error);
     } else if (response.status === 403) {
-      await axios.get("http://localhost:5000/auth/token", {
-        withCredentials: true,
-        validateStatus: false,
-      });
+      await axios.get("http://localhost:5000/auth/token", config);
       response = await axios(options);
     }
   } else {

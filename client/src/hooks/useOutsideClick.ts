@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 
 export function useOutsideClick(
-  modalRef: React.MutableRefObject<HTMLDivElement>,
-  buttonRef: React.MutableRefObject<HTMLDivElement>,
+  modalRef: React.MutableRefObject<HTMLElement | null>,
+  buttonRef: React.MutableRefObject<HTMLElement | null>,
   handleEvent: () => void
 ) {
   // In order to use the callback function to call on the outside click event, we have to declare it in this scope

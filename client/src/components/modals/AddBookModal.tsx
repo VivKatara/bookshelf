@@ -1,19 +1,13 @@
-import React, { useState, useEffect, useRef } from "react";
-import PropTypes from "prop-types";
+import React, { useState, useEffect, useRef, FunctionComponent } from "react";
 import { useHistory } from "react-router-dom";
 import { connect } from "react-redux";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import styled from "@emotion/styled";
-
 import { startLogOffUser } from "../../actions/user";
-
 import { useOutsideClick } from "../../hooks/useOutsideClick";
 import { useErrorMessage } from "../../hooks/useErrorMessage";
-
 import { AddBookModalSchema } from "../../validation/schemas";
-
 import { checkAccessAndRefreshToken } from "../../utils/authMiddleware";
-
 import {
   FormHeader,
   Label,
@@ -21,14 +15,31 @@ import {
   SubmitButton,
   DisplayedErrorMessage,
 } from "../../styles/authForms";
+import { AddBookModalFormState } from "../../types/AddBookModal";
+import { bindActionCreators } from "redux";
+import { ThunkDispatch } from "redux-thunk";
+import {
+  AppActions,
+  SUCCESS,
+  ErrorMessageHookActionTypes,
+} from "../../types/actions";
 
-const initialValues = {
+const initialValues: AddBookModalFormState = {
   title: "",
   author: "",
   shelf: "currentBooks",
 };
 
-function AddBookModal(props) {
+type AddBookModalProps = {
+  buttonRef: React.MutableRefObject<HTMLElement | null>;
+  handleClose: () => void;
+  shelfUpdate: (shelf: string) => void;
+  shelf?: string;
+};
+
+type Props = AddBookModalProps & LinkDispatchProps;
+
+const AddBookModal: FunctionComponent<Props> = (props) => {
   const { buttonRef, handleClose, shelfUpdate, shelf } = props;
 
   const modalRef = useRef(null);
@@ -50,7 +61,7 @@ function AddBookModal(props) {
     }
   }, [shelf]);
 
-  const onSubmit = async (values) => {
+  const onSubmit = async (values: AddBookModalFormState) => {
     const { title, author, shelf } = values;
     try {
       const method = "POST";
@@ -71,7 +82,12 @@ function AddBookModal(props) {
       );
       if (response.status === 200) {
         // Success
-        dispatchAddBookError({ type: "SUCCESS" });
+        const action: ErrorMessageHookActionTypes = {
+          type: SUCCESS,
+          payload: null,
+        };
+
+        dispatchAddBookError(action);
         shelfUpdate(shelf);
         handleClose();
       } else {
@@ -118,12 +134,12 @@ function AddBookModal(props) {
           <FormDiv>
             <Label>Title</Label>
             <Field type="text" as={Input} name="title" id="title" required />
-            <ErrorMessage name="title" as={DisplayedErrorMessage} />
+            <ErrorMessage name="title" component={DisplayedErrorMessage} />
           </FormDiv>
           <FormDiv>
             <Label>Author</Label>
             <Field type="text" as={Input} name="author" id="author" />
-            <ErrorMessage name="author" as={DisplayedErrorMessage} />
+            <ErrorMessage name="author" component={DisplayedErrorMessage} />
           </FormDiv>
           <FormDiv>
             <Label>Shelf</Label>
@@ -137,21 +153,26 @@ function AddBookModal(props) {
                 {addBookError.errorMsg}
               </DisplayedErrorMessage>
             )}
-            <SubmitButton type="Submit">Add</SubmitButton>
+            <SubmitButton type="submit">Add</SubmitButton>
           </FormDiv>
         </Form>
       </Formik>
     </MainModal>
   );
-}
-
-AddBookModal.propTypes = {
-  startLogOffUser: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = (state) => ({});
+interface LinkDispatchProps {
+  startLogOffUser: () => void;
+}
 
-export default connect(mapStateToProps, { startLogOffUser })(AddBookModal);
+const mapDispatchToProps = (
+  dispatch: ThunkDispatch<any, any, AppActions>,
+  ownProps: AddBookModalProps
+) => ({
+  startLogOffUser: bindActionCreators(startLogOffUser, dispatch),
+});
+
+export default connect(null, mapDispatchToProps)(AddBookModal);
 
 export const MainModal = styled.div`
   width: 50%;

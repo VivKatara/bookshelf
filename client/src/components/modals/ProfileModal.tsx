@@ -1,14 +1,21 @@
-import React, { useRef } from "react";
-import PropTypes from "prop-types";
+import React, { useRef, FunctionComponent } from "react";
 import { connect } from "react-redux";
 import { useHistory } from "react-router-dom";
 import styled from "@emotion/styled";
-
 import { useOutsideClick } from "../../hooks/useOutsideClick";
-
 import { startLogOffUser } from "../../actions/user";
+import { bindActionCreators } from "redux";
+import { ThunkDispatch } from "redux-thunk";
+import { AppActions } from "../../types/actions";
 
-function ProfileModal(props) {
+type ProfileModalProps = {
+  buttonRef: React.MutableRefObject<HTMLElement | null>;
+  handleClose: () => void;
+};
+
+type Props = ProfileModalProps & LinkDispatchProps;
+
+const ProfileModal: FunctionComponent<Props> = (props) => {
   const { buttonRef, handleClose, startLogOffUser } = props;
   const history = useHistory();
 
@@ -16,7 +23,7 @@ function ProfileModal(props) {
   const modalRef = useRef(null);
   useOutsideClick(modalRef, buttonRef, handleClose);
 
-  const logOut = async () => {
+  const logOut: () => void = async () => {
     await startLogOffUser();
     history.push("/");
   };
@@ -28,15 +35,20 @@ function ProfileModal(props) {
       <LogOutButton onClick={logOut}>Sign Out</LogOutButton>
     </ModalContainer>
   );
-}
-
-ProfileModal.propTypes = {
-  startLogOffUser: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = (state) => ({});
+interface LinkDispatchProps {
+  startLogOffUser: () => void;
+}
 
-export default connect(mapStateToProps, { startLogOffUser })(ProfileModal);
+const mapDispatchToProps = (
+  dispatch: ThunkDispatch<any, any, AppActions>,
+  ownProps: ProfileModalProps
+): LinkDispatchProps => ({
+  startLogOffUser: bindActionCreators(startLogOffUser, dispatch),
+});
+
+export default connect(null, mapDispatchToProps)(ProfileModal);
 
 export const ModalContainer = styled.div`
   position: absolute;

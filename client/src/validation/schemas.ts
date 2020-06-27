@@ -15,7 +15,7 @@ export const RegisterSchema = Yup.object({
     .test(
       "check-fullName-length",
       "Please provide your first and last name",
-      function (value) {
+      function (value: string) {
         // Test to check if we're given just one name (first or last) or a full name
         const name = value.split(" ");
         return name.length > 1;
@@ -26,7 +26,7 @@ export const RegisterSchema = Yup.object({
     .min(8, "Password must be at least 8 characters long")
     .required("This field is required!"),
   passwordConfirm: Yup.string()
-    .test("passwords-match", "Passwords must match", function (value) {
+    .test("passwords-match", "Passwords must match", function (value: string) {
       // Test for password equality
       return this.parent.password === value;
     })
