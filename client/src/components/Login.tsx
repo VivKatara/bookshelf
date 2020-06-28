@@ -17,7 +17,7 @@ import {
 } from "../styles/authForms";
 import { ErrorMessageHook } from "../types/ErrorMessageHook";
 import { ThunkDispatch } from "redux-thunk";
-import { AppActions } from "../types/actions";
+import { AppActions, SUCCESS, FAIL } from "../types/actions";
 import { bindActionCreators } from "redux";
 
 interface LoginFormState {
@@ -52,13 +52,13 @@ const Login: React.FC<Props> = (props) => {
         { withCredentials: true }
       );
       if (loginError.error)
-        dispatchLoginError({ type: "SUCCESS", payload: null });
+        dispatchLoginError({ type: SUCCESS, payload: null });
       await startSetUser();
       history.push("/");
     } catch (error) {
       console.log(error.response.data.msg);
       dispatchLoginError({
-        type: "FAIL",
+        type: FAIL,
         payload: { errorMsg: error.response.data.msg },
       });
     }

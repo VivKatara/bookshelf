@@ -14,6 +14,7 @@ import {
   DisplayedErrorMessage,
 } from "../styles/authForms";
 import { ErrorMessageHook } from "../types/ErrorMessageHook";
+import { SUCCESS, FAIL } from "../types/actions";
 
 interface RegisterFormState {
   email: string;
@@ -48,12 +49,12 @@ const Register: React.FC<Props> = (props) => {
         passwordConfirm,
       });
       if (registerError.error)
-        dispatchRegisterError({ type: "SUCCESS", payload: null });
+        dispatchRegisterError({ type: SUCCESS, payload: null });
       history.push("/login");
     } catch (error) {
       console.log(error.response.data.msg);
       dispatchRegisterError({
-        type: "FAIL",
+        type: FAIL,
         payload: { errorMsg: error.response.data.msg },
       });
     }

@@ -1,6 +1,6 @@
 import { useReducer } from "react";
 import { ErrorMessageState, ErrorMessageHook } from "../types/ErrorMessageHook";
-import { ErrorMessageHookActionTypes } from "../types/actions";
+import { ErrorMessageHookActionTypes, SUCCESS, FAIL } from "../types/actions";
 
 const initialState: ErrorMessageState = {
   error: false,
@@ -12,13 +12,13 @@ const reducer = (
   action: ErrorMessageHookActionTypes
 ) => {
   switch (action.type) {
-    case "SUCCESS":
+    case SUCCESS:
       return {
         ...state,
         error: false,
         errorMsg: "",
       };
-    case "FAIL":
+    case FAIL:
       return {
         ...state,
         error: true,
