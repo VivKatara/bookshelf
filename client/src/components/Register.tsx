@@ -1,4 +1,4 @@
-import React from "react";
+import React, { FunctionComponent } from "react";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
 import { Formik, Form, Field, ErrorMessage } from "formik";
@@ -13,15 +13,9 @@ import {
   SubmitButton,
   DisplayedErrorMessage,
 } from "../styles/authForms";
-import { ErrorMessageHook } from "../types/ErrorMessageHook";
+import { ErrorMessageHook } from "../types/hooks";
 import { SUCCESS, FAIL } from "../types/actions";
-
-interface RegisterFormState {
-  email: string;
-  fullName: string;
-  password: string;
-  passwordConfirm: string;
-}
+import { RegisterFormState } from "../types/Register";
 
 const initalValues: RegisterFormState = {
   email: "",
@@ -30,16 +24,16 @@ const initalValues: RegisterFormState = {
   passwordConfirm: "",
 };
 
-interface Props {}
+type Props = {};
 
-const Register: React.FC<Props> = (props) => {
+const Register: FunctionComponent<Props> = (props) => {
   const [
     registerError,
     dispatchRegisterError,
   ]: ErrorMessageHook = useErrorMessage();
   const history = useHistory();
 
-  const onSubmit = async (values: RegisterFormState) => {
+  const onSubmit = async (values: RegisterFormState): Promise<void> => {
     const { email, fullName, password, passwordConfirm } = values;
     try {
       await axios.post("http://localhost:5000/auth/register", {

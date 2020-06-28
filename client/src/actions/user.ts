@@ -18,13 +18,15 @@ export const logOffUser = (): AppActions => ({
   type: LOG_OFF_USER,
 });
 
-export const startSetUser = () => async (dispatch: Dispatch<AppActions>) => {
+export const startSetUser = () => async (
+  dispatch: Dispatch<AppActions>
+): Promise<void> => {
   try {
-    const method = "GET";
-    const url = "http://localhost:5000/profile";
-    const data = {};
-    const config = { withCredentials: true, validateStatus: false };
-    const error = "User is not logged in";
+    const method: string = "GET";
+    const url: string = "http://localhost:5000/profile";
+    const data: any = {};
+    const config: any = { withCredentials: true, validateStatus: false };
+    const error: string = "User is not logged in";
     const response = await checkAccessAndRefreshToken(
       method,
       url,
@@ -32,7 +34,10 @@ export const startSetUser = () => async (dispatch: Dispatch<AppActions>) => {
       config,
       error
     );
-    const { userFullName, username } = response.data.user;
+    const {
+      userFullName,
+      username,
+    }: { userFullName: string; username: string } = response.data.user;
     const setUserData = { userFullName, username, isLoggedIn: true };
     dispatch(setUser(setUserData));
   } catch (error) {

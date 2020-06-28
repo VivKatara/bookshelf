@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, FunctionComponent } from "react";
 import ProfileModal from "../modals/ProfileModal";
 import { useModal } from "../../hooks/useModal";
 import {
@@ -10,11 +10,11 @@ import {
 } from "../../styles/headers";
 import { ModalDisplayHook } from "../../types/hooks";
 
-interface LoggedInProps {
+type Props = {
   userFullName: string;
-}
+};
 
-const LoggedInHeader: React.FC<LoggedInProps> = (props) => {
+const LoggedInHeader: FunctionComponent<Props> = (props) => {
   const { userFullName } = props;
   const [show, toggleModal]: ModalDisplayHook = useModal();
   const buttonRef = useRef(null);

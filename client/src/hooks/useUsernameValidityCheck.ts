@@ -1,17 +1,16 @@
-import { useEffect } from "react";
+import { useEffect, Dispatch } from "react";
 import axios from "axios";
 
 export const useUsernameValidityCheck = (
-  username: string | null,
+  username: string,
   setValidUsername: any
 ): void => {
   useEffect(() => {
-    async function checkUsername() {
+    async function checkUsername(): Promise<void> {
       try {
-        const response = await axios.get(
-          "http://localhost:5000/auth/checkUsername",
-          { params: { username } }
-        );
+        await axios.get("http://localhost:5000/auth/checkUsername", {
+          params: { username },
+        });
         // Assuming here that we got a success(200) -> anything between 200 - 300 axios by default treats as success
         setValidUsername(true);
       } catch (e) {

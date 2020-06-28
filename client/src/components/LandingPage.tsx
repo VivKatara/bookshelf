@@ -1,12 +1,12 @@
-import React from "react";
+import React, { FunctionComponent } from "react";
 import styled from "@emotion/styled";
 import { Link } from "react-router-dom";
 
 import { MainContainer, CentralDiv, Button } from "../styles/mainPages";
 
-interface Props {}
+type Props = {};
 
-const LandingPage: React.FC<Props> = () => {
+const LandingPage: FunctionComponent<Props> = () => {
   return (
     <MainContainer>
       <CentralDiv>

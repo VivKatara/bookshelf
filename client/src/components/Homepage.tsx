@@ -22,12 +22,7 @@ import {
 } from "../types/actions";
 import { User } from "../types/User";
 import { RouteComponentProps } from "react-router-dom";
-
-interface HomepageIsbnState {
-  currentIsbns: Array<string>;
-  pastIsbns: Array<string>;
-  futureIsbns: Array<string>;
-}
+import { HomepageIsbnState } from "../types/Homepage";
 
 const initialState: HomepageIsbnState = {
   currentIsbns: [],

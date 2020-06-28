@@ -48,7 +48,7 @@ const Book: FunctionComponent<Props> = (props) => {
   useEffect(() => {
     // Get the details of book with given ISBN
     // TODO Try Catch error logic here
-    async function getBookDetails() {
+    async function getBookDetails(): Promise<void> {
       const response = await axios.get(
         "http://localhost:5000/book/getBookDetails",
         {

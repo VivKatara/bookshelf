@@ -15,13 +15,14 @@ import {
   SubmitButton,
   DisplayedErrorMessage,
 } from "../../styles/authForms";
-import { AddBookModalFormState } from "../../types/AddBookModal";
+import { AddBookModalFormState } from "../../types/modals";
 import { bindActionCreators } from "redux";
 import { ThunkDispatch } from "redux-thunk";
 import {
   AppActions,
   SUCCESS,
   ErrorMessageHookActionTypes,
+  FAIL,
 } from "../../types/actions";
 
 const initialValues: AddBookModalFormState = {
@@ -31,7 +32,7 @@ const initialValues: AddBookModalFormState = {
 };
 
 type AddBookModalProps = {
-  buttonRef: React.MutableRefObject<HTMLElement | null>;
+  buttonRef: React.MutableRefObject<HTMLElement | null>; // TODO: Not sure if this type is correct for buttonRef
   handleClose: () => void;
   shelfUpdate: (shelf: string) => void;
   shelf?: string;
@@ -61,18 +62,19 @@ const AddBookModal: FunctionComponent<Props> = (props) => {
     }
   }, [shelf]);
 
-  const onSubmit = async (values: AddBookModalFormState) => {
+  const onSubmit = async (values: AddBookModalFormState): Promise<void> => {
     const { title, author, shelf } = values;
     try {
-      const method = "POST";
-      const url = "http://localhost:5000/book/add";
-      const data = {
+      const method: string = "POST";
+      const url: string = "http://localhost:5000/book/add";
+      const data: any = {
         title,
         author,
         shelf,
       };
-      const config = { withCredentials: true, validateStatus: false };
-      const error = "Unsuccessful attempt to add new book. Please login";
+      const config: any = { withCredentials: true, validateStatus: false };
+      const error: string =
+        "Unsuccessful attempt to add new book. Please login";
       const response = await checkAccessAndRefreshToken(
         method,
         url,
@@ -92,7 +94,7 @@ const AddBookModal: FunctionComponent<Props> = (props) => {
       } else {
         // Server error
         dispatchAddBookError({
-          type: "FAIL",
+          type: FAIL,
           payload: { errorMsg: response.data.msg },
         });
       }
@@ -160,9 +162,9 @@ const AddBookModal: FunctionComponent<Props> = (props) => {
   );
 };
 
-interface LinkDispatchProps {
+type LinkDispatchProps = {
   startLogOffUser: () => void;
-}
+};
 
 const mapDispatchToProps = (
   dispatch: ThunkDispatch<any, any, AppActions>,

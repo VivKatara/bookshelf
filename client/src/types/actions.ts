@@ -91,7 +91,7 @@ export interface FailAction {
 
 export type ErrorMessageHookActionTypes = SuccessAction | FailAction;
 
-// All actions aggregator
+// All actions aggregator - mainly used for Redux Thunk Dispatch
 export type AppActions =
   | UserActionTypes
   | HomepageActionTypes

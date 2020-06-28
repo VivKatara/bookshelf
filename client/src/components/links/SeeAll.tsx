@@ -1,11 +1,11 @@
-import React from "react";
+import React, { FunctionComponent } from "react";
 import styled from "@emotion/styled";
 
-interface SeeAllProps {
+type Props = {
   route: string;
-}
+};
 
-const SeeAll: React.FC<SeeAllProps> = (props) => {
+const SeeAll: FunctionComponent<Props> = (props) => {
   const { route } = props;
   return (
     <LinkContainer>
@@ -14,7 +14,7 @@ const SeeAll: React.FC<SeeAllProps> = (props) => {
   );
 };
 
-export default SeeAll;
+export default React.memo(SeeAll);
 
 const LinkContainer = styled.div`
   margin-left: auto;

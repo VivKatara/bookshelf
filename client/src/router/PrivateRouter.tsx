@@ -1,4 +1,4 @@
-import React from "react";
+import React, { FunctionComponent } from "react";
 import { Switch, Route, Redirect } from "react-router-dom";
 
 import LoggedInHeader from "../components/headers/LoggedInHeader";
@@ -6,12 +6,12 @@ import Homepage from "../components/Homepage";
 import FullShelf from "../components/FullShelf";
 import NotFound from "../components/NotFound";
 
-interface PrivateProps {
+type Props = {
   userFullName: string;
   username: string;
-}
+};
 
-const PrivateRouter: React.FC<PrivateProps> = (props) => {
+const PrivateRouter: FunctionComponent<Props> = (props) => {
   const { userFullName, username } = props;
   return (
     <>

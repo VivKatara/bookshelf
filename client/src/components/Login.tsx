@@ -1,4 +1,4 @@
-import React from "react";
+import React, { FunctionComponent } from "react";
 import axios from "axios";
 import { useHistory } from "react-router-dom";
 import { connect } from "react-redux";
@@ -15,32 +15,28 @@ import {
   SubmitButton,
   DisplayedErrorMessage,
 } from "../styles/authForms";
-import { ErrorMessageHook } from "../types/ErrorMessageHook";
+import { ErrorMessageHook } from "../types/hooks";
 import { ThunkDispatch } from "redux-thunk";
 import { AppActions, SUCCESS, FAIL } from "../types/actions";
 import { bindActionCreators } from "redux";
-
-interface LoginFormState {
-  email: string;
-  password: string;
-}
+import { LoginFormState } from "../types/Login";
 
 const initialValues: LoginFormState = {
   email: "",
   password: "",
 };
 
-interface LoginProps {}
+type LoginProps = {};
 
 type Props = LoginProps & LinkDispatchProps;
 
-const Login: React.FC<Props> = (props) => {
+const Login: FunctionComponent<Props> = (props) => {
   const [loginError, dispatchLoginError]: ErrorMessageHook = useErrorMessage();
   const history = useHistory();
 
   const { startSetUser } = props;
 
-  const onSubmit = async (values: LoginFormState) => {
+  const onSubmit = async (values: LoginFormState): Promise<void> => {
     const { email, password } = values;
     try {
       await axios.post(
@@ -108,9 +104,9 @@ const Login: React.FC<Props> = (props) => {
   );
 };
 
-interface LinkDispatchProps {
+type LinkDispatchProps = {
   startSetUser: () => void;
-}
+};
 
 const mapDispatchToProps = (
   dispatch: ThunkDispatch<any, any, AppActions>,

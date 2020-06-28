@@ -1,11 +1,11 @@
 import React, { FunctionComponent } from "react";
 import styled from "@emotion/styled";
 
-interface Props {
+type Props = {
   show: boolean;
   page: number;
   totalPages: number;
-}
+};
 
 const PageCount: FunctionComponent<Props> = (props) => {
   const { show, page, totalPages } = props;

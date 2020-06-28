@@ -3,3 +3,8 @@ export type AddBookModalFormState = {
   author: string;
   shelf: string;
 };
+
+export type BookModalFormState = {
+  shelf: string;
+  display: boolean;
+};

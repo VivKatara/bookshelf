@@ -9,7 +9,7 @@ import { ThunkDispatch } from "redux-thunk";
 import { AppActions } from "../../types/actions";
 
 type ProfileModalProps = {
-  buttonRef: React.MutableRefObject<HTMLElement | null>;
+  buttonRef: React.MutableRefObject<HTMLElement | null>; // TODO: Not sure if this is the right type for buttonRef
   handleClose: () => void;
 };
 
@@ -23,7 +23,7 @@ const ProfileModal: FunctionComponent<Props> = (props) => {
   const modalRef = useRef(null);
   useOutsideClick(modalRef, buttonRef, handleClose);
 
-  const logOut: () => void = async () => {
+  const logOut: () => Promise<void> = async () => {
     await startLogOffUser();
     history.push("/");
   };
@@ -37,9 +37,9 @@ const ProfileModal: FunctionComponent<Props> = (props) => {
   );
 };
 
-interface LinkDispatchProps {
+type LinkDispatchProps = {
   startLogOffUser: () => void;
-}
+};
 
 const mapDispatchToProps = (
   dispatch: ThunkDispatch<any, any, AppActions>,

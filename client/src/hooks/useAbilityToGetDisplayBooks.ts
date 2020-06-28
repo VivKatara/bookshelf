@@ -12,7 +12,7 @@ export const useAbilityToGetDisplayBooks = async (
   bookModalUpdates: number
 ) => {
   useEffect(() => {
-    async function getBookIsbns() {
+    async function getBookIsbns(): Promise<void> {
       try {
         const response = await axios.get(
           "http://localhost:5000/book/getDisplayBooks",

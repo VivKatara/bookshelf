@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, FunctionComponent } from "react";
 import axios from "axios";
 import {
   HeaderContainer,
@@ -8,16 +8,16 @@ import {
   Profile,
 } from "../../styles/headers";
 
-interface NotLoggedInProps {
+type Props = {
   username: string;
-}
+};
 
-const NotLoggedInHeader: React.FC<NotLoggedInProps> = (props) => {
+const NotLoggedInHeader: FunctionComponent<Props> = (props) => {
   const { username } = props;
   const [userFullName, setUserFullName] = useState("");
 
   useEffect(() => {
-    async function getUserFullName() {
+    async function getUserFullName(): Promise<void> {
       try {
         const response = await axios.get(
           "http://localhost:5000/auth/getUserFullName",

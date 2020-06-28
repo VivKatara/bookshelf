@@ -1,9 +1,11 @@
-import React from "react";
+import React, { FunctionComponent } from "react";
 import styled from "@emotion/styled";
 
-function NotFound() {
+type Props = {};
+
+const NotFound: FunctionComponent<Props> = (props) => {
   return <MainContainer>Not Found</MainContainer>;
-}
+};
 
 export default NotFound;
 

@@ -4,16 +4,16 @@ import Book from "./Book";
 
 export const ShelfContext = React.createContext("");
 
-interface Props {
+type Props = {
   isbns: Array<string>;
   shelf: string;
-  children?: any;
+  children?: React.ReactNode;
   handleModalUpdate: () => void;
-}
+};
 
 const Shelf: FunctionComponent<Props> = (props) => {
   const { isbns, shelf, children, handleModalUpdate } = props;
-  const books = isbns.map((isbn) => (
+  const books = isbns.map((isbn: string) => (
     <Book key={isbn} isbn={isbn} handleModalUpdate={handleModalUpdate} />
   ));
 

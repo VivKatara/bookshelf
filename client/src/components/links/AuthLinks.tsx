@@ -1,16 +1,18 @@
-import React from "react";
+import React, { FunctionComponent } from "react";
 import styled from "@emotion/styled";
 
-function AuthLinks() {
+type Props = {};
+
+const AuthLinks: FunctionComponent<Props> = (props) => {
   return (
     <AuthLinksContainer>
       <SignUp href="/register">Sign Up</SignUp>/
       <Login href="/login">Login</Login>
     </AuthLinksContainer>
   );
-}
+};
 
-export default AuthLinks;
+export default React.memo(AuthLinks);
 
 export const AuthLinksContainer = styled.div`
   margin-top: 20px;

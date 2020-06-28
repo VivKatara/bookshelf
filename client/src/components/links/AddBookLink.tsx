@@ -1,12 +1,12 @@
-import React from "react";
+import React, { FunctionComponent } from "react";
 import styled from "@emotion/styled";
 
-interface Props {
+type Props = {
   buttonRef: React.MutableRefObject<null>;
   toggleModal: () => void;
-}
+};
 
-const AddBookLink: React.FC<Props> = (props) => {
+const AddBookLink: FunctionComponent<Props> = (props) => {
   const { buttonRef, toggleModal } = props;
   return (
     <AddBookLinkContainer ref={buttonRef} onClick={toggleModal}>
@@ -15,7 +15,7 @@ const AddBookLink: React.FC<Props> = (props) => {
   );
 };
 
-export default AddBookLink;
+export default React.memo(AddBookLink);
 
 export const AddBookLinkContainer = styled.a`
   margin-top: 20px;

@@ -123,7 +123,7 @@ const FullShelf: FunctionComponent<Props> = (props) => {
 
   // This is the effect that updates various pageState such as the total page count and whether or not to show certain buttons
   useEffect(() => {
-    async function pageMount() {
+    async function pageMount(): Promise<void> {
       let totalPages = 1;
       //TODO Refresh Token middelware
       const response = await axios.get(
@@ -132,7 +132,7 @@ const FullShelf: FunctionComponent<Props> = (props) => {
       );
       totalPages = response.data.totalPages;
 
-      let shelfTitle = "";
+      let shelfTitle: string = "";
       if (shelf === "currentBooks") {
         shelfTitle = "Currently Reading";
       } else if (shelf === "pastBooks") {
@@ -141,9 +141,9 @@ const FullShelf: FunctionComponent<Props> = (props) => {
         shelfTitle = "Want to Read";
       }
 
-      let showNext = false;
-      let showPrevious = false;
-      let showPageCount = false;
+      let showNext: boolean = false;
+      let showPrevious: boolean = false;
+      let showPageCount: boolean = false;
       if (totalPages > 1) {
         showPageCount = true;
         if (page < totalPages) {
@@ -172,17 +172,22 @@ const FullShelf: FunctionComponent<Props> = (props) => {
 
   // This is the effect that tracks which isbn numbers should be passed down to the shelves
   useEffect(() => {
-    async function getIsbns() {
+    async function getIsbns(): Promise<void> {
       const response = await axios.get("http://localhost:5000/book/getBooks", {
         params: { username, shelf, page, pageSize },
         withCredentials: true,
       });
-      const firstShelfIsbn = response.data.isbn.slice(0, pageSize / 3);
-      const secondShelfIsbn = response.data.isbn.slice(
+      const firstShelfIsbn: Array<string> = response.data.isbn.slice(
+        0,
+        pageSize / 3
+      );
+      const secondShelfIsbn: Array<string> = response.data.isbn.slice(
         pageSize / 3,
         (pageSize * 2) / 3
       );
-      const thirdShelfIsbn = response.data.isbn.slice((pageSize * 2) / 3);
+      const thirdShelfIsbn: Array<string> = response.data.isbn.slice(
+        (pageSize * 2) / 3
+      );
       const action: FullShelfActionTypes = {
         type: UPDATE_ISBNS,
         payload: {

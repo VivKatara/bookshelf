@@ -1,14 +1,14 @@
-import React from "react";
+import React, { FunctionComponent } from "react";
 import styled from "@emotion/styled";
 
-interface Props {
+type Props = {
   prev: boolean;
   next: boolean;
   url: string;
   page: number;
-}
+};
 
-const NextPreviousNavigation: React.FC<Props> = (props) => {
+const NextPreviousNavigation: FunctionComponent<Props> = (props) => {
   const { prev, next, url, page } = props;
   return (
     <>

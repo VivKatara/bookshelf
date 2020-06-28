@@ -8,7 +8,7 @@ const initialState: User = {
 };
 
 export default function userReducer(
-  state = initialState,
+  state: User = initialState,
   action: UserActionTypes
 ): User {
   switch (action.type) {

@@ -1,12 +1,12 @@
-import React from "react";
+import React, { FunctionComponent } from "react";
 import { Provider } from "react-redux";
 import AppRouter from "./router";
 import store from "./store/configureStore";
 import styled from "@emotion/styled";
 
-interface Props {}
+type Props = {};
 
-const App: React.FC<Props> = () => {
+const App: FunctionComponent<Props> = () => {
   return (
     <Provider store={store}>
       <AppContainer>

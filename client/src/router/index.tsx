@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, FunctionComponent } from "react";
 import { BrowserRouter as Router } from "react-router-dom";
 import { connect } from "react-redux";
 
@@ -13,10 +13,10 @@ import { ThunkDispatch } from "redux-thunk";
 import { AppActions } from "../types/actions";
 import { bindActionCreators } from "redux";
 
-interface AppRouterProps {}
+type AppRouterProps = {};
 type Props = AppRouterProps & LinkStateProps & LinkDispatchProps;
 
-const AppRouter: React.FC<Props> = (props) => {
+const AppRouter: FunctionComponent<Props> = (props) => {
   const { userFullName, username, isLoggedIn } = props.user;
   const { startSetUser } = props;
 
@@ -25,7 +25,7 @@ const AppRouter: React.FC<Props> = (props) => {
   const [userSet, setUserSet] = useState(false);
 
   useEffect(() => {
-    async function setUserOnMount() {
+    async function setUserOnMount(): Promise<void> {
       await startSetUser();
       setUserSet(true);
     }
@@ -45,13 +45,13 @@ const AppRouter: React.FC<Props> = (props) => {
   } else return <Loading />;
 };
 
-interface LinkStateProps {
+type LinkStateProps = {
   user: User;
-}
+};
 
-interface LinkDispatchProps {
+type LinkDispatchProps = {
   startSetUser: () => void;
-}
+};
 
 const mapStateToProps = (
   state: AppState,

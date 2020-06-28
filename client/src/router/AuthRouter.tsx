@@ -1,4 +1,4 @@
-import React from "react";
+import React, { FunctionComponent } from "react";
 import { Switch, Route } from "react-router-dom";
 
 import LandingPage from "../components/LandingPage";
@@ -8,9 +8,9 @@ import Homepage from "../components/Homepage";
 import FullShelf from "../components/FullShelf";
 import NotFound from "../components/NotFound";
 
-interface AuthProps {}
+type Props = {};
 
-const AuthRouter: React.FC<AuthProps> = (props) => {
+const AuthRouter: FunctionComponent<Props> = (props) => {
   return (
     <>
       <Switch>

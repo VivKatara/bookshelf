@@ -1,10 +1,12 @@
-import React from "react";
+import React, { FunctionComponent } from "react";
 import styled from "@emotion/styled";
 
+type Props = {};
+
 // TODO Make this component nice (and also take care of the header that it might be laying on top of)
-function Loading() {
+const Loading: FunctionComponent<Props> = (props) => {
   return <MainContainer>Loading...</MainContainer>;
-}
+};
 
 export default Loading;
 

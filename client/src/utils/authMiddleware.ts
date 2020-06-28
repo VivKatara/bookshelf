@@ -7,7 +7,7 @@ export async function checkAccessAndRefreshToken(
   config: any,
   error: string
 ) {
-  let options = {};
+  let options: any = {};
   if (method === "GET") {
     options = {
       method,
