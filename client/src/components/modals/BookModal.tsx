@@ -96,7 +96,6 @@ const BookModal: FunctionComponent<Props> = (props) => {
           }
           const action: ErrorMessageHookActionTypes = {
             type: SUCCESS,
-            payload: null,
           };
           dispatchDisplayError(action);
         } else {
@@ -144,7 +143,6 @@ const BookModal: FunctionComponent<Props> = (props) => {
           setInitialDisplayState(values.display);
           const action: ErrorMessageHookActionTypes = {
             type: SUCCESS,
-            payload: null,
           };
           dispatchDisplayError(action);
         } else {

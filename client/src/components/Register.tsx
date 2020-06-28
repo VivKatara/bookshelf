@@ -48,8 +48,7 @@ const Register: React.FC<Props> = (props) => {
         password,
         passwordConfirm,
       });
-      if (registerError.error)
-        dispatchRegisterError({ type: SUCCESS, payload: null });
+      if (registerError.error) dispatchRegisterError({ type: SUCCESS });
       history.push("/login");
     } catch (error) {
       console.log(error.response.data.msg);

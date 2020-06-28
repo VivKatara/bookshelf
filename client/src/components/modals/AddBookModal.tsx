@@ -84,7 +84,6 @@ const AddBookModal: FunctionComponent<Props> = (props) => {
         // Success
         const action: ErrorMessageHookActionTypes = {
           type: SUCCESS,
-          payload: null,
         };
 
         dispatchAddBookError(action);

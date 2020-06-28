@@ -51,8 +51,7 @@ const Login: React.FC<Props> = (props) => {
         },
         { withCredentials: true }
       );
-      if (loginError.error)
-        dispatchLoginError({ type: SUCCESS, payload: null });
+      if (loginError.error) dispatchLoginError({ type: SUCCESS });
       await startSetUser();
       history.push("/");
     } catch (error) {

@@ -82,7 +82,6 @@ export const FAIL = "FAIL";
 
 export interface SuccessAction {
   type: typeof SUCCESS;
-  payload: null;
 }
 
 export interface FailAction {
