@@ -1,5 +1,11 @@
-module.exports = function (items, userAddedTitle, userAddedAuthor) {
-  const newItems = items.filter((item) => {
+type BookFields = [string, Array<string>, string, string, string, boolean];
+
+const extractBookFields = (
+  items: any,
+  userAddedTitle: string,
+  userAddedAuthor: string
+): BookFields => {
+  const newItems = items.filter((item: any) => {
     // Also should do a check here to make sure item.volumeInfo.authors includes userAddedAuthor
     return item.volumeInfo.title.toUpperCase() === userAddedTitle.toUpperCase();
   });
@@ -10,7 +16,7 @@ module.exports = function (items, userAddedTitle, userAddedAuthor) {
     const finalAuthors = finalItem.volumeInfo.authors;
     const finalDescription = finalItem.volumeInfo.description;
     const industryIdentifiers = finalItem.volumeInfo.industryIdentifiers;
-    const filteredIsbn = industryIdentifiers.filter((identifer) => {
+    const filteredIsbn = industryIdentifiers.filter((identifer: any) => {
       return identifer.type === "ISBN_13";
     });
     const finalIsbn = filteredIsbn[0].identifier;
@@ -27,6 +33,8 @@ module.exports = function (items, userAddedTitle, userAddedAuthor) {
     ];
   } else {
     // Throw an error because there was no match
-    return ["", [], "", "", false];
+    return ["", [], "", "", "", false];
   }
 };
+
+export default extractBookFields;

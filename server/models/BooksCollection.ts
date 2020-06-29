@@ -1,8 +1,7 @@
-const mongoose = require("mongoose");
+import mongoose, { Schema, model } from "mongoose";
+import Book from "./Book";
 
-const { Schema } = mongoose;
-
-const BookSchema = new Schema({
+const BookSchema: Schema = new Schema({
   title: {
     type: String,
     required: true,
@@ -25,4 +24,6 @@ const BookSchema = new Schema({
   },
 });
 
-module.exports = Books = mongoose.model("books", BookSchema);
+const BookCollection = model<Book>("book", BookSchema);
+
+export default BookCollection;

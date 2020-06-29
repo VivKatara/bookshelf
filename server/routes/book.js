@@ -15,7 +15,7 @@ const {
   deleteBookFromShelf,
 } = require("../api/endpoints");
 
-const authenticateToken = require("../validation/authenticateToken");
+const authenticateToken = require("../authentication/authenticateToken");
 const extractBookFields = require("../utils/extractBookFields");
 
 router.post("/add", authenticateToken, async (req, res) => {
@@ -125,12 +125,9 @@ router.get("/getBookDisplay", authenticateToken, async (req, res) => {
   const { shelf, isbn } = req.query;
   const { success, display } = await getDisplayOfBook(email, shelf, isbn);
   if (!success) {
-    return res
-      .status(400)
-      .json({
-        msg:
-          "Something unexpected occurred. Cannot show display state of book.",
-      });
+    return res.status(400).json({
+      msg: "Something unexpected occurred. Cannot show display state of book.",
+    });
   }
   return res.status(200).json({ display });
 });

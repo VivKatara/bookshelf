@@ -1,8 +1,7 @@
-const mongoose = require("mongoose");
+import mongoose, { Schema, model } from "mongoose";
+import UserBooks from "./UserBooks";
 
-const { Schema } = mongoose;
-
-const UserBooksSchema = new Schema({
+const UserBooksSchema: Schema = new Schema({
   email: {
     type: String,
     required: true,
@@ -80,4 +79,5 @@ const UserBooksSchema = new Schema({
   },
 });
 
-module.exports = UserBooks = mongoose.model("userBooks", UserBooksSchema);
+const UserBooksCollection = model<UserBooks>("userBooks", UserBooksSchema);
+export default UserBooksCollection;

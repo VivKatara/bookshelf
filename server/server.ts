@@ -1,15 +1,15 @@
-const express = require("express");
-const app = express();
-const port = 5000;
-const bodyParser = require("body-parser");
-const cors = require("cors");
-const mongoose = require("mongoose");
-const cookieParser = require("cookie-parser");
-const routes = require("./routes");
-const passport = require("passport");
-
+import express from "express";
+import bodyParser from "body-parser";
+import cors from "cors";
+import mongoose from "mongoose";
+import cookieParser from "cookie-parser";
+import passport from "passport";
+import routes from "./routes";
 require("dotenv").config();
 require("./authentication/passport");
+
+const app = express();
+const port = 5000;
 
 app.use(cookieParser()); //Do we need this
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -24,13 +24,14 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // Connect to DB
+const mongoUrl: string = process.env.MONGODB_URI as string;
 mongoose
-  .connect(process.env.MONGODB_URI, {
+  .connect(mongoUrl, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
   .then(() => console.log("MongoDB successfully connected to server"))
-  .catch((err) => console.log(err));
+  .catch((err: any) => console.log(err)); // TODO: If you don't successfully connect to MongoDB, maybe you should do process.exit()
 
 // Routes
 app.use("/", routes);
@@ -38,3 +39,5 @@ app.use("/", routes);
 app.listen(port, () => {
   console.log(`Server up on port ${port}`);
 });
+
+export default app;

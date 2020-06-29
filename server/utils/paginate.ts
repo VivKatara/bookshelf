@@ -1,4 +1,9 @@
-module.exports = function paginate(array, length, pageNumber, pageSize) {
+const paginate = (
+  array: Array<string>,
+  length: number,
+  pageNumber: number,
+  pageSize: number
+): Array<string> => {
   if ((pageNumber - 1) * pageSize + pageSize <= length) {
     // Check to make sure that it isn't a problem that this returns a shallow copy
     return array.slice((pageNumber - 1) * pageSize, pageNumber * pageSize);
@@ -9,3 +14,5 @@ module.exports = function paginate(array, length, pageNumber, pageSize) {
     return [];
   }
 };
+
+export default paginate;
