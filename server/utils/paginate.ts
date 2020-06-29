@@ -1,9 +1,9 @@
 const paginate = (
-  array: Array<string>,
+  array: Array<{ isbn: string; display: boolean }>,
   length: number,
   pageNumber: number,
   pageSize: number
-): Array<string> => {
+): Array<{ isbn: string; display: boolean }> => {
   if ((pageNumber - 1) * pageSize + pageSize <= length) {
     // Check to make sure that it isn't a problem that this returns a shallow copy
     return array.slice((pageNumber - 1) * pageSize, pageNumber * pageSize);

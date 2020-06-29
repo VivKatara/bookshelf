@@ -10,6 +10,7 @@ const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
   }
   const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET as string;
   // Verify the token
+  // TODO You should more strongly type the user parameter here
   jwt.verify(accessToken, accessTokenSecret, async (err: any, user: any) => {
     if (err) {
       console.log("Failed to correctly sign access token");

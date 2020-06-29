@@ -1,13 +1,13 @@
-const passport = require("passport");
-const bcrypt = require("bcryptjs");
-const LocalStrategy = require("passport-local").Strategy;
-const User = require("../models/User");
+import passport from "passport";
+import bcrypt from "bcryptjs";
+import LocalStrategy from "passport-local";
+import UserCollection from "../models/UserCollection";
 
 passport.use(
-  new LocalStrategy(
+  new LocalStrategy.Strategy(
     { usernameField: "email", passwordField: "password", session: false },
-    function (email, password, done) {
-      User.findOne({ email }, (err, user) => {
+    function (email: string, password: string, done: any) {
+      UserCollection.findOne({ email }, (err, user) => {
         if (err) return done(err); // Unexpected error
         if (!user) {
           return done(null, false, { message: "Incorrect username" });
