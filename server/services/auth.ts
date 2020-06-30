@@ -1,10 +1,10 @@
 import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import config from "../../config";
-import UserCollection from "../../models/UserCollection";
-import UserBooksCollection from "../../models/UserBooksCollection";
-import TokenCollection from "../../models/TokenCollection";
+import config from "../config";
+import UserCollection from "../models/UserCollection";
+import UserBooksCollection from "../models/UserBooksCollection";
+import TokenCollection from "../models/TokenCollection";
 
 export default class AuthService {
   public static SignUp = async (

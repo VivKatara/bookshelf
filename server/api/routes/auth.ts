@@ -1,6 +1,6 @@
 // When the project gets bigger, ideally this should be moved to its own authentication server
 import { Router, Request, Response, NextFunction } from "express";
-import AuthService from "../services/auth";
+import AuthService from "../../services/auth";
 
 const router = Router();
 
