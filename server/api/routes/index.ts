@@ -1,23 +1,12 @@
-import { Router, Request, Response, NextFunction } from "express";
+import { Router } from "express";
 import authRoutes from "./auth";
+import userRoutes from "./user";
 import bookRoutes from "./book";
-import authenticateToken from "../middleware/authenticateToken";
 
 const router = Router();
+
 router.use("/auth", authRoutes);
+router.use("/user", userRoutes);
 router.use("/book", bookRoutes);
-
-router.get("/profile", authenticateToken, (req: Request, res: Response) => {
-  const { user }: any = req;
-  const { email, fullName, username } = user;
-
-  return res.status(200).json({
-    user: {
-      email: email,
-      userFullName: fullName,
-      username: username,
-    },
-  });
-});
 
 export default router;

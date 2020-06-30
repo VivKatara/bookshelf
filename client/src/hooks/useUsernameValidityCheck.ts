@@ -8,7 +8,7 @@ export const useUsernameValidityCheck = (
   useEffect(() => {
     async function checkUsername(): Promise<void> {
       try {
-        await axios.get("http://localhost:5000/auth/checkUsername", {
+        await axios.get("http://localhost:5000/user/checkUsername", {
           params: { username },
         });
         // Assuming here that we got a success(200) -> anything between 200 - 300 axios by default treats as success

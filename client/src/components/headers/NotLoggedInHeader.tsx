@@ -20,7 +20,7 @@ const NotLoggedInHeader: FunctionComponent<Props> = (props) => {
     async function getUserFullName(): Promise<void> {
       try {
         const response = await axios.get(
-          "http://localhost:5000/auth/getUserFullName",
+          "http://localhost:5000/user/getUserFullName",
           { params: { username } }
         );
         setUserFullName(response.data.userFullName);

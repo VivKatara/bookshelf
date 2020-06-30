@@ -23,7 +23,7 @@ export const startSetUser = () => async (
 ): Promise<void> => {
   try {
     const method: string = "GET";
-    const url: string = "http://localhost:5000/profile";
+    const url: string = "http://localhost:5000/user/profile";
     const data: any = {};
     const config: any = { withCredentials: true, validateStatus: false };
     const error: string = "User is not logged in";

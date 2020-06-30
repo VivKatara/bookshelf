@@ -1,6 +1,5 @@
 // When the project gets bigger, ideally this should be moved to its own authentication server
 import { Router, Request, Response, NextFunction } from "express";
-import UserCollection from "../../models/UserCollection";
 import AuthService from "../services/auth";
 
 const router = Router();
@@ -84,19 +83,5 @@ router.delete(
     }
   }
 );
-
-router.get("/checkUsername", async (req: Request, res: Response) => {
-  const { username } = req.query as { username: string };
-  const user = await UserCollection.findOne({ username });
-  if (user) return res.status(200).json({ msg: "Success" });
-  else return res.status(400).json({ msg: "Can't find username" });
-});
-
-router.get("/getUserFullName", async (req: Request, res: Response) => {
-  const { username } = req.query as { username: string };
-  const user = await UserCollection.findOne({ username });
-  if (user) return res.status(200).json({ userFullName: user.fullName });
-  else return res.status(400).json({ msg: "Can't find user's full name" });
-});
 
 export default router;
