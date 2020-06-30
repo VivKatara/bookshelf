@@ -65,6 +65,23 @@ export default class BookService {
     }
   };
 
+  // Get the details of given book
+  public static getBookDetails = async (
+    isbn: string
+  ): Promise<{
+    title: string;
+    authors: Array<string>;
+    description: string;
+    coverImage: string;
+  }> => {
+    const book = await BookCollection.findOne({ isbn });
+    if (!book) {
+      throw { status: 500, message: "Something unexpected occurred" };
+    }
+    const { title, authors, description, coverImage } = book;
+    return { title, authors, description, coverImage };
+  };
+
   private static findExactMatch = (
     items: any,
     userAddedTitle: string,
