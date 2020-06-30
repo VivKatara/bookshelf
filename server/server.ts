@@ -5,11 +5,11 @@ import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 import passport from "passport";
 import routes from "./routes";
-require("dotenv").config();
+import config from "./config";
 require("./authentication/passport");
 
 const app = express();
-const port = 5000;
+const port = config.port;
 
 app.use(cookieParser()); //Do we need this
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -24,7 +24,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // Connect to DB
-const mongoUrl: string = process.env.MONGODB_URI as string;
+const mongoUrl: string = config.databaseUrl;
 mongoose
   .connect(mongoUrl, {
     useNewUrlParser: true,

@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-interface Book {
+interface BookObject {
   isbn: string;
   display: boolean;
 }
@@ -8,13 +8,13 @@ interface Book {
 export default interface UserBooks extends mongoose.Document {
   email: string;
   username: string;
-  currentBooks: Array<Book>;
+  currentBooks: Array<BookObject>;
   currentBooksCount: number;
   currentBooksDisplayCount: number;
-  pastBooks: Array<Book>;
+  pastBooks: Array<BookObject>;
   pastBooksCount: number;
   pastBooksDisplayCount: number;
-  futureBooks: Array<Book>;
+  futureBooks: Array<BookObject>;
   futureBooksCount: number;
   futureBooksDisplayCount: number;
 }

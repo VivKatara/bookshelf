@@ -1,5 +1,5 @@
 import mongoose, { Schema, model } from "mongoose";
-import UserBooks from "./UserBooks";
+import UserBooksDocument from "../interfaces/UserBooksDocument";
 
 const UserBooksSchema: Schema = new Schema({
   email: {
@@ -79,5 +79,8 @@ const UserBooksSchema: Schema = new Schema({
   },
 });
 
-const UserBooksCollection = model<UserBooks>("userBooks", UserBooksSchema);
+const UserBooksCollection = model<UserBooksDocument>(
+  "userBooks",
+  UserBooksSchema
+);
 export default UserBooksCollection;

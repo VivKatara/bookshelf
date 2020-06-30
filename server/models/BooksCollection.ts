@@ -1,5 +1,5 @@
 import mongoose, { Schema, model } from "mongoose";
-import Book from "./Book";
+import BookDocument from "../interfaces/BookDocument";
 
 const BookSchema: Schema = new Schema({
   title: {
@@ -24,6 +24,6 @@ const BookSchema: Schema = new Schema({
   },
 });
 
-const BookCollection = model<Book>("book", BookSchema);
+const BookCollection = model<BookDocument>("book", BookSchema);
 
 export default BookCollection;

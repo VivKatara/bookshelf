@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-export default interface Book extends mongoose.Document {
+export default interface BookDocument extends mongoose.Document {
   title: string;
   authors: Array<string>;
   description: string;

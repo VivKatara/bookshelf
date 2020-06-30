@@ -1,5 +1,5 @@
 import mongoose, { Schema, model } from "mongoose";
-import Token from "./Token";
+import TokenDocument from "../interfaces/TokenDocument";
 
 const TokenSchema: Schema = new Schema({
   refreshToken: {
@@ -8,5 +8,5 @@ const TokenSchema: Schema = new Schema({
   },
 });
 
-const TokenCollection = model<Token>("token", TokenSchema);
+const TokenCollection = model<TokenDocument>("token", TokenSchema);
 export default TokenCollection;
