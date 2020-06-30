@@ -1,5 +1,7 @@
 import crypto from "crypto";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import config from "../../config";
 import UserCollection from "../../models/UserCollection";
 import UserBooksCollection from "../../models/UserBooksCollection";
 import TokenCollection from "../../models/TokenCollection";
@@ -42,9 +44,78 @@ export const SignUp = async (
   };
 };
 
+export const SignIn = async (
+  email: string,
+  password: string
+): Promise<[string, string]> => {
+  const user = await UserCollection.findOne({ email });
+  if (!user) throw { status: 401, message: "Incorrect username" };
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) throw { status: 401, message: "Incorrect password" };
+  const payload = {
+    id: user.id,
+    email: user.email,
+    fullName: user.fullName,
+    username: user.username,
+  };
+
+  const accessToken = generateAccessToken(
+    payload,
+    config.accessTokenSecret,
+    "5s"
+  );
+  const refreshToken = generateAccessToken(
+    payload,
+    config.refreshTokenSecret,
+    "7d"
+  );
+
+  const newRefreshToken = new TokenCollection({ refreshToken });
+  await newRefreshToken.save();
+
+  return [accessToken, refreshToken];
+};
+
+export const RefreshAccessToken = async (
+  refreshToken: any
+): Promise<string> => {
+  if (refreshToken === null) {
+    throw { status: 401, message: "Invalid. Please try logging in again" };
+  }
+  const foundToken = await TokenCollection.findOne({ refreshToken });
+  if (!foundToken) {
+    console.log("Provided refresh token not in database");
+    throw { status: 403, message: "Invalid. Please try logging in again" };
+  }
+  const user: any = await jwt.verify(refreshToken, config.refreshTokenSecret);
+
+  const payload = {
+    id: user.id,
+    email: user.email,
+    fullName: user.fullName,
+    username: user.username,
+  };
+
+  const accessToken = generateAccessToken(
+    payload,
+    config.accessTokenSecret,
+    "5s"
+  );
+
+  return accessToken;
+};
+
 export const SignOut = async (refreshToken: any): Promise<void> => {
   await TokenCollection.deleteOne({ refreshToken });
   return;
+};
+
+const generateAccessToken = (
+  payload: any,
+  secret: any,
+  expires: any
+): string => {
+  return jwt.sign(payload, secret, { expiresIn: expires });
 };
 
 const createUsername = async (fullName: string): Promise<string> => {
