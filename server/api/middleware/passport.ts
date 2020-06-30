@@ -1,7 +1,7 @@
 import passport from "passport";
 import bcrypt from "bcryptjs";
 import LocalStrategy from "passport-local";
-import UserCollection from "../models/UserCollection";
+import UserCollection from "../../models/UserCollection";
 
 passport.use(
   new LocalStrategy.Strategy(

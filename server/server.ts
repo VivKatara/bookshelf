@@ -4,9 +4,9 @@ import cors from "cors";
 import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 import passport from "passport";
-import routes from "./routes";
+import routes from "./api/routes";
 import config from "./config";
-require("./authentication/passport");
+require("./api/middleware/passport");
 
 const app = express();
 const port = config.port;

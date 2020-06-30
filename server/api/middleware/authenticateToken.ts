@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import config from "../../config";
 import { Request, Response, NextFunction } from "express";
 
 const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
@@ -8,7 +9,7 @@ const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
     console.log("Attempt to access without access token");
     return res.status(401).json({ msg: "Forbidden. Please try logging in." });
   }
-  const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET as string;
+  const accessTokenSecret = config.accessTokenSecret as string;
   // Verify the token
   // TODO You should more strongly type the user parameter here
   jwt.verify(accessToken, accessTokenSecret, async (err: any, user: any) => {
