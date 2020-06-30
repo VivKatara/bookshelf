@@ -2,10 +2,10 @@
   "name": "book_shelf",
   "version": "1.0.0",
   "description": "Virtual bookshelf to share what you're currently reading, have read, or want to read in the future",
-  "main": "server/server.js",
+  "main": "server/app.ts",
   "scripts": {
     "client": "cd client && npm run start",
-    "server": "cd server && nodemon server.ts",
+    "server": "cd server && nodemon app.ts",
     "dev": "concurrently \"npm run server\" \"npm run client\""
   },
   "author": "Vivek Katara",

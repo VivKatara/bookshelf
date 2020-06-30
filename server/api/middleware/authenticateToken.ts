@@ -9,7 +9,7 @@ const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
     console.log("Attempt to access without access token");
     return res.status(401).json({ msg: "Forbidden. Please try logging in." });
   }
-  const accessTokenSecret = config.accessTokenSecret as string;
+  const accessTokenSecret = config.accessTokenSecret;
   // Verify the token
   // TODO You should more strongly type the user parameter here
   jwt.verify(accessToken, accessTokenSecret, async (err: any, user: any) => {
