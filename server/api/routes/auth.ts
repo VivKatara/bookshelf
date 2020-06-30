@@ -1,7 +1,7 @@
 // When the project gets bigger, ideally this should be moved to its own authentication server
 import { Router, Request, Response, NextFunction } from "express";
 import UserCollection from "../../models/UserCollection";
-import { SignUp, SignOut, SignIn, RefreshAccessToken } from "../services/auth";
+import AuthService from "../services/auth";
 
 const router = Router();
 
@@ -11,7 +11,7 @@ router.post(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { email, fullName, password } = req.body;
-      const { user } = await SignUp(email, fullName, password);
+      const { user } = await AuthService.SignUp(email, fullName, password);
       return res.status(200).json({ user });
     } catch (err) {
       next(err);
@@ -25,10 +25,10 @@ router.post(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { email, password } = req.body;
-      const [accessToken, refreshToken]: [string, string] = await SignIn(
-        email,
-        password
-      );
+      const [accessToken, refreshToken]: [
+        string,
+        string
+      ] = await AuthService.SignIn(email, password);
       // Lifetime is a year, is this too long?
       res.cookie("accessToken", `Bearer ${accessToken}`, {
         maxAge: 365 * 24 * 60 * 60 * 1000,
@@ -53,7 +53,7 @@ router.get(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const refreshToken = req.cookies["refreshToken"];
-      const newAccessToken = await RefreshAccessToken(refreshToken);
+      const newAccessToken = await AuthService.RefreshAccessToken(refreshToken);
 
       // Rewrite the access token
       res.cookie("accessToken", `Bearer ${newAccessToken}`, {
@@ -69,13 +69,13 @@ router.get(
   }
 );
 
-// Logout - do we get rid of all browser cookies, and all session data? Must this be checked?
+// Logout route
 router.delete(
   "/logout",
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const refreshToken = req.cookies["refreshToken"];
-      await SignOut(refreshToken);
+      await AuthService.SignOut(refreshToken);
       res.clearCookie("accessToken");
       res.clearCookie("refreshToken");
       return res.status(200).json({ msg: "Success" });
