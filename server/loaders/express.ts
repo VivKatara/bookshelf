@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -23,5 +23,8 @@ export default ({ app }: { app: express.Application }) => {
   // Routes
   app.use("/", routes);
 
-  // TODO: You can define your error handling middleware here
+  app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+    const status = err.status || 500;
+    return res.status(status).json({ msg: err.message });
+  });
 };

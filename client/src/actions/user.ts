@@ -47,7 +47,9 @@ export const startSetUser = () => async (
   }
 };
 
-export const startLogOffUser = () => async (dispatch: Dispatch<AppActions>) => {
+export const startLogOffUser = () => async (
+  dispatch: Dispatch<AppActions>
+): Promise<void> => {
   // Call the backend logout
   await axios.delete("http://localhost:5000/auth/logout", {
     withCredentials: true,

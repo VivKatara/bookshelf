@@ -1,4 +1,4 @@
-import { Router, Request, Response } from "express";
+import { Router, Request, Response, NextFunction } from "express";
 import authRoutes from "./auth";
 import bookRoutes from "./book";
 import authenticateToken from "../middleware/authenticateToken";
