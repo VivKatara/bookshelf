@@ -63,7 +63,7 @@ export default class AuthService {
     const accessToken = AuthService.generateAccessToken(
       payload,
       config.accessTokenSecret,
-      "5s"
+      "1d"
     );
     const refreshToken = AuthService.generateAccessToken(
       payload,
@@ -100,7 +100,7 @@ export default class AuthService {
     const accessToken = AuthService.generateAccessToken(
       payload,
       config.accessTokenSecret,
-      "5s"
+      "1d"
     );
 
     return accessToken;

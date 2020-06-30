@@ -1,4 +1,6 @@
-import { Router, Request, Response } from "express";
+import { Router, Request, Response, NextFunction } from "express";
+import authenticateToken from "../middleware/authenticateToken";
+import BookService from "../../services/book";
 import {
   searchBookDatabase,
   searchGoogleBooksAPI,
@@ -12,68 +14,36 @@ import {
   changeDisplayOfBook,
   deleteBookFromShelf,
 } from "../endpoints";
-import authenticateToken from "../middleware/authenticateToken";
-import extractBookFields from "../../utils/extractBookFields";
+import UserService from "../../services/user";
 
 const router = Router();
 
-router.post("/add", authenticateToken, async (req: Request, res: Response) => {
-  const user: any = req.user;
-  const email: any = user.email;
-  const {
-    title,
-    author,
-    shelf,
-  }: { title: string; author: string; shelf: string } = req.body;
-  let isbn: string = "";
+router.post(
+  "/add",
+  authenticateToken,
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const user: any = req.user;
+      const email: any = user.email;
+      const {
+        title,
+        author,
+        shelf,
+      }: { title: string; author: string; shelf: string } = req.body;
 
-  // Look in current database for the book
-  const searchBook = await searchBookDatabase(title, author);
-  if (searchBook.success) {
-    isbn = searchBook.isbn as string;
-  } else {
-    // Search google books API for the book
-    const googleBook = await searchGoogleBooksAPI(title, author);
-    if (!googleBook.success) {
-      return res
-        .status(404)
-        .json({ msg: "Error! Could not find this particular book." });
-    }
-    const [
-      finalTitle,
-      finalAuthors,
-      finalDescription,
-      finalIsbn,
-      finalImageLink,
-      matchFound,
-    ] = extractBookFields(googleBook.items, title, author);
-    // Could not find exact match
-    if (!matchFound) {
-      return res
-        .status(404)
-        .json({ msg: "Error! Could not find this particular book." });
-    }
-    // Add found book to the book database
-    await addBook(
-      finalTitle,
-      finalAuthors,
-      finalDescription,
-      finalIsbn,
-      finalImageLink
-    );
-    isbn = finalIsbn;
-  }
+      // add to Book DB
+      const isbn = await BookService.addBook(title, author);
 
-  // Add book to userBook
-  // If possible, put a new book on default display
-  const display = true;
-  const { success, msg } = await addBookToShelf(email, isbn, shelf, display);
-  if (!success) {
-    return res.status(400).json({ msg });
-  } else {
-    return res.status(200).json({ msg });
+      await UserService.addBookToShelf(email, isbn, shelf, true);
+
+      return res
+        .status(200)
+        .json({ msg: "Book is on shelf or has been added to it" });
+    } catch (err) {
+      next(err);
+    }
   }
-});
+);
 
 // Called to get all the books on display for a given shelf
 router.get("/getDisplayBooks", async (req: Request, res: Response) => {
