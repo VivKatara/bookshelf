@@ -1,38 +1,9 @@
-import React, { useReducer, useEffect, useRef, FunctionComponent } from "react";
-import axios from "axios";
+import React, { useRef, FunctionComponent } from "react";
 import styled from "@emotion/styled";
 import BookModal from "./modals/BookModal";
-import { BookDetailsState } from "../types/Book";
-import { BookActionTypes, FOUND_BOOK } from "../types/actions";
 import { useModal } from "../hooks/useModal";
-
-const initialState: BookDetailsState = {
-  foundBook: false,
-  title: "",
-  authors: "",
-  description: "",
-  coverImage: "",
-};
-
-const reducer = (
-  state: BookDetailsState,
-  action: BookActionTypes
-): BookDetailsState => {
-  switch (action.type) {
-    case FOUND_BOOK: {
-      return {
-        ...state,
-        foundBook: action.payload.foundBook,
-        title: action.payload.title,
-        authors: action.payload.authors,
-        description: action.payload.description,
-        coverImage: action.payload.coverImage,
-      };
-    }
-    default:
-      return state;
-  }
-};
+import { useQuery } from "@apollo/react-hooks";
+import { GET_BOOK_DETAILS_QUERY } from "../graphql/queries";
 
 type Props = {
   isbn: string;
@@ -41,59 +12,33 @@ type Props = {
 
 const Book: FunctionComponent<Props> = (props) => {
   const { isbn, handleModalUpdate } = props;
-  const [bookState, dispatch] = useReducer(reducer, initialState);
   const [showModal, toggleModal] = useModal();
   const buttonRef = useRef(null);
 
-  useEffect(() => {
-    // Get the details of book with given ISBN
-    // TODO Try Catch error logic here
-    async function getBookDetails(): Promise<void> {
-      const response = await axios.get(
-        "http://localhost:5000/book/getBookDetails",
-        {
-          params: { isbn },
-          withCredentials: true,
-        }
-      );
-      if (response.status === 200) {
-        let splitAuthors: string = response.data.authors;
-        if (response.data.authors.length > 1)
-          splitAuthors = response.data.authors.join(", ");
-        const action: BookActionTypes = {
-          type: FOUND_BOOK,
-          payload: {
-            foundBook: true,
-            title: response.data.title,
-            authors: splitAuthors,
-            description: response.data.description,
-            coverImage: response.data.coverImage,
-          },
-        };
-        dispatch(action);
-      }
-    }
-    getBookDetails();
-  }, [isbn]);
+  const { loading, error, data } = useQuery(GET_BOOK_DETAILS_QUERY, {
+    variables: { isbn },
+  });
 
+  if (loading) return <h1>Loading...</h1>;
+  if (error) return <h1>Error...</h1>;
+
+  // Safe to assume here data must be valid
   return (
     <>
       <BookContainer ref={buttonRef} onClick={toggleModal}>
-        {bookState.foundBook && (
-          <img
-            src={bookState.coverImage}
-            alt={bookState.title}
-            width="120"
-            height="160"
-          ></img>
-        )}
+        <img
+          src={data.book.coverImage}
+          alt={data.book.title}
+          width="120"
+          height="160"
+        ></img>
       </BookContainer>
       {showModal && (
         <BookModal
           isbn={isbn}
-          title={bookState.title}
-          authors={bookState.authors}
-          description={bookState.description}
+          title={data.book.title}
+          authors={data.book.authors} // TODO: This should be a split string of authors
+          description={data.book.description}
           handleClose={toggleModal}
           buttonRef={buttonRef}
           handleModalUpdate={handleModalUpdate}

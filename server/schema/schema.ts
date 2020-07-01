@@ -1,10 +1,24 @@
 import {
   GraphQLObjectType,
   GraphQLString,
+  GraphQLInt,
+  GraphQLBoolean,
   GraphQLList,
   GraphQLSchema,
 } from "graphql";
 import BookCollection from "../models/BookCollection";
+import BookshelfCollection from "../models/BookshelfCollection";
+import UserCollection from "../models/UserCollection";
+
+const UserType = new GraphQLObjectType({
+  name: "User",
+  fields: () => ({
+    email: { type: GraphQLString },
+    fullName: { type: GraphQLString },
+    username: { type: GraphQLString },
+    profilePhoto: { type: GraphQLString },
+  }),
+});
 
 const BookType = new GraphQLObjectType({
   name: "Book",
@@ -17,14 +31,53 @@ const BookType = new GraphQLObjectType({
   }),
 });
 
+const BookshelfBookType = new GraphQLObjectType({
+  name: "BookshelfBook",
+  fields: () => ({
+    isbn: { type: GraphQLString },
+    display: { type: GraphQLBoolean },
+  }),
+});
+
+const BookshelfType = new GraphQLObjectType({
+  name: "Bookshelf",
+  fields: () => ({
+    email: { type: GraphQLString },
+    username: { type: GraphQLString },
+    currentBooks: { type: new GraphQLList(BookshelfBookType) },
+    currentBooksCount: { type: GraphQLInt },
+    currentBooksDisplayCount: { type: GraphQLInt },
+    pastBooks: { type: new GraphQLList(BookshelfBookType) },
+    pastBooksCount: { type: GraphQLInt },
+    pastBooksDisplayCount: { type: GraphQLInt },
+    futureBooks: { type: new GraphQLList(BookshelfBookType) },
+    futureBooksCount: { type: GraphQLInt },
+    futureBooksDisplayCount: { type: GraphQLInt },
+  }),
+});
+
 const RootQuery = new GraphQLObjectType({
   name: "RootQueryType",
   fields: {
+    user: {
+      type: UserType,
+      args: { username: { type: GraphQLString } },
+      resolve: async (parent, args) => {
+        return await UserCollection.findOne({ username: args.username });
+      },
+    },
     book: {
       type: BookType,
       args: { isbn: { type: GraphQLString } },
-      async resolve(parent, args) {
+      resolve: async (parent, args) => {
         return await BookCollection.findOne({ isbn: args.isbn });
+      },
+    },
+    bookshelf: {
+      type: BookshelfType,
+      args: { username: { type: GraphQLString } },
+      resolve: async (parent, args) => {
+        return await BookshelfCollection.findOne({ username: args.username });
       },
     },
   },

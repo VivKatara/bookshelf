@@ -1,5 +1,4 @@
-import React, { useState, useEffect, FunctionComponent } from "react";
-import axios from "axios";
+import React, { FunctionComponent } from "react";
 import {
   HeaderContainer,
   HyperLink,
@@ -7,6 +6,8 @@ import {
   Username,
   Profile,
 } from "../../styles/headers";
+import { useQuery } from "@apollo/react-hooks";
+import { GET_USER_FULL_NAME } from "../../graphql/queries";
 
 type Props = {
   username: string;
@@ -14,32 +15,22 @@ type Props = {
 
 const NotLoggedInHeader: FunctionComponent<Props> = (props) => {
   const { username } = props;
-  const [userFullName, setUserFullName] = useState("");
+  const { loading, error, data } = useQuery(GET_USER_FULL_NAME, {
+    variables: { username },
+  });
 
-  useEffect(() => {
-    async function getUserFullName(): Promise<void> {
-      try {
-        const response = await axios.get(
-          "http://localhost:5000/user/getUserFullName",
-          { params: { username } }
-        );
-        setUserFullName(response.data.userFullName);
-      } catch (e) {
-        // Theoretically we should never come here because Homepage has already checked that the username is valid, and fullName is a required field to user
-        console.log(e);
-      }
-    }
-    getUserFullName();
-  }, [username]);
+  if (loading) return <h1>Loading...</h1>;
+  if (error) return <h1>Error...</h1>;
 
+  // Safe to assume here that data must be good
   return (
     <HeaderContainer>
       <HyperLink href="/">
         <p>Bookshelf</p>
       </HyperLink>
       <User>
-        <Username>{userFullName}</Username>
-        <Profile>{userFullName[0]}</Profile>
+        <Username>{data.user.fullName}</Username>
+        <Profile>{data.user.fullName[0]}</Profile>
       </User>
     </HeaderContainer>
   );
