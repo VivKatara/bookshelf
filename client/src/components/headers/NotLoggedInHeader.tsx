@@ -7,7 +7,7 @@ import {
   Profile,
 } from "../../styles/headers";
 import { useQuery } from "@apollo/react-hooks";
-import { GET_USER_FULL_NAME } from "../../graphql/queries";
+import { GET_USER_FULL_NAME_QUERY } from "../../graphql/queries";
 
 type Props = {
   username: string;
@@ -15,7 +15,7 @@ type Props = {
 
 const NotLoggedInHeader: FunctionComponent<Props> = (props) => {
   const { username } = props;
-  const { loading, error, data } = useQuery(GET_USER_FULL_NAME, {
+  const { loading, error, data } = useQuery(GET_USER_FULL_NAME_QUERY, {
     variables: { username },
   });
 

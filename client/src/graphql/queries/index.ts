@@ -11,8 +11,14 @@ export const GET_BOOK_DETAILS_QUERY = gql`
   }
 `;
 
-export const GET_USER_FULL_NAME = gql`
-  query getUserFullName($username: String) {
+export const CHECK_USERNAME_QUERY = gql`
+  query checkUsernameQuery($username: String) {
+    userExists(username: $username)
+  }
+`;
+
+export const GET_USER_FULL_NAME_QUERY = gql`
+  query getUserFullNameQuery($username: String) {
     user(username: $username) {
       fullName
     }

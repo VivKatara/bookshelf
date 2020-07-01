@@ -9,14 +9,14 @@ export default class UserService {
     return true;
   };
 
-  public static getUserFullName = async (username: string): Promise<string> => {
-    const user = await UserCollection.findOne({ username });
-    if (!user) {
-      throw { status: 400, message: "Can't find user" };
-    }
-    if (!user.fullName) {
-      throw { status: 400, message: "Can't find user's full name" };
-    }
-    return user.fullName;
-  };
+  // public static getUserFullName = async (username: string): Promise<string> => {
+  //   const user = await UserCollection.findOne({ username });
+  //   if (!user) {
+  //     throw { status: 400, message: "Can't find user" };
+  //   }
+  //   if (!user.fullName) {
+  //     throw { status: 400, message: "Can't find user's full name" };
+  //   }
+  //   return user.fullName;
+  // };
 }

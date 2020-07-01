@@ -23,6 +23,8 @@ import {
 import { User } from "../types/User";
 import { RouteComponentProps } from "react-router-dom";
 import { HomepageIsbnState } from "../types/Homepage";
+import { useQuery } from "@apollo/react-hooks";
+import { CHECK_USERNAME_QUERY } from "../graphql/queries";
 
 const initialState: HomepageIsbnState = {
   currentIsbns: [],
@@ -63,6 +65,7 @@ interface HomepageProps {}
 type Props = HomepageProps & LinkStateProps & RouteComponentProps<RouteParams>;
 
 const Homepage: FunctionComponent<Props> = (props) => {
+  // console.log("In homepage");
   const username = props.match.params.username;
   const [validUsername, setValidUsername] = useState(null);
   useUsernameValidityCheck(username, setValidUsername);

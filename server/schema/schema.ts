@@ -66,6 +66,15 @@ const RootQuery = new GraphQLObjectType({
         return await UserCollection.findOne({ username: args.username });
       },
     },
+    userExists: {
+      type: GraphQLBoolean,
+      args: { username: { type: GraphQLString } },
+      resolve: async (parent, args) => {
+        const user = await UserCollection.findOne({ username: args.username });
+        if (user) return true;
+        else return false;
+      },
+    },
     book: {
       type: BookType,
       args: { isbn: { type: GraphQLString } },

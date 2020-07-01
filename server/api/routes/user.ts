@@ -39,17 +39,17 @@ router.get(
   }
 );
 
-router.get(
-  "/getUserFullName",
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { username } = req.query as { username: string };
-      const userFullName = await UserService.getUserFullName(username);
-      return res.status(200).json({ userFullName });
-    } catch (err) {
-      next(err);
-    }
-  }
-);
+// router.get(
+//   "/getUserFullName",
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     try {
+//       const { username } = req.query as { username: string };
+//       const userFullName = await UserService.getUserFullName(username);
+//       return res.status(200).json({ userFullName });
+//     } catch (err) {
+//       next(err);
+//     }
+//   }
+// );
 
 export default router;
