@@ -5,7 +5,7 @@ interface BookObject {
   display: boolean;
 }
 
-export default interface UserBooks extends mongoose.Document {
+export default interface BookshelfDocument extends mongoose.Document {
   email: string;
   username: string;
   currentBooks: Array<BookObject>;

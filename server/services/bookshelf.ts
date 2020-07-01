@@ -1,4 +1,4 @@
-import UserBooksCollection from "../models/UserBooksCollection";
+import BookshelfCollection from "../models/BookshelfCollection";
 
 export default class BookshelfService {
   public static addBookToShelf = async (
@@ -7,15 +7,15 @@ export default class BookshelfService {
     shelf: string,
     display: boolean
   ): Promise<void> => {
-    const userBooks = await UserBooksCollection.findOne({ email });
-    if (!userBooks) {
+    const bookshelf = await BookshelfCollection.findOne({ email });
+    if (!bookshelf) {
       throw { status: 500, message: "Something unexpected occurred." };
     }
-    const desiredShelf = userBooks.get(shelf);
+    const desiredShelf = bookshelf.get(shelf);
     const countLabel = `${shelf}Count`;
-    const desiredCount = userBooks.get(countLabel);
+    const desiredCount = bookshelf.get(countLabel);
     const displayCountLabel = `${shelf}DisplayCount`;
-    const desiredDisplayCount = userBooks.get(displayCountLabel);
+    const desiredDisplayCount = bookshelf.get(displayCountLabel);
 
     for (let i = 0; i < desiredCount; i++) {
       if (desiredShelf[i].isbn === isbn) {
@@ -26,7 +26,7 @@ export default class BookshelfService {
 
     // Set display to true on update
     if (display && desiredDisplayCount < 6) {
-      await UserBooksCollection.updateOne(
+      await BookshelfCollection.updateOne(
         { email },
         {
           $push: { [shelf]: { isbn: isbn, display: true } },
@@ -35,7 +35,7 @@ export default class BookshelfService {
       );
     } else {
       // Set display to false on update
-      await UserBooksCollection.updateOne(
+      await BookshelfCollection.updateOne(
         { email },
         {
           $push: { [shelf]: { isbn: isbn, display: false } },
@@ -49,11 +49,11 @@ export default class BookshelfService {
     username: string,
     shelf: string
   ): Promise<Array<string>> => {
-    const userBooks = await UserBooksCollection.findOne({ username });
-    if (!userBooks) {
+    const bookshelf = await BookshelfCollection.findOne({ username });
+    if (!bookshelf) {
       throw { status: 500, message: "Something unexpected occurred." };
     }
-    const desiredShelf = userBooks.get(shelf);
+    const desiredShelf = bookshelf.get(shelf);
     const displayBooks = desiredShelf.filter((book: any) => {
       if (book.display) {
         return book;
@@ -75,13 +75,13 @@ export default class BookshelfService {
   ): Promise<Array<string>> => {
     const currentPage = parseInt(page);
     const currentPageSize = parseInt(pageSize);
-    const userBooks = await UserBooksCollection.findOne({ username });
-    if (!userBooks) {
+    const bookshelf = await BookshelfCollection.findOne({ username });
+    if (!bookshelf) {
       throw { status: 500, message: "Something unexpected occurred." };
     }
-    const desiredShelf = userBooks.get(shelf);
+    const desiredShelf = bookshelf.get(shelf);
     const countLabel = `${shelf}Count`;
-    const desiredShelfCount = userBooks.get(countLabel);
+    const desiredShelfCount = bookshelf.get(countLabel);
     const paginatedDesiredBooks = BookshelfService.paginateBooks(
       desiredShelf,
       desiredShelfCount,
@@ -97,13 +97,13 @@ export default class BookshelfService {
     pageSize: string,
     shelf: string
   ): Promise<number> => {
-    const userBooks = await UserBooksCollection.findOne({ username });
-    if (!userBooks) {
+    const bookshelf = await BookshelfCollection.findOne({ username });
+    if (!bookshelf) {
       throw { status: 500, message: "Something unexpected occurred." };
     }
-    const desiredShelf = userBooks.get(shelf);
+    const desiredShelf = bookshelf.get(shelf);
     const countLabel = `${shelf}Count`;
-    const desiredShelfCount = userBooks.get(countLabel);
+    const desiredShelfCount = bookshelf.get(countLabel);
     const totalPages = Math.ceil(desiredShelfCount / parseInt(pageSize));
     return totalPages;
   };
@@ -113,11 +113,11 @@ export default class BookshelfService {
     shelf: string,
     isbn: string
   ): Promise<boolean> => {
-    const userBooks = await UserBooksCollection.findOne({ email });
-    if (!userBooks) {
+    const bookshelf = await BookshelfCollection.findOne({ email });
+    if (!bookshelf) {
       throw { status: 500, message: "Something unexpected occurred." };
     }
-    const desiredShelf = userBooks.get(shelf);
+    const desiredShelf = bookshelf.get(shelf);
     const desiredBooks = desiredShelf.filter((book: any) => book.isbn === isbn);
     if (!desiredBooks.length) {
       throw {
@@ -137,13 +137,13 @@ export default class BookshelfService {
     shelf: string,
     desiredDisplay: boolean
   ): Promise<void> => {
-    const userBooks = await UserBooksCollection.findOne({ email });
-    if (!userBooks) {
+    const bookshelf = await BookshelfCollection.findOne({ email });
+    if (!bookshelf) {
       throw { status: 500, message: "Something unexpected occurred." };
     }
     const displayCountLabel = `${shelf}DisplayCount`;
-    const desiredShelf = userBooks.get(shelf);
-    const displayCount = userBooks.get(displayCountLabel);
+    const desiredShelf = bookshelf.get(shelf);
+    const displayCount = bookshelf.get(displayCountLabel);
 
     if (desiredDisplay && displayCount >= 6) {
       throw {
@@ -170,7 +170,7 @@ export default class BookshelfService {
         }
       );
 
-      await UserBooksCollection.updateOne(
+      await BookshelfCollection.updateOne(
         { email },
         {
           $set: { [shelf]: newBookShelf },
@@ -185,12 +185,12 @@ export default class BookshelfService {
     isbn: string,
     shelf: string
   ): Promise<void> => {
-    const userBooks = await UserBooksCollection.findOne({ email });
-    if (!userBooks) {
+    const bookshelf = await BookshelfCollection.findOne({ email });
+    if (!bookshelf) {
       throw { status: 500, message: "Something unexpected occurred." };
     }
 
-    const desiredShelf = userBooks.get(shelf);
+    const desiredShelf = bookshelf.get(shelf);
     const countLabel = `${shelf}Count`;
     const displayCountLabel = `${shelf}DisplayCount`;
 
@@ -218,7 +218,7 @@ export default class BookshelfService {
     }
 
     // Update the db
-    await UserBooksCollection.updateOne(
+    await BookshelfCollection.updateOne(
       { email },
       {
         $set: { [shelf]: newShelf },

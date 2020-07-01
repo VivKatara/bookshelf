@@ -19,6 +19,7 @@ export default ({ app }: { app: express.Application }) => {
   // Routes
   app.use("/", routes);
 
+  // Error handler
   app.use((err: any, req: Request, res: Response, next: NextFunction) => {
     const status = err.status || 500;
     return res.status(status).json({ msg: err.message });

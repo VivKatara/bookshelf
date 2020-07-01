@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import config from "../config";
 import UserCollection from "../models/UserCollection";
-import UserBooksCollection from "../models/UserBooksCollection";
+import BookshelfCollection from "../models/BookshelfCollection";
 import TokenCollection from "../models/TokenCollection";
 
 export default class AuthService {
@@ -18,7 +18,7 @@ export default class AuthService {
     const username = await AuthService.createUsername(fullName);
     const newUser = new UserCollection({ email, fullName, username, password });
 
-    const newUserBook = new UserBooksCollection({
+    const newBookshelf = new BookshelfCollection({
       email,
       username,
       currentBooks: [],
@@ -38,7 +38,7 @@ export default class AuthService {
     newUser.password = hash;
 
     const savedUser = await newUser.save();
-    await newUserBook.save();
+    await newBookshelf.save();
 
     return {
       user: { email: savedUser.email, name: savedUser.fullName },

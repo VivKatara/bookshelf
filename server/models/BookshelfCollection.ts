@@ -1,7 +1,7 @@
-import mongoose, { Schema, model } from "mongoose";
-import UserBooksDocument from "../interfaces/UserBooksDocument";
+import { Schema, model } from "mongoose";
+import BookshelfDocument from "../interfaces/BookshelfDocument";
 
-const UserBooksSchema: Schema = new Schema({
+const BookshelfSchema: Schema = new Schema({
   email: {
     type: String,
     required: true,
@@ -79,8 +79,8 @@ const UserBooksSchema: Schema = new Schema({
   },
 });
 
-const UserBooksCollection = model<UserBooksDocument>(
-  "userBooks",
-  UserBooksSchema
+const BookshelfCollection = model<BookshelfDocument>(
+  "bookshelf",
+  BookshelfSchema
 );
-export default UserBooksCollection;
+export default BookshelfCollection;
