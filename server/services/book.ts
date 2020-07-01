@@ -1,6 +1,6 @@
 import axios from "axios";
 import config from "../config";
-import BookCollection from "../models/BooksCollection";
+import BookCollection from "../models/BookCollection";
 
 type BookFields = [string, Array<string>, string, string, string];
 

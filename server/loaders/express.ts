@@ -2,6 +2,8 @@ import express, { Request, Response, NextFunction } from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import graphqlHTTP from "express-graphql";
+import schema from "../schema/schema";
 import routes from "../api/routes";
 
 export default ({ app }: { app: express.Application }) => {
@@ -16,7 +18,16 @@ export default ({ app }: { app: express.Application }) => {
   };
   app.use(cors(corsOptions));
 
-  // Routes
+  // GraphQL
+  app.use(
+    "/graphql",
+    graphqlHTTP({
+      schema,
+      graphiql: true,
+    })
+  );
+
+  // REST Routes
   app.use("/", routes);
 
   // Error handler
