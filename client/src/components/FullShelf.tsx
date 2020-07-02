@@ -17,7 +17,6 @@ import AddBookModal from "./modals/AddBookModal";
 import AddBookLink from "./links/AddBookLink";
 import AuthLinks from "./links/AuthLinks";
 import NextPreviousNavigation from "./links/NextPreviousNavigation";
-import { useUsernameValidityCheck } from "../hooks/useUsernameValidityCheck";
 import { useModal } from "../hooks/useModal";
 import { useBookModalUpdates } from "../hooks/useBookModalUpdates";
 import {
@@ -92,8 +91,6 @@ const FullShelf: FunctionComponent<Props> = (props) => {
   const username = props.match.params.username;
   const shelf = `${props.match.params.type}Books`;
   const shelfTitle = shelfTypes[shelf];
-  // const [validUsername, setValidUsername] = useState(null);
-  // useUsernameValidityCheck(username, setValidUsername);
 
   // Get page number from query string parameter
   const queryString = new URLSearchParams(props.location.search);
@@ -128,6 +125,7 @@ const FullShelf: FunctionComponent<Props> = (props) => {
 
   useEffect(() => {
     if (data) {
+      refetch({ username }); // TODO: This works, but the architecture is super inefficient
       const totalPages = data.homepage.bookshelf[`${shelf}Count`] / pageSize;
       let showNext: boolean = false;
       let showPrevious: boolean = false;
@@ -181,7 +179,7 @@ const FullShelf: FunctionComponent<Props> = (props) => {
       };
       isbnDispatch(isbnAction);
     }
-  }, [data]);
+  }, [data, shelfUpdates, bookModalUpdates]);
 
   if (loading) {
     return <Loading />;
