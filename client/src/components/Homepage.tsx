@@ -36,9 +36,7 @@ const Homepage: FunctionComponent<Props> = (props) => {
 
   const [showModal, toggleModal] = useModal();
   const buttonRef = useRef(null);
-  const [currentUpdates, setCurrentUpdates] = useState(0);
-  const [pastUpdates, setPastUpdates] = useState(0);
-  const [futureUpdates, setFutureUpdates] = useState(0);
+  const [shelfUpdates, setShelfUpdates] = useState(0);
   const [bookModalUpdates, triggerBookModalUpdate] = useBookModalUpdates();
 
   const getDisplayBooks = (books: any) => {
@@ -49,21 +47,12 @@ const Homepage: FunctionComponent<Props> = (props) => {
   };
 
   const handleShelfUpdate = (shelf: string) => {
-    console.log("Updating shelf");
-    if (shelf === "currentBooks") {
-      setCurrentUpdates((prev) => prev + 1);
-    }
-    if (shelf === "pastBooks") {
-      setPastUpdates((prev) => prev + 1);
-    }
-    if (shelf === "futureBooks") {
-      setFutureUpdates((prev) => prev + 1);
-    }
+    setShelfUpdates((prev) => prev + 1);
   };
 
   useEffect(() => {
     refetch({ username });
-  }, [currentUpdates, pastUpdates, futureUpdates, bookModalUpdates]);
+  }, [shelfUpdates, bookModalUpdates]);
 
   // Get user from Redux
   const { user } = props;
