@@ -9,5 +9,4 @@ export interface FullShelfPageState {
   showPrevious: boolean;
   showNext: boolean;
   showPageCount: boolean;
-  shelfTitle: string;
 }

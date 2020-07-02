@@ -15,6 +15,7 @@ export const GET_USER_BOOKSHELF_AND_BOOK_QUERY = gql`
             coverImage
           }
         }
+        currentBooksCount
         pastBooks {
           display
           details {
@@ -35,6 +36,7 @@ export const GET_USER_BOOKSHELF_AND_BOOK_QUERY = gql`
             coverImage
           }
         }
+        futureBooksCount
       }
     }
   }

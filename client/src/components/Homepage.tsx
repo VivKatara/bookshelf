@@ -1,4 +1,4 @@
-import React, { useState, useReducer, useRef, FunctionComponent } from "react";
+import React, { useState, useRef, FunctionComponent, useEffect } from "react";
 import { connect } from "react-redux";
 import styled from "@emotion/styled";
 import Shelf from "./Shelf";
@@ -9,53 +9,13 @@ import AddBookModal from "./modals/AddBookModal";
 import AddBookLink from "./links/AddBookLink";
 import AuthLinks from "./links/AuthLinks";
 import SeeAll from "./links/SeeAll";
-import { useUsernameValidityCheck } from "../hooks/useUsernameValidityCheck";
-import { useAbilityToGetDisplayBooks } from "../hooks/useAbilityToGetDisplayBooks";
 import { useModal } from "../hooks/useModal";
 import { useBookModalUpdates } from "../hooks/useBookModalUpdates";
 import { AppState } from "../store/configureStore";
-import {
-  UPDATE_CURRENT,
-  UPDATE_PAST,
-  UPDATE_FUTURE,
-  HomepageActionTypes,
-} from "../types/actions";
 import { User } from "../types/User";
 import { RouteComponentProps } from "react-router-dom";
-import { HomepageIsbnState } from "../types/Homepage";
-import { useQuery } from "@apollo/react-hooks";
+import { useQuery, useLazyQuery } from "@apollo/react-hooks";
 import { GET_USER_BOOKSHELF_AND_BOOK_QUERY } from "../graphql/queries";
-
-const initialState: HomepageIsbnState = {
-  currentIsbns: [],
-  pastIsbns: [],
-  futureIsbns: [],
-};
-
-const reducer = (
-  state: HomepageIsbnState,
-  action: HomepageActionTypes
-): HomepageIsbnState => {
-  switch (action.type) {
-    case UPDATE_CURRENT:
-      return {
-        ...state,
-        currentIsbns: action.payload.isbns,
-      };
-    case UPDATE_PAST:
-      return {
-        ...state,
-        pastIsbns: action.payload.isbns,
-      };
-    case UPDATE_FUTURE:
-      return {
-        ...state,
-        futureIsbns: action.payload.isbns,
-      };
-    default:
-      return state;
-  }
-};
 
 interface RouteParams {
   username: string;
@@ -66,9 +26,47 @@ type Props = HomepageProps & LinkStateProps & RouteComponentProps<RouteParams>;
 
 const Homepage: FunctionComponent<Props> = (props) => {
   const username = props.match.params.username;
-  const { loading, error, data } = useQuery(GET_USER_BOOKSHELF_AND_BOOK_QUERY, {
-    variables: { username },
-  });
+
+  const { loading, error, data, refetch } = useQuery(
+    GET_USER_BOOKSHELF_AND_BOOK_QUERY,
+    {
+      variables: { username },
+    }
+  );
+
+  const [showModal, toggleModal] = useModal();
+  const buttonRef = useRef(null);
+  const [currentUpdates, setCurrentUpdates] = useState(0);
+  const [pastUpdates, setPastUpdates] = useState(0);
+  const [futureUpdates, setFutureUpdates] = useState(0);
+  const [bookModalUpdates, triggerBookModalUpdate] = useBookModalUpdates();
+
+  const getDisplayBooks = (books: any) => {
+    const displayBooks = books.filter((book: any) => {
+      if (book.display) return book;
+    });
+    return displayBooks;
+  };
+
+  const handleShelfUpdate = (shelf: string) => {
+    console.log("Updating shelf");
+    if (shelf === "currentBooks") {
+      setCurrentUpdates((prev) => prev + 1);
+    }
+    if (shelf === "pastBooks") {
+      setPastUpdates((prev) => prev + 1);
+    }
+    if (shelf === "futureBooks") {
+      setFutureUpdates((prev) => prev + 1);
+    }
+  };
+
+  useEffect(() => {
+    refetch({ username });
+  }, [currentUpdates, pastUpdates, futureUpdates, bookModalUpdates]);
+
+  // Get user from Redux
+  const { user } = props;
 
   console.log("Called");
   console.log(loading);
@@ -77,126 +75,64 @@ const Homepage: FunctionComponent<Props> = (props) => {
   if (loading) {
     return <Loading />;
   } else if (error) {
-    return <NotFound />; // Will have to find a way to handle this more specifically
+    return <NotFound />;
   } else {
-    if (!data.homepage) {
-      // Got Null response
+    if (!data || !data.homepage) {
       return <NotFound />;
     } else {
       // username is valid since we got a response
       // TODO: Homepage logic now based on your data
-      return <h1>Success...</h1>;
+      return (
+        <>
+          {!user.isLoggedIn && <NotLoggedInHeader username={username} />}
+          <MainContainer>
+            {showModal && (
+              <AddBookModal
+                buttonRef={buttonRef}
+                handleClose={toggleModal}
+                shelfUpdate={handleShelfUpdate}
+              />
+            )}
+            {user.isLoggedIn ? (
+              <AddBookLink buttonRef={buttonRef} toggleModal={toggleModal} />
+            ) : (
+              <AuthLinks />
+            )}
+            <CentralDiv>
+              <Title>Currently Reading</Title>
+              <Shelf
+                shelfBooks={getDisplayBooks(
+                  data.homepage.bookshelf.currentBooks
+                )}
+                shelf="currentBooks"
+                handleModalUpdate={triggerBookModalUpdate}
+              >
+                <SeeAll route={`/${username}/shelf/current?page=1`} />
+              </Shelf>
+              <Title>Have Read</Title>
+              <Shelf
+                shelfBooks={getDisplayBooks(data.homepage.bookshelf.pastBooks)}
+                shelf="pastBooks"
+                handleModalUpdate={triggerBookModalUpdate}
+              >
+                <SeeAll route={`/${username}/shelf/past?page=1`} />
+              </Shelf>
+              <Title>Want to Read</Title>
+              <Shelf
+                shelfBooks={getDisplayBooks(
+                  data.homepage.bookshelf.futureBooks
+                )}
+                shelf="futureBooks"
+                handleModalUpdate={triggerBookModalUpdate}
+              >
+                <SeeAll route={`/${username}/shelf/future?page=1`} />
+              </Shelf>
+            </CentralDiv>
+          </MainContainer>
+        </>
+      );
     }
   }
-  // console.log("In homepage");
-  //   const username = props.match.params.username;
-  //   const [validUsername, setValidUsername] = useState(null);
-  //   useUsernameValidityCheck(username, setValidUsername);
-
-  //   // State for all the ISBNs that will be passed down to shelves
-  //   const [isbnState, dispatch] = useReducer(reducer, initialState);
-
-  //   // Logic to track the modal, as well as whether there were any updates to a shelf, or a particular book
-  //   const [showModal, toggleModal] = useModal();
-  //   const buttonRef = useRef(null);
-  //   const [currentUpdates, setCurrentUpdates] = useState(0);
-  //   const [pastUpdates, setPastUpdates] = useState(0);
-  //   const [futureUpdates, setFutureUpdates] = useState(0);
-  //   const [bookModalUpdates, triggerBookModalUpdate] = useBookModalUpdates();
-  //   // Get user from Redux
-  //   const { user } = props;
-
-  //   useAbilityToGetDisplayBooks(
-  //     username,
-  //     validUsername,
-  //     "currentBooks",
-  //     dispatch,
-  //     UPDATE_CURRENT,
-  //     currentUpdates,
-  //     bookModalUpdates
-  //   );
-  //   useAbilityToGetDisplayBooks(
-  //     username,
-  //     validUsername,
-  //     "pastBooks",
-  //     dispatch,
-  //     UPDATE_PAST,
-  //     pastUpdates,
-  //     bookModalUpdates
-  //   );
-  //   useAbilityToGetDisplayBooks(
-  //     username,
-  //     validUsername,
-  //     "futureBooks",
-  //     dispatch,
-  //     UPDATE_FUTURE,
-  //     futureUpdates,
-  //     bookModalUpdates
-  //   );
-
-  //   const handleShelfUpdate = (shelf: string) => {
-  //     if (shelf === "currentBooks") {
-  //       setCurrentUpdates((prev) => prev + 1);
-  //     }
-  //     if (shelf === "pastBooks") {
-  //       setPastUpdates((prev) => prev + 1);
-  //     }
-  //     if (shelf === "futureBooks") {
-  //       setFutureUpdates((prev) => prev + 1);
-  //     }
-  //   };
-
-  //   if (validUsername === null) {
-  //     return <Loading />;
-  //   } else if (validUsername) {
-  //     return (
-  //       <>
-  //         {!user.isLoggedIn && <NotLoggedInHeader username={username} />}
-  //         <MainContainer>
-  //           {showModal && (
-  //             <AddBookModal
-  //               buttonRef={buttonRef}
-  //               handleClose={toggleModal}
-  //               shelfUpdate={handleShelfUpdate}
-  //             />
-  //           )}
-  //           {user.isLoggedIn ? (
-  //             <AddBookLink buttonRef={buttonRef} toggleModal={toggleModal} />
-  //           ) : (
-  //             <AuthLinks />
-  //           )}
-  //           <CentralDiv>
-  //             <Title>Currently Reading</Title>
-  //             <Shelf
-  //               isbns={isbnState.currentIsbns}
-  //               shelf="currentBooks"
-  //               handleModalUpdate={triggerBookModalUpdate}
-  //             >
-  //               <SeeAll route={`/${username}/shelf/current?page=1`} />
-  //             </Shelf>
-  //             <Title>Have Read</Title>
-  //             <Shelf
-  //               isbns={isbnState.pastIsbns}
-  //               shelf="pastBooks"
-  //               handleModalUpdate={triggerBookModalUpdate}
-  //             >
-  //               <SeeAll route={`/${username}/shelf/past?page=1`} />
-  //             </Shelf>
-  //             <Title>Want to Read</Title>
-  //             <Shelf
-  //               isbns={isbnState.futureIsbns}
-  //               shelf="futureBooks"
-  //               handleModalUpdate={triggerBookModalUpdate}
-  //             >
-  //               <SeeAll route={`/${username}/shelf/future?page=1`} />
-  //             </Shelf>
-  //           </CentralDiv>
-  //         </MainContainer>
-  //       </>
-  //     );
-  //   } else {
-  //     return <NotFound />;
-  //   }
 };
 
 interface LinkStateProps {

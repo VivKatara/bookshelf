@@ -29,18 +29,18 @@ import { FullShelfIsbnState, FullShelfPageState } from "../types/FullShelf";
 import { RouteComponentProps } from "react-router-dom";
 import { AppState } from "../store/configureStore";
 import { User } from "../types/User";
+import { useQuery } from "@apollo/react-hooks";
+import { GET_USER_BOOKSHELF_AND_BOOK_QUERY } from "../graphql/queries";
+import { shelfTypes } from "./shelfTypes";
 
 // Keep track of array of ISBNs to pass down to shelves
-const initialIsbnState: FullShelfIsbnState = {
+const initialIsbnState: any = {
   firstShelfIsbn: [],
   secondShelfIsbn: [],
   thirdShelfIsbn: [],
 };
 
-const isbnReducer = (
-  state: FullShelfIsbnState,
-  action: FullShelfActionTypes
-): FullShelfIsbnState => {
+const isbnReducer = (state: any, action: FullShelfActionTypes): any => {
   switch (action.type) {
     case UPDATE_ISBNS:
       return {
@@ -60,7 +60,6 @@ const initialPageState: FullShelfPageState = {
   showPrevious: false,
   showNext: false,
   showPageCount: false,
-  shelfTitle: "",
 };
 
 const pageReducer = (
@@ -75,7 +74,6 @@ const pageReducer = (
         showPrevious: action.payload.showPrevious,
         showNext: action.payload.showNext,
         showPageCount: action.payload.showPageCount,
-        shelfTitle: action.payload.shelfTitle,
       };
     default:
       return state;
@@ -92,16 +90,16 @@ type Props = FullShelfProps & LinkStateProps;
 
 const FullShelf: FunctionComponent<Props> = (props) => {
   const username = props.match.params.username;
-  const [validUsername, setValidUsername] = useState(null);
-  useUsernameValidityCheck(username, setValidUsername);
-
-  // Get shelf from the url
   const shelf = `${props.match.params.type}Books`;
+  const shelfTitle = shelfTypes[shelf];
+  // const [validUsername, setValidUsername] = useState(null);
+  // useUsernameValidityCheck(username, setValidUsername);
 
   // Get page number from query string parameter
   const queryString = new URLSearchParams(props.location.search);
   const pageValues = queryString.getAll("page");
   const page = parseInt(pageValues[0]);
+
   const [pageSize, setPageSize] = useState(21);
 
   const [shelfState, isbnDispatch] = useReducer(isbnReducer, initialIsbnState);
@@ -117,30 +115,20 @@ const FullShelf: FunctionComponent<Props> = (props) => {
 
   const { user } = props;
 
+  const { loading, error, data, refetch } = useQuery(
+    GET_USER_BOOKSHELF_AND_BOOK_QUERY,
+    {
+      variables: { username },
+    }
+  );
+
   const handleShelfUpdate = (shelf: string) => {
     setShelfUpdates((prev) => prev + 1);
   };
 
-  // This is the effect that updates various pageState such as the total page count and whether or not to show certain buttons
   useEffect(() => {
-    async function pageMount(): Promise<void> {
-      let totalPages = 1;
-      //TODO Refresh Token middelware
-      const response = await axios.get(
-        "http://localhost:5000/book/getTotalPages",
-        { params: { username, shelf, pageSize }, withCredentials: true }
-      );
-      totalPages = response.data.totalPages;
-
-      let shelfTitle: string = "";
-      if (shelf === "currentBooks") {
-        shelfTitle = "Currently Reading";
-      } else if (shelf === "pastBooks") {
-        shelfTitle = "Have Read";
-      } else {
-        shelfTitle = "Want to Read";
-      }
-
+    if (data) {
+      const totalPages = data.homepage.bookshelf[`${shelf}Count`] / pageSize;
       let showNext: boolean = false;
       let showPrevious: boolean = false;
       let showPageCount: boolean = false;
@@ -161,34 +149,29 @@ const FullShelf: FunctionComponent<Props> = (props) => {
           showPrevious,
           showNext,
           showPageCount,
-          shelfTitle,
         },
       };
 
       pageDispatch(action);
-    }
-    pageMount();
-  }, [shelfUpdates, bookModalUpdates]);
 
-  // This is the effect that tracks which isbn numbers should be passed down to the shelves
-  useEffect(() => {
-    async function getIsbns(): Promise<void> {
-      const response = await axios.get("http://localhost:5000/book/getBooks", {
-        params: { username, shelf, page, pageSize },
-        withCredentials: true,
-      });
-      const firstShelfIsbn: Array<string> = response.data.isbn.slice(
+      const paginatedBooks = paginate(
+        data.homepage.bookshelf[shelf],
+        data.homepage.bookshelf[`${shelf}Count`],
+        page,
+        pageSize
+      );
+      const firstShelfIsbn: Array<string> = paginatedBooks.slice(
         0,
         pageSize / 3
       );
-      const secondShelfIsbn: Array<string> = response.data.isbn.slice(
+      const secondShelfIsbn: Array<string> = paginatedBooks.slice(
         pageSize / 3,
         (pageSize * 2) / 3
       );
-      const thirdShelfIsbn: Array<string> = response.data.isbn.slice(
+      const thirdShelfIsbn: Array<string> = paginatedBooks.slice(
         (pageSize * 2) / 3
       );
-      const action: FullShelfActionTypes = {
+      const isbnAction: FullShelfActionTypes = {
         type: UPDATE_ISBNS,
         payload: {
           firstShelf: firstShelfIsbn,
@@ -196,69 +179,213 @@ const FullShelf: FunctionComponent<Props> = (props) => {
           thirdShelf: thirdShelfIsbn,
         },
       };
-      isbnDispatch(action);
+      isbnDispatch(isbnAction);
     }
-    getIsbns();
-  }, [shelfUpdates, bookModalUpdates]);
+  }, [data]);
 
-  //TODO Make a nice Loading component
-  if (validUsername === null) {
+  if (loading) {
     return <Loading />;
-  } else if (validUsername) {
-    return (
-      <>
-        {!user.isLoggedIn && <NotLoggedInHeader username={username} />}
-        <MainContainer>
-          <PageCount
-            show={pageState.showPageCount}
-            page={page}
-            totalPages={pageState.totalPages}
-          />
-          {showModal && (
-            <AddBookModal
-              buttonRef={buttonRef}
-              handleClose={toggleModal}
-              shelfUpdate={handleShelfUpdate}
-              shelf={shelf}
-            />
-          )}
-          {user.isLoggedIn ? (
-            <AddBookLink buttonRef={buttonRef} toggleModal={toggleModal} />
-          ) : (
-            <AuthLinks />
-          )}
-          <CentralDiv>
-            <Title>{pageState.shelfTitle}</Title>
-            <Shelf
-              isbns={shelfState.firstShelfIsbn}
-              shelf={shelf}
-              handleModalUpdate={triggerBookModalUpdate}
-            />
-            <Space />
-            <Shelf
-              isbns={shelfState.secondShelfIsbn}
-              shelf={shelf}
-              handleModalUpdate={triggerBookModalUpdate}
-            />
-            <Space />
-            <Shelf
-              isbns={shelfState.thirdShelfIsbn}
-              shelf={shelf}
-              handleModalUpdate={triggerBookModalUpdate}
-            />
-            <NextPreviousNavigation
-              prev={pageState.showPrevious}
-              next={pageState.showNext}
-              url={props.match.url}
-              page={page}
-            />
-          </CentralDiv>
-        </MainContainer>
-      </>
-    );
-  } else {
+  } else if (error) {
     return <NotFound />;
+  } else {
+    if (!data.homepage) {
+      return <NotFound />;
+    } else {
+      return (
+        <>
+          {!user.isLoggedIn && <NotLoggedInHeader username={username} />}
+          <MainContainer>
+            <PageCount
+              show={pageState.showPageCount}
+              page={page}
+              totalPages={pageState.totalPages}
+            />
+            {showModal && (
+              <AddBookModal
+                buttonRef={buttonRef}
+                handleClose={toggleModal}
+                shelfUpdate={handleShelfUpdate}
+                shelf={shelf}
+              />
+            )}
+            {user.isLoggedIn ? (
+              <AddBookLink buttonRef={buttonRef} toggleModal={toggleModal} />
+            ) : (
+              <AuthLinks />
+            )}
+            <CentralDiv>
+              <Title>{shelfTitle}</Title>
+              <Shelf
+                shelfBooks={shelfState.firstShelfIsbn}
+                shelf={shelf}
+                handleModalUpdate={triggerBookModalUpdate}
+              />
+              <Space />
+              <Shelf
+                shelfBooks={shelfState.secondShelfIsbn}
+                shelf={shelf}
+                handleModalUpdate={triggerBookModalUpdate}
+              />
+              <Space />
+              <Shelf
+                shelfBooks={shelfState.thirdShelfIsbn}
+                shelf={shelf}
+                handleModalUpdate={triggerBookModalUpdate}
+              />
+              <NextPreviousNavigation
+                prev={pageState.showPrevious}
+                next={pageState.showNext}
+                url={props.match.url}
+                page={page}
+              />
+            </CentralDiv>
+          </MainContainer>
+        </>
+      );
+    }
   }
+  // const handleShelfUpdate = (shelf: string) => {
+  //   setShelfUpdates((prev) => prev + 1);
+  // };
+
+  // // This is the effect that updates various pageState such as the total page count and whether or not to show certain buttons
+  // useEffect(() => {
+  //   async function pageMount(): Promise<void> {
+  //     let totalPages = 1;
+  //     //TODO Refresh Token middelware
+  //     const response = await axios.get(
+  //       "http://localhost:5000/book/getTotalPages",
+  //       { params: { username, shelf, pageSize }, withCredentials: true }
+  //     );
+  //     totalPages = response.data.totalPages;
+
+  //     let shelfTitle: string = "";
+  //     if (shelf === "currentBooks") {
+  //       shelfTitle = "Currently Reading";
+  //     } else if (shelf === "pastBooks") {
+  //       shelfTitle = "Have Read";
+  //     } else {
+  //       shelfTitle = "Want to Read";
+  //     }
+
+  //     let showNext: boolean = false;
+  //     let showPrevious: boolean = false;
+  //     let showPageCount: boolean = false;
+  //     if (totalPages > 1) {
+  //       showPageCount = true;
+  //       if (page < totalPages) {
+  //         showNext = true;
+  //       }
+  //       if (page > 1) {
+  //         showPrevious = true;
+  //       }
+  //     }
+
+  //     const action: FullShelfActionTypes = {
+  //       type: PAGE_MOUNT,
+  //       payload: {
+  //         totalPages,
+  //         showPrevious,
+  //         showNext,
+  //         showPageCount,
+  //         shelfTitle,
+  //       },
+  //     };
+
+  //     pageDispatch(action);
+  //   }
+  //   pageMount();
+  // }, [shelfUpdates, bookModalUpdates]);
+
+  // // This is the effect that tracks which isbn numbers should be passed down to the shelves
+  // useEffect(() => {
+  //   async function getIsbns(): Promise<void> {
+  //     const response = await axios.get("http://localhost:5000/book/getBooks", {
+  //       params: { username, shelf, page, pageSize },
+  //       withCredentials: true,
+  //     });
+  //     const firstShelfIsbn: Array<string> = response.data.isbn.slice(
+  //       0,
+  //       pageSize / 3
+  //     );
+  //     const secondShelfIsbn: Array<string> = response.data.isbn.slice(
+  //       pageSize / 3,
+  //       (pageSize * 2) / 3
+  //     );
+  //     const thirdShelfIsbn: Array<string> = response.data.isbn.slice(
+  //       (pageSize * 2) / 3
+  //     );
+  //     const action: FullShelfActionTypes = {
+  //       type: UPDATE_ISBNS,
+  //       payload: {
+  //         firstShelf: firstShelfIsbn,
+  //         secondShelf: secondShelfIsbn,
+  //         thirdShelf: thirdShelfIsbn,
+  //       },
+  //     };
+  //     isbnDispatch(action);
+  //   }
+  //   getIsbns();
+  // }, [shelfUpdates, bookModalUpdates]);
+
+  // //TODO Make a nice Loading component
+  // if (validUsername === null) {
+  //   return <Loading />;
+  // } else if (validUsername) {
+  //   return (
+  //     <>
+  //       {!user.isLoggedIn && <NotLoggedInHeader username={username} />}
+  //       <MainContainer>
+  //         <PageCount
+  //           show={pageState.showPageCount}
+  //           page={page}
+  //           totalPages={pageState.totalPages}
+  //         />
+  //         {showModal && (
+  //           <AddBookModal
+  //             buttonRef={buttonRef}
+  //             handleClose={toggleModal}
+  //             shelfUpdate={handleShelfUpdate}
+  //             shelf={shelf}
+  //           />
+  //         )}
+  //         {user.isLoggedIn ? (
+  //           <AddBookLink buttonRef={buttonRef} toggleModal={toggleModal} />
+  //         ) : (
+  //           <AuthLinks />
+  //         )}
+  //         <CentralDiv>
+  //           <Title>{pageState.shelfTitle}</Title>
+  //           <Shelf
+  //             isbns={shelfState.firstShelfIsbn}
+  //             shelf={shelf}
+  //             handleModalUpdate={triggerBookModalUpdate}
+  //           />
+  //           <Space />
+  //           <Shelf
+  //             isbns={shelfState.secondShelfIsbn}
+  //             shelf={shelf}
+  //             handleModalUpdate={triggerBookModalUpdate}
+  //           />
+  //           <Space />
+  //           <Shelf
+  //             isbns={shelfState.thirdShelfIsbn}
+  //             shelf={shelf}
+  //             handleModalUpdate={triggerBookModalUpdate}
+  //           />
+  //           <NextPreviousNavigation
+  //             prev={pageState.showPrevious}
+  //             next={pageState.showNext}
+  //             url={props.match.url}
+  //             page={page}
+  //           />
+  //         </CentralDiv>
+  //       </MainContainer>
+  //     </>
+  //   );
+  // } else {
+  //   return <NotFound />;
+  // }
 };
 
 type LinkStateProps = {
@@ -273,6 +400,23 @@ const mapStateToProps = (
 });
 
 export default connect(mapStateToProps, null)(FullShelf);
+
+const paginate = (
+  array: any,
+  length: number,
+  pageNumber: number,
+  pageSize: number
+): any => {
+  if ((pageNumber - 1) * pageSize + pageSize <= length) {
+    // Check to make sure that it isn't a problem that this returns a shallow copy
+    return array.slice((pageNumber - 1) * pageSize, pageNumber * pageSize);
+  } else if ((pageNumber - 1) * pageSize < length) {
+    return array.slice((pageNumber - 1) * pageSize);
+  } else {
+    // Here the pageNumber must be too high, so we're out of range
+    return [];
+  }
+};
 
 export const MainContainer = styled.div`
   width: 100vw;

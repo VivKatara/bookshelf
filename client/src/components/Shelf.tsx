@@ -5,16 +5,24 @@ import Book from "./Book";
 export const ShelfContext = React.createContext("");
 
 type Props = {
-  isbns: Array<string>;
+  shelfBooks: any;
   shelf: string;
   children?: React.ReactNode;
   handleModalUpdate: () => void;
 };
 
 const Shelf: FunctionComponent<Props> = (props) => {
-  const { isbns, shelf, children, handleModalUpdate } = props;
-  const books = isbns.map((isbn: string) => (
-    <Book key={isbn} isbn={isbn} handleModalUpdate={handleModalUpdate} />
+  const { shelfBooks, shelf, children, handleModalUpdate } = props;
+  const books = shelfBooks.map((shelfBook: any) => (
+    <Book
+      key={shelfBook.details.isbn}
+      title={shelfBook.details.title}
+      authors={shelfBook.details.authors}
+      isbn={shelfBook.details.isbn}
+      description={shelfBook.details.description}
+      coverImage={shelfBook.details.coverImage}
+      handleModalUpdate={handleModalUpdate}
+    />
   ));
 
   return (

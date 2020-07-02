@@ -52,7 +52,6 @@ export interface FullShelfPageMountAction {
     showPrevious: boolean;
     showNext: boolean;
     showPageCount: boolean;
-    shelfTitle: string;
   };
 }
 
