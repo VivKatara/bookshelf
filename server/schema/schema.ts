@@ -17,25 +17,12 @@ const UserType = new GraphQLObjectType({
     fullName: { type: GraphQLString },
     username: { type: GraphQLString },
     profilePhoto: { type: GraphQLString },
-  }),
-});
-
-const BookType = new GraphQLObjectType({
-  name: "Book",
-  fields: () => ({
-    title: { type: GraphQLString },
-    authors: { type: GraphQLList(GraphQLString) },
-    description: { type: GraphQLString },
-    isbn: { type: GraphQLString },
-    coverImage: { type: GraphQLString },
-  }),
-});
-
-const BookshelfBookType = new GraphQLObjectType({
-  name: "BookshelfBook",
-  fields: () => ({
-    isbn: { type: GraphQLString },
-    display: { type: GraphQLBoolean },
+    bookshelf: {
+      type: BookshelfType,
+      resolve: async (parent, args) => {
+        return await BookshelfCollection.findOne({ username: parent.username });
+      },
+    },
   }),
 });
 
@@ -53,6 +40,31 @@ const BookshelfType = new GraphQLObjectType({
     futureBooks: { type: new GraphQLList(BookshelfBookType) },
     futureBooksCount: { type: GraphQLInt },
     futureBooksDisplayCount: { type: GraphQLInt },
+  }),
+});
+
+const BookshelfBookType = new GraphQLObjectType({
+  name: "BookshelfBook",
+  fields: () => ({
+    isbn: { type: GraphQLString },
+    display: { type: GraphQLBoolean },
+    details: {
+      type: BookType,
+      resolve: async (parent, args) => {
+        return await BookCollection.findOne({ isbn: parent.isbn });
+      },
+    },
+  }),
+});
+
+const BookType = new GraphQLObjectType({
+  name: "Book",
+  fields: () => ({
+    title: { type: GraphQLString },
+    authors: { type: GraphQLList(GraphQLString) },
+    description: { type: GraphQLString },
+    isbn: { type: GraphQLString },
+    coverImage: { type: GraphQLString },
   }),
 });
 
@@ -87,6 +99,13 @@ const RootQuery = new GraphQLObjectType({
       args: { username: { type: GraphQLString } },
       resolve: async (parent, args) => {
         return await BookshelfCollection.findOne({ username: args.username });
+      },
+    },
+    homepage: {
+      type: UserType,
+      args: { username: { type: GraphQLString } },
+      resolve: async (parent, args) => {
+        return await UserCollection.findOne({ username: args.username });
       },
     },
   },

@@ -1,5 +1,45 @@
 import gql from "graphql-tag";
 
+export const GET_USER_BOOKSHELF_AND_BOOK_QUERY = gql`
+  query getUserBookshelfAndBookQuery($username: String) {
+    homepage(username: $username) {
+      fullName
+      bookshelf {
+        currentBooks {
+          display
+          details {
+            title
+            authors
+            isbn
+            description
+            coverImage
+          }
+        }
+        pastBooks {
+          display
+          details {
+            title
+            authors
+            isbn
+            description
+            coverImage
+          }
+        }
+        futureBooks {
+          display
+          details {
+            title
+            authors
+            isbn
+            description
+            coverImage
+          }
+        }
+      }
+    }
+  }
+`;
+
 export const GET_BOOK_DETAILS_QUERY = gql`
   query getBookDetailsQuery($isbn: String) {
     book(isbn: $isbn) {

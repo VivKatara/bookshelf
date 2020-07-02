@@ -1,4 +1,4 @@
-// import UserCollection from "../models/UserCollection";
+import UserCollection from "../models/UserCollection";
 
 // export default class UserService {
 //   public static checkUsername = async (username: string): Promise<boolean> => {

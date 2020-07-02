@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from "express";
-import UserService from "../../services/user";
+// import UserService from "../../services/user";
 import authenticateToken from "../middleware/authenticateToken";
 
 const router = Router();
@@ -37,7 +37,7 @@ router.get(
 //       next(err);
 //     }
 //   }
-);
+// );
 
 // router.get(
 //   "/getUserFullName",
