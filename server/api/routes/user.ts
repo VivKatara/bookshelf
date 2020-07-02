@@ -26,17 +26,17 @@ router.get(
   }
 );
 
-router.get(
-  "/checkUsername",
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { username } = req.query as { username: string };
-      const foundUsername = await UserService.checkUsername(username);
-      return res.status(200).json({ msg: "Succesfully found username" });
-    } catch (err) {
-      next(err);
-    }
-  }
+// router.get(
+//   "/checkUsername",
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     try {
+//       const { username } = req.query as { username: string };
+//       const foundUsername = await UserService.checkUsername(username);
+//       return res.status(200).json({ msg: "Succesfully found username" });
+//     } catch (err) {
+//       next(err);
+//     }
+//   }
 );
 
 // router.get(
