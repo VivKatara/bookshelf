@@ -34,79 +34,79 @@ router.post(
 );
 
 // Called to get all the books on display for a given shelf
-router.get(
-  "/getDisplayBooks",
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { username, shelf } = req.query;
-      const displayBooksIsbn = await BookshelfService.getBooksOnDisplay(
-        username as string,
-        shelf as string
-      );
-      return res.status(200).json({ isbn: displayBooksIsbn });
-    } catch (err) {
-      next(err);
-    }
-  }
-);
+// router.get(
+//   "/getDisplayBooks",
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     try {
+//       const { username, shelf } = req.query;
+//       const displayBooksIsbn = await BookshelfService.getBooksOnDisplay(
+//         username as string,
+//         shelf as string
+//       );
+//       return res.status(200).json({ isbn: displayBooksIsbn });
+//     } catch (err) {
+//       next(err);
+//     }
+//   }
+// );
 
 // Called to get all the books on a given shelf, paginated
-router.get(
-  "/getBooks",
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { username, page, pageSize, shelf } = req.query;
-      const desiredIsbns = await BookshelfService.getBooksOnShelfPaginated(
-        username as string,
-        page as string,
-        pageSize as string,
-        shelf as string
-      );
-      // This assumes that empty list is not returned
-      // If empty list is returned, then there must have been an out of range page number
-      return res.status(200).json({ isbn: desiredIsbns });
-    } catch (err) {
-      next(err);
-    }
-  }
-);
+// router.get(
+//   "/getBooks",
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     try {
+//       const { username, page, pageSize, shelf } = req.query;
+//       const desiredIsbns = await BookshelfService.getBooksOnShelfPaginated(
+//         username as string,
+//         page as string,
+//         pageSize as string,
+//         shelf as string
+//       );
+//       // This assumes that empty list is not returned
+//       // If empty list is returned, then there must have been an out of range page number
+//       return res.status(200).json({ isbn: desiredIsbns });
+//     } catch (err) {
+//       next(err);
+//     }
+//   }
+// );
 
 // Get the number of pages a paginated bookshelf has
-router.get(
-  "/getTotalPages",
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { username, pageSize, shelf } = req.query;
-      const totalPages = await BookshelfService.getTotalPages(
-        username as string,
-        pageSize as string,
-        shelf as string
-      );
-      return res.status(200).json({ totalPages });
-    } catch (err) {
-      next(err);
-    }
-  }
-);
+// router.get(
+//   "/getTotalPages",
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     try {
+//       const { username, pageSize, shelf } = req.query;
+//       const totalPages = await BookshelfService.getTotalPages(
+//         username as string,
+//         pageSize as string,
+//         shelf as string
+//       );
+//       return res.status(200).json({ totalPages });
+//     } catch (err) {
+//       next(err);
+//     }
+//   }
+// );
 
 // Get the details of a given book
-router.get(
-  "/getBookDetails",
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const isbn = req.query.isbn;
-      const {
-        title,
-        authors,
-        description,
-        coverImage,
-      } = await BookService.getBookDetails(isbn as string);
-      return res.status(200).json({ title, authors, description, coverImage });
-    } catch (err) {
-      next(err);
-    }
-  }
-);
+// router.get(
+//   "/getBookDetails",
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     try {
+//       const isbn = req.query.isbn;
+//       const {
+//         title,
+//         authors,
+//         description,
+//         coverImage,
+//       } = await BookService.getBookDetails(isbn as string);
+//       return res.status(200).json({ title, authors, description, coverImage });
+//     } catch (err) {
+//       next(err);
+//     }
+//   }
+// );
 
 // Get whether a given book is on display or not
 router.get(

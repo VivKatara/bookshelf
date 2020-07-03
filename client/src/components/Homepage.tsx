@@ -67,10 +67,10 @@ const Homepage: FunctionComponent<Props> = (props) => {
   // Get user from Redux
   const { user } = props;
 
-  console.log("Called");
-  console.log(loading);
-  console.log(error);
-  console.log(data);
+  // console.log("Called");
+  // console.log(loading);
+  // console.log(error);
+  // console.log(data);
   if (loading) {
     return <Loading />;
   } else if (error) {

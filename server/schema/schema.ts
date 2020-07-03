@@ -5,6 +5,8 @@ import {
   GraphQLBoolean,
   GraphQLList,
   GraphQLSchema,
+  GraphQLNonNull,
+  GraphQLID,
 } from "graphql";
 import BookCollection from "../models/BookCollection";
 import BookshelfCollection from "../models/BookshelfCollection";
@@ -42,6 +44,58 @@ const BookshelfType = new GraphQLObjectType({
     futureBooksDisplayCount: { type: GraphQLInt },
   }),
 });
+
+// const Viewer = new GraphQLObjectType({
+//   name: "Viewer",
+//   fields: () => ({
+//     id: {
+//       type: new GraphQLNonNull(GraphQLID),
+//     },
+//     allBooks: {
+//       type: BookConnection,
+//       resolve() {
+//         return {};
+//       },
+//     },
+//   }),
+// });
+
+// const PageInfo = new GraphQLObjectType({
+//   name: "PageInfo",
+//   fields: () => ({
+//     hasNextPage: {
+//       type: GraphQLNonNull(GraphQLBoolean),
+//     },
+//     hasPreviousPage: {
+//       type: GraphQLNonNull(GraphQLBoolean),
+//     },
+//   }),
+// });
+
+// const BookConnection = new GraphQLObjectType({
+//   name: "BookConnection",
+//   fields: () => ({
+//     edges: {
+//       type: new GraphQLList(BookEdge),
+//       resolve() {
+//         return [];
+//       },
+//     },
+//     pageInfo: {
+//       type: new GraphQLNonNull(PageInfo),
+//     },
+//   }),
+// });
+
+// const BookEdge = new GraphQLObjectType({
+//   name: "BookEdge",
+//   fields: () => ({
+//     cursor: { type: GraphQLString },
+//     node: {
+//       type: BookType,
+//     },
+//   }),
+// });
 
 const BookshelfBookType = new GraphQLObjectType({
   name: "BookshelfBook",
@@ -120,6 +174,12 @@ const RootQuery = new GraphQLObjectType({
         return await UserCollection.findOne({ username: args.username });
       },
     },
+    // viewer: {
+    //   type: Viewer,
+    //   resolve() {
+    //     return { id: "VIEWER_ID" };
+    //   },
+    // },
   },
 });
 
