@@ -37,7 +37,8 @@ const Homepage: FunctionComponent<Props> = (props) => {
   const [showModal, toggleModal] = useModal();
   const buttonRef = useRef(null);
   const [shelfUpdates, setShelfUpdates] = useState(0);
-  const [bookModalUpdates, triggerBookModalUpdate] = useBookModalUpdates();
+  const [bookModalUpdates, setBookModalUpdates] = useState(0);
+  // const [bookModalUpdates, triggerBookModalUpdate] = useBookModalUpdates();
 
   const getDisplayBooks = (books: any) => {
     const displayBooks = books.filter((book: any) => {
@@ -48,11 +49,20 @@ const Homepage: FunctionComponent<Props> = (props) => {
 
   const handleShelfUpdate = (shelf: string) => {
     setShelfUpdates((prev) => prev + 1);
+    refetch({ username }); //TODO: This seems like an anti-pattern. My hypo is that it is needed because apollo isn't sensing the mutation update. So, it is likely rather that once the mutations are in place, we won't need this
   };
 
-  useEffect(() => {
+  const triggerBookModalUpdate = () => {
+    setBookModalUpdates((prev) => prev + 1);
     refetch({ username });
-  }, [shelfUpdates, bookModalUpdates]);
+  };
+
+  // useEffect(() => {
+  //   if (data) {
+  //     refetch({ username });
+  //     console.log("Refetching");
+  //   }
+  // }, [shelfUpdates, bookModalUpdates]);
 
   // Get user from Redux
   const { user } = props;

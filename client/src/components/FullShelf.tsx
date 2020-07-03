@@ -29,7 +29,7 @@ import { RouteComponentProps } from "react-router-dom";
 import { AppState } from "../store/configureStore";
 import { User } from "../types/User";
 import { useQuery } from "@apollo/react-hooks";
-import { GET_USER_BOOKSHELF_AND_BOOK_QUERY } from "../graphql/queries";
+import { FULLSHELF_QUERY } from "../graphql/queries";
 import { shelfTypes } from "./shelfTypes";
 
 // Keep track of array of ISBNs to pass down to shelves
@@ -112,12 +112,9 @@ const FullShelf: FunctionComponent<Props> = (props) => {
 
   const { user } = props;
 
-  const { loading, error, data, refetch } = useQuery(
-    GET_USER_BOOKSHELF_AND_BOOK_QUERY,
-    {
-      variables: { username },
-    }
-  );
+  const { loading, error, data, refetch } = useQuery(FULLSHELF_QUERY, {
+    variables: { username, [shelf]: true },
+  });
 
   const handleShelfUpdate = (shelf: string) => {
     setShelfUpdates((prev) => prev + 1);
@@ -125,8 +122,8 @@ const FullShelf: FunctionComponent<Props> = (props) => {
 
   useEffect(() => {
     if (data) {
-      refetch({ username }); // TODO: This works, but the architecture is super inefficient
-      const totalPages = data.homepage.bookshelf[`${shelf}Count`] / pageSize;
+      refetch({ username, [shelf]: true }); // TODO: This works, but the architecture is super inefficient
+      const totalPages = data.fullshelf.bookshelf[`${shelf}Count`] / pageSize;
       let showNext: boolean = false;
       let showPrevious: boolean = false;
       let showPageCount: boolean = false;
@@ -153,22 +150,18 @@ const FullShelf: FunctionComponent<Props> = (props) => {
       pageDispatch(action);
 
       const paginatedBooks = paginate(
-        data.homepage.bookshelf[shelf],
-        data.homepage.bookshelf[`${shelf}Count`],
+        data.fullshelf.bookshelf[shelf],
+        data.fullshelf.bookshelf[`${shelf}Count`],
         page,
         pageSize
       );
-      const firstShelfIsbn: Array<string> = paginatedBooks.slice(
-        0,
-        pageSize / 3
-      );
-      const secondShelfIsbn: Array<string> = paginatedBooks.slice(
+
+      const firstShelfIsbn: any = paginatedBooks.slice(0, pageSize / 3);
+      const secondShelfIsbn: any = paginatedBooks.slice(
         pageSize / 3,
         (pageSize * 2) / 3
       );
-      const thirdShelfIsbn: Array<string> = paginatedBooks.slice(
-        (pageSize * 2) / 3
-      );
+      const thirdShelfIsbn: any = paginatedBooks.slice((pageSize * 2) / 3);
       const isbnAction: FullShelfActionTypes = {
         type: UPDATE_ISBNS,
         payload: {
@@ -186,7 +179,7 @@ const FullShelf: FunctionComponent<Props> = (props) => {
   } else if (error) {
     return <NotFound />;
   } else {
-    if (!data.homepage) {
+    if (!data.fullshelf) {
       return <NotFound />;
     } else {
       return (

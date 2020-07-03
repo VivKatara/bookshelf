@@ -108,6 +108,28 @@ const RootQuery = new GraphQLObjectType({
         return await UserCollection.findOne({ username: args.username });
       },
     },
+    fullshelf: {
+      type: UserType,
+      args: {
+        username: { type: GraphQLString },
+        currentBooks: { type: GraphQLBoolean },
+        pastBooks: { type: GraphQLBoolean },
+        futureBooks: { type: GraphQLBoolean },
+      },
+      resolve: async (parent, args) => {
+        return await UserCollection.findOne({ username: args.username });
+      },
+    },
+  },
+});
+
+const Mutation = new GraphQLObjectType({
+  name: "Mutation",
+  fields: {
+    register: {
+      type: UserType,
+      args: {},
+    },
   },
 });
 
