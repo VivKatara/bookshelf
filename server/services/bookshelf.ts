@@ -230,6 +230,10 @@ export default class BookshelfService {
     );
   };
 
+  public static getBookshelf = async (username: string) => {
+    return await BookshelfCollection.findOne({ username });
+  };
+
   public static paginateBookshelfBooks = (
     bookshelfBooks: any,
     length: any,

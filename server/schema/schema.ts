@@ -8,10 +8,7 @@ import {
   GraphQLNonNull,
   GraphQLID,
 } from "graphql";
-import BookCollection from "../models/BookCollection";
-import BookshelfCollection from "../models/BookshelfCollection";
-import UserCollection from "../models/UserCollection";
-import { query } from "express";
+import UserService from "../services/user";
 import BookService from "../services/book";
 import BookshelfService from "../services/bookshelf";
 
@@ -25,7 +22,7 @@ const UserType = new GraphQLObjectType({
     bookshelf: {
       type: BookshelfType,
       resolve: async (parent, args) => {
-        return await BookshelfCollection.findOne({ username: parent.username });
+        return await BookshelfService.getBookshelf(parent.username);
       },
     },
   }),
@@ -99,61 +96,6 @@ const BookshelfType = new GraphQLObjectType({
   }),
 });
 
-// const Viewer = new GraphQLObjectType({
-//   name: "Viewer",
-//   fields: () => ({
-//     id: { type: GraphQLString },
-//     allBooks: {
-//       type: BookConnection,
-//       args: { page: { type: GraphQLInt }, pageSize: { type: GraphQLInt } },
-//       resolve: async (parent, args) => {
-//         const result = await BookService.getBooks(args);
-//         const { pageInfo, query } = result;
-//         return {
-//           pageInfo,
-//           query,
-//         };
-//       },
-//     },
-//   }),
-// });
-
-// const BookConnection = new GraphQLObjectType({
-//   name: "BookConnection",
-//   fields: () => ({
-//     pageInfo: {
-//       type: PageInfo,
-//     },
-//     edges: {
-//       type: new GraphQLList(BookEdge),
-//       resolve: (parent, args) => {
-//         return parent.query;
-//       },
-//     },
-//   }),
-// });
-
-// const PageInfo = new GraphQLObjectType({
-//   name: "PageInfo",
-//   fields: () => ({
-//     totalPages: { type: GraphQLInt },
-//     hasNextPage: { type: GraphQLBoolean },
-//     hasPreviousPage: { type: GraphQLBoolean },
-//   }),
-// });
-
-// const BookEdge = new GraphQLObjectType({
-//   name: "BookEdge",
-//   fields: () => ({
-//     node: {
-//       type: BookType,
-//       resolve: (parent, args) => {
-//         return parent;
-//       },
-//     },
-//   }),
-// });
-
 const ShelfInfoAndBookshelfBooks = new GraphQLObjectType({
   name: "ShelfInfoAndBookshelfBooks",
   fields: () => ({
@@ -189,7 +131,7 @@ const BookshelfBookType = new GraphQLObjectType({
     details: {
       type: BookType,
       resolve: async (parent, args) => {
-        return await BookCollection.findOne({ isbn: parent.isbn });
+        return await BookService.getBook(parent.isbn);
       },
     },
   }),
@@ -213,14 +155,14 @@ const RootQuery = new GraphQLObjectType({
       type: UserType,
       args: { username: { type: GraphQLString } },
       resolve: async (parent, args) => {
-        return await UserCollection.findOne({ username: args.username });
+        return await UserService.getUser(args.username);
       },
     },
     userExists: {
       type: GraphQLBoolean,
       args: { username: { type: GraphQLString } },
       resolve: async (parent, args) => {
-        const user = await UserCollection.findOne({ username: args.username });
+        const user = await UserService.getUser(args.username);
         if (user) return true;
         else return false;
       },
@@ -229,21 +171,21 @@ const RootQuery = new GraphQLObjectType({
       type: BookType,
       args: { isbn: { type: GraphQLString } },
       resolve: async (parent, args) => {
-        return await BookCollection.findOne({ isbn: args.isbn });
+        return await BookService.getBook(parent.isbn);
       },
     },
     bookshelf: {
       type: BookshelfType,
       args: { username: { type: GraphQLString } },
       resolve: async (parent, args) => {
-        return await BookshelfCollection.findOne({ username: args.username });
+        return await BookshelfService.getBookshelf(parent.username);
       },
     },
     homepage: {
       type: UserType,
       args: { username: { type: GraphQLString } },
       resolve: async (parent, args) => {
-        return await UserCollection.findOne({ username: args.username });
+        return await UserService.getUser(args.username);
       },
     },
     fullshelf: {
@@ -257,16 +199,9 @@ const RootQuery = new GraphQLObjectType({
         pageSize: { type: GraphQLInt },
       },
       resolve: async (parent, args) => {
-        return await UserCollection.findOne({ username: args.username });
+        return await UserService.getUser(args.username);
       },
     },
-    // viewer: {
-    //   type: Viewer,
-    //   args: { page: { type: GraphQLInt }, pageSize: { type: GraphQLInt } },
-    //   resolve() {
-    //     return { id: "VIEWER_ID" };
-    //   },
-    // },
   },
 });
 

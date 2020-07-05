@@ -5,6 +5,9 @@ import BookCollection from "../models/BookCollection";
 type BookFields = [string, Array<string>, string, string, string];
 
 export default class BookService {
+  public static getBook = async (isbn: string) => {
+    return await BookCollection.findOne({ isbn });
+  };
   public static addBook = async (
     title: string,
     author: string
