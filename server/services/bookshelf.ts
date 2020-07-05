@@ -230,6 +230,38 @@ export default class BookshelfService {
     );
   };
 
+  public static paginateBookshelfBooks = (
+    bookshelfBooks: any,
+    length: any,
+    pageNumber: any,
+    pageSize: any
+  ): any => {
+    if ((pageNumber - 1) * pageSize + pageSize <= length) {
+      // Check to make sure that it isn't a problem that this returns a shallow copy
+      return bookshelfBooks.slice(
+        (pageNumber - 1) * pageSize,
+        pageNumber * pageSize
+      );
+    } else if ((pageNumber - 1) * pageSize < length) {
+      return bookshelfBooks.slice((pageNumber - 1) * pageSize);
+    } else {
+      // Here the pageNumber must be too high, so we're out of range
+      return [];
+    }
+  };
+
+  public static extractShelfInfo = (
+    length: any,
+    pageNumber: any,
+    pageSize: any
+  ) => {
+    return {
+      totalPages: Math.ceil(length / pageSize),
+      hasNextPage: Math.ceil(length / pageSize) > pageNumber,
+      hasPreviousPage: pageNumber > 1,
+    };
+  };
+
   private static paginateBooks = (
     array: Array<{ isbn: string; display: boolean }>,
     length: number,

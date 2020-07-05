@@ -11,6 +11,9 @@ import {
 import BookCollection from "../models/BookCollection";
 import BookshelfCollection from "../models/BookshelfCollection";
 import UserCollection from "../models/UserCollection";
+import { query } from "express";
+import BookService from "../services/book";
+import BookshelfService from "../services/bookshelf";
 
 const UserType = new GraphQLObjectType({
   name: "User",
@@ -33,13 +36,64 @@ const BookshelfType = new GraphQLObjectType({
   fields: () => ({
     email: { type: GraphQLString },
     username: { type: GraphQLString },
-    currentBooks: { type: new GraphQLList(BookshelfBookType) },
+    currentBooks: {
+      type: ShelfInfoAndBookshelfBooks,
+      args: { page: { type: GraphQLInt }, pageSize: { type: GraphQLInt } },
+      resolve: (parent, args) => {
+        const shelfInfo = BookshelfService.extractShelfInfo(
+          parent.currentBooksCount,
+          args.page,
+          args.pageSize
+        );
+        const bookshelfBooks = BookshelfService.paginateBookshelfBooks(
+          parent.currentBooks,
+          parent.currentBooksCount,
+          args.page,
+          args.pageSize
+        );
+        return { shelfInfo, bookshelfBooks };
+      },
+    },
     currentBooksCount: { type: GraphQLInt },
     currentBooksDisplayCount: { type: GraphQLInt },
-    pastBooks: { type: new GraphQLList(BookshelfBookType) },
+    pastBooks: {
+      type: ShelfInfoAndBookshelfBooks,
+      args: { page: { type: GraphQLInt }, pageSize: { type: GraphQLInt } },
+      resolve: (parent, args) => {
+        const shelfInfo = BookshelfService.extractShelfInfo(
+          parent.pastBooksCount,
+          args.page,
+          args.pageSize
+        );
+        const bookshelfBooks = BookshelfService.paginateBookshelfBooks(
+          parent.pastBooks,
+          parent.pastBooksCount,
+          args.page,
+          args.pageSize
+        );
+        return { shelfInfo, bookshelfBooks };
+      },
+    },
     pastBooksCount: { type: GraphQLInt },
     pastBooksDisplayCount: { type: GraphQLInt },
-    futureBooks: { type: new GraphQLList(BookshelfBookType) },
+    futureBooks: {
+      type: ShelfInfoAndBookshelfBooks,
+      args: { page: { type: GraphQLInt }, pageSize: { type: GraphQLInt } },
+      resolve: (parent, args) => {
+        const shelfInfo = BookshelfService.extractShelfInfo(
+          parent.futureBooksCount,
+          args.page,
+          args.pageSize
+        );
+        const bookshelfBooks = BookshelfService.paginateBookshelfBooks(
+          parent.futureBooks,
+          parent.futureBooksCount,
+          args.page,
+          args.pageSize
+        );
+        return { shelfInfo, bookshelfBooks };
+      },
+    },
     futureBooksCount: { type: GraphQLInt },
     futureBooksDisplayCount: { type: GraphQLInt },
   }),
@@ -48,13 +102,32 @@ const BookshelfType = new GraphQLObjectType({
 // const Viewer = new GraphQLObjectType({
 //   name: "Viewer",
 //   fields: () => ({
-//     id: {
-//       type: new GraphQLNonNull(GraphQLID),
-//     },
+//     id: { type: GraphQLString },
 //     allBooks: {
 //       type: BookConnection,
-//       resolve() {
-//         return {};
+//       args: { page: { type: GraphQLInt }, pageSize: { type: GraphQLInt } },
+//       resolve: async (parent, args) => {
+//         const result = await BookService.getBooks(args);
+//         const { pageInfo, query } = result;
+//         return {
+//           pageInfo,
+//           query,
+//         };
+//       },
+//     },
+//   }),
+// });
+
+// const BookConnection = new GraphQLObjectType({
+//   name: "BookConnection",
+//   fields: () => ({
+//     pageInfo: {
+//       type: PageInfo,
+//     },
+//     edges: {
+//       type: new GraphQLList(BookEdge),
+//       resolve: (parent, args) => {
+//         return parent.query;
 //       },
 //     },
 //   }),
@@ -63,39 +136,50 @@ const BookshelfType = new GraphQLObjectType({
 // const PageInfo = new GraphQLObjectType({
 //   name: "PageInfo",
 //   fields: () => ({
-//     hasNextPage: {
-//       type: GraphQLNonNull(GraphQLBoolean),
-//     },
-//     hasPreviousPage: {
-//       type: GraphQLNonNull(GraphQLBoolean),
-//     },
-//   }),
-// });
-
-// const BookConnection = new GraphQLObjectType({
-//   name: "BookConnection",
-//   fields: () => ({
-//     edges: {
-//       type: new GraphQLList(BookEdge),
-//       resolve() {
-//         return [];
-//       },
-//     },
-//     pageInfo: {
-//       type: new GraphQLNonNull(PageInfo),
-//     },
+//     totalPages: { type: GraphQLInt },
+//     hasNextPage: { type: GraphQLBoolean },
+//     hasPreviousPage: { type: GraphQLBoolean },
 //   }),
 // });
 
 // const BookEdge = new GraphQLObjectType({
 //   name: "BookEdge",
 //   fields: () => ({
-//     cursor: { type: GraphQLString },
 //     node: {
 //       type: BookType,
+//       resolve: (parent, args) => {
+//         return parent;
+//       },
 //     },
 //   }),
 // });
+
+const ShelfInfoAndBookshelfBooks = new GraphQLObjectType({
+  name: "ShelfInfoAndBookshelfBooks",
+  fields: () => ({
+    shelfInfo: {
+      type: ShelfInfoType,
+      resolve: (parent, args) => {
+        return parent.shelfInfo;
+      },
+    },
+    bookshelfBooks: {
+      type: new GraphQLList(BookshelfBookType),
+      resolve: (parent, args) => {
+        return parent.bookshelfBooks;
+      },
+    },
+  }),
+});
+
+const ShelfInfoType = new GraphQLObjectType({
+  name: "ShelfInfo",
+  fields: () => ({
+    totalPages: { type: GraphQLInt },
+    hasNextPage: { type: GraphQLBoolean },
+    hasPreviousPage: { type: GraphQLBoolean },
+  }),
+});
 
 const BookshelfBookType = new GraphQLObjectType({
   name: "BookshelfBook",
@@ -169,6 +253,8 @@ const RootQuery = new GraphQLObjectType({
         currentBooks: { type: GraphQLBoolean },
         pastBooks: { type: GraphQLBoolean },
         futureBooks: { type: GraphQLBoolean },
+        page: { type: GraphQLInt },
+        pageSize: { type: GraphQLInt },
       },
       resolve: async (parent, args) => {
         return await UserCollection.findOne({ username: args.username });
@@ -176,6 +262,7 @@ const RootQuery = new GraphQLObjectType({
     },
     // viewer: {
     //   type: Viewer,
+    //   args: { page: { type: GraphQLInt }, pageSize: { type: GraphQLInt } },
     //   resolve() {
     //     return { id: "VIEWER_ID" };
     //   },

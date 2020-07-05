@@ -39,6 +39,50 @@ export default class BookService {
     return finalIsbn;
   };
 
+  public static getBooks = async (args: any) => {
+    let query = await BookCollection.find();
+    const pageInfo = await BookService.getPageInfo(
+      query,
+      args.page,
+      args.pageSize
+    );
+    query = await BookService.applyPagination(
+      query,
+      query.length,
+      args.page,
+      args.pageSize
+    );
+    return {
+      query,
+      pageInfo,
+    };
+  };
+
+  private static getPageInfo = (query: any, page: any, pageSize: any) => {
+    return {
+      totalPages: Math.ceil(query.length / pageSize),
+      hasNextPage: Math.ceil(query.length / pageSize) > page,
+      hasPreviousPage: page > 1,
+    };
+  };
+
+  private static applyPagination = async (
+    array: any,
+    length: any,
+    pageNumber: any,
+    pageSize: any
+  ) => {
+    if ((pageNumber - 1) * pageSize + pageSize <= length) {
+      // Check to make sure that it isn't a problem that this returns a shallow copy
+      return array.slice((pageNumber - 1) * pageSize, pageNumber * pageSize);
+    } else if ((pageNumber - 1) * pageSize < length) {
+      return array.slice((pageNumber - 1) * pageSize);
+    } else {
+      // Here the pageNumber must be too high, so we're out of range
+      return [];
+    }
+  };
+
   private static searchGoogleBooksAPI = async (
     title: string,
     author: string

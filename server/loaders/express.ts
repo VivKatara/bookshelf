@@ -18,7 +18,7 @@ export default ({ app }: { app: express.Application }) => {
   };
   app.use(cors(corsOptions));
 
-  // GraphQL
+  // GraphQL;
   app.use(
     "/graphql",
     graphqlHTTP({
