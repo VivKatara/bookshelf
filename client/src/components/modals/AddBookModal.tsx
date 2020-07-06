@@ -24,6 +24,8 @@ import {
   ErrorMessageHookActionTypes,
   FAIL,
 } from "../../types/actions";
+import { useMutation } from "@apollo/react-hooks";
+import { ADD_BOOK_MUTATION } from "../../graphql/mutations";
 
 const initialValues: AddBookModalFormState = {
   title: "",
@@ -52,6 +54,8 @@ const AddBookModal: FunctionComponent<Props> = (props) => {
 
   const history = useHistory();
 
+  const [addBook] = useMutation(ADD_BOOK_MUTATION);
+
   // If the shelf is given, define the label title so only that one option will display in modal
   useEffect(() => {
     if (shelf) {
@@ -65,46 +69,54 @@ const AddBookModal: FunctionComponent<Props> = (props) => {
   const onSubmit = async (values: AddBookModalFormState): Promise<void> => {
     const { title, author, shelf } = values;
     try {
-      const method: string = "POST";
-      const url: string = "http://localhost:5000/book/add";
-      const data: any = {
-        title,
-        author,
-        shelf,
-      };
-      const config: any = { withCredentials: true, validateStatus: false };
-      const error: string =
-        "Unsuccessful attempt to add new book. Please login";
-      const response = await checkAccessAndRefreshToken(
-        method,
-        url,
-        data,
-        config,
-        error
-      );
-      if (response.status === 200) {
-        // Success
-        const action: ErrorMessageHookActionTypes = {
-          type: SUCCESS,
-        };
-
-        dispatchAddBookError(action);
-        shelfUpdate(shelf);
-        handleClose();
-      } else {
-        // Server error
-        dispatchAddBookError({
-          type: FAIL,
-          payload: { errorMsg: response.data.msg },
-        });
-      }
-    } catch (error) {
-      // Authentication error
-      alert(error.message);
+      await addBook({ variables: { title, author, shelf } });
+      shelfUpdate(shelf);
       handleClose();
-      await props.startLogOffUser();
-      history.push("/login");
+    } catch (e) {
+      dispatchAddBookError({ type: FAIL, payload: { errorMsg: e.message } });
     }
+    // addBook({ variables: { title, author, shelf } });
+    // try {
+    //   const method: string = "POST";
+    //   const url: string = "http://localhost:5000/book/add";
+    //   const data: any = {
+    //     title,
+    //     author,
+    //     shelf,
+    //   };
+    //   const config: any = { withCredentials: true, validateStatus: false };
+    //   const error: string =
+    //     "Unsuccessful attempt to add new book. Please login";
+    //   const response = await checkAccessAndRefreshToken(
+    //     method,
+    //     url,
+    //     data,
+    //     config,
+    //     error
+    //   );
+    //   if (response.status === 200) {
+    //     // Success
+    //     const action: ErrorMessageHookActionTypes = {
+    //       type: SUCCESS,
+    //     };
+
+    //     dispatchAddBookError(action);
+    //     shelfUpdate(shelf);
+    //     handleClose();
+    //   } else {
+    //     // Server error
+    //     dispatchAddBookError({
+    //       type: FAIL,
+    //       payload: { errorMsg: response.data.msg },
+    //     });
+    //   }
+    // } catch (error) {
+    //   // Authentication error
+    //   alert(error.message);
+    //   handleClose();
+    //   await props.startLogOffUser();
+    //   history.push("/login");
+    // }
   };
 
   // If the shelf is defined in props, only display that one shelf. Else, display all

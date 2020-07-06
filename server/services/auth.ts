@@ -5,15 +5,17 @@ import config from "../config";
 import UserCollection from "../models/UserCollection";
 import BookshelfCollection from "../models/BookshelfCollection";
 import TokenCollection from "../models/TokenCollection";
+import { errorNames } from "../errors";
 
 export default class AuthService {
   public static SignUp = async (
     email: string,
     fullName: string,
     password: string
-  ): Promise<{ user: { email: string; name: string } }> => {
+  ): Promise<any> => {
     const user = await UserCollection.findOne({ email });
-    if (user) throw { status: 409, message: "This email already exists" };
+    // if (user) throw { status: 409, message: "This email already exists" };
+    if (user) throw new Error(errorNames.USER_ALREADY_EXISTS);
 
     const username = await AuthService.createUsername(fullName);
     const newUser = new UserCollection({ email, fullName, username, password });
@@ -40,9 +42,7 @@ export default class AuthService {
     const savedUser = await newUser.save();
     await newBookshelf.save();
 
-    return {
-      user: { email: savedUser.email, name: savedUser.fullName },
-    };
+    return savedUser;
   };
 
   public static SignIn = async (

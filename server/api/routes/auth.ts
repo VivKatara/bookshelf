@@ -5,18 +5,18 @@ import AuthService from "../../services/auth";
 const router = Router();
 
 // Register route
-router.post(
-  "/register",
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { email, fullName, password } = req.body;
-      const { user } = await AuthService.SignUp(email, fullName, password);
-      return res.status(200).json({ user });
-    } catch (err) {
-      next(err);
-    }
-  }
-);
+// router.post(
+//   "/register",
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     try {
+//       const { email, fullName, password } = req.body;
+//       const { user } = await AuthService.SignUp(email, fullName, password);
+//       return res.status(200).json({ user });
+//     } catch (err) {
+//       next(err);
+//     }
+//   }
+// );
 
 // Login route
 router.post(

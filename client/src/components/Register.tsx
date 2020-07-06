@@ -16,6 +16,8 @@ import {
 import { ErrorMessageHook } from "../types/hooks";
 import { SUCCESS, FAIL } from "../types/actions";
 import { RegisterFormState } from "../types/Register";
+import { useMutation } from "@apollo/react-hooks";
+import { REGISTER_MUTATION } from "../graphql/mutations";
 
 const initalValues: RegisterFormState = {
   email: "",
@@ -32,25 +34,32 @@ const Register: FunctionComponent<Props> = (props) => {
     dispatchRegisterError,
   ]: ErrorMessageHook = useErrorMessage();
   const history = useHistory();
+  const [addUser] = useMutation(REGISTER_MUTATION);
 
   const onSubmit = async (values: RegisterFormState): Promise<void> => {
-    const { email, fullName, password, passwordConfirm } = values;
+    const { email, fullName, password } = values;
     try {
-      await axios.post("http://localhost:5000/auth/register", {
-        email,
-        fullName,
-        password,
-        passwordConfirm,
-      });
-      if (registerError.error) dispatchRegisterError({ type: SUCCESS });
+      await addUser({ variables: { email, fullName, password } });
       history.push("/login");
-    } catch (error) {
-      console.log(error.response.data.msg);
-      dispatchRegisterError({
-        type: FAIL,
-        payload: { errorMsg: error.response.data.msg },
-      });
+    } catch (e) {
+      dispatchRegisterError({ type: FAIL, payload: { errorMsg: e.message } });
     }
+    // try {
+    //   await axios.post("http://localhost:5000/auth/register", {
+    //     email,
+    //     fullName,
+    //     password,
+    //     passwordConfirm,
+    //   });
+    //   if (registerError.error) dispatchRegisterError({ type: SUCCESS });
+    //   history.push("/login");
+    // } catch (error) {
+    //   console.log(error.response.data.msg);
+    //   dispatchRegisterError({
+    //     type: FAIL,
+    //     payload: { errorMsg: error.response.data.msg },
+    //   });
+    // }
   };
 
   return (

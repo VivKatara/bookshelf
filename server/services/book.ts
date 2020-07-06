@@ -1,6 +1,7 @@
 import axios from "axios";
 import config from "../config";
 import BookCollection from "../models/BookCollection";
+import { errorNames } from "../errors";
 
 type BookFields = [string, Array<string>, string, string, string];
 
@@ -108,7 +109,7 @@ export default class BookService {
     ) {
       return googleBooksApiResponse.data.items;
     } else {
-      throw { status: 404, message: "Could not find this particular book" };
+      throw new Error(errorNames.COULD_NOT_FIND_BOOK);
     }
   };
 
@@ -143,10 +144,7 @@ export default class BookService {
     });
 
     if (!finalMatches.length) {
-      throw {
-        status: 404,
-        message: "Error! Could not find this particular book",
-      };
+      throw new Error(errorNames.COULD_NOT_FIND_BOOK);
     }
 
     // Must have found a match, let's just assume the one we're looking for is the first

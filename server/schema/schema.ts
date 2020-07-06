@@ -9,6 +9,7 @@ import {
 import UserService from "../services/user";
 import BookService from "../services/book";
 import BookshelfService from "../services/bookshelf";
+import AuthService from "../services/auth";
 
 const UserType = new GraphQLObjectType({
   name: "User",
@@ -211,15 +212,56 @@ const RootQuery = new GraphQLObjectType({
 const Mutation = new GraphQLObjectType({
   name: "Mutation",
   fields: {
-    register: {
+    addUser: {
       type: UserType,
-      args: {},
+      args: {
+        email: { type: GraphQLString },
+        fullName: { type: GraphQLString },
+        password: { type: GraphQLString },
+      },
+      resolve: async (parent, args) => {
+        return await AuthService.SignUp(
+          args.email,
+          args.fullName,
+          args.password
+        );
+      },
     },
+    addBook: {
+      type: GraphQLBoolean,
+      args: {
+        email: { type: GraphQLString },
+        title: { type: GraphQLString },
+        author: { type: GraphQLString },
+        shelf: { type: GraphQLString },
+      },
+      resolve: async (parent, args) => {
+        const isbn = await BookService.addBook(args.title, args.author);
+        await BookshelfService.addBookToShelf(
+          args.email,
+          isbn,
+          args.shelf,
+          true
+        );
+        return true;
+      },
+    },
+    // checkUser: { // This isn't that easy because we would need to figure out authentication
+    //   type: GraphQLBoolean,
+    //   args: {
+    //     email: { type: GraphQLString },
+    //     password: { type: GraphQLString },
+    //   },
+    //   resolve: async (parent, args) => {
+    //     return await AuthService.SignIn(args.email, args.password);
+    //   },
+    // },
   },
 });
 
 const schema = new GraphQLSchema({
   query: RootQuery,
+  mutation: Mutation,
 });
 
 export default schema;
