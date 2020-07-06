@@ -21,30 +21,73 @@ export const FULLSHELF_QUERY = gql`
     $currentBooks: Boolean = false
     $pastBooks: Boolean = false
     $futureBooks: Boolean = false
+    $page: Int = 1
+    $pageSize: Int = 1
   ) {
     fullshelf(username: $username) {
       fullName
       bookshelf @include(if: $currentBooks) {
-        currentBooks {
-          ...BookshelfBooksFragment
+        currentBooks(page: $page, pageSize: $pageSize) {
+          shelfInfo {
+            totalPages
+            hasNextPage
+            hasPreviousPage
+          }
+          bookshelfBooks {
+            display
+            details {
+              title
+              authors
+              isbn
+              description
+              coverImage
+            }
+          }
         }
         currentBooksCount
       }
       bookshelf @include(if: $pastBooks) {
-        pastBooks {
-          ...BookshelfBooksFragment
+        pastBooks(page: $page, pageSize: $pageSize) {
+          shelfInfo {
+            totalPages
+            hasNextPage
+            hasPreviousPage
+          }
+          bookshelfBooks {
+            display
+            details {
+              title
+              authors
+              isbn
+              description
+              coverImage
+            }
+          }
         }
         pastBooksCount
       }
       bookshelf @include(if: $futureBooks) {
-        futureBooks {
-          ...BookshelfBooksFragment
+        futureBooks(page: $page, pageSize: $pageSize) {
+          shelfInfo {
+            totalPages
+            hasNextPage
+            hasPreviousPage
+          }
+          bookshelfBooks {
+            display
+            details {
+              title
+              authors
+              isbn
+              description
+              coverImage
+            }
+          }
         }
         futureBooksCount
       }
     }
   }
-  ${BookshelfBook.booksFragment}
 `;
 
 export const GET_USER_BOOKSHELF_AND_BOOK_QUERY = gql`
