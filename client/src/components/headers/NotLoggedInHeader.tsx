@@ -6,31 +6,23 @@ import {
   Username,
   Profile,
 } from "../../styles/headers";
-import { useQuery } from "@apollo/react-hooks";
-import { GET_USER_FULL_NAME_QUERY } from "../../graphql/queries";
 
 type Props = {
   username: string;
+  fullName: string;
 };
 
 const NotLoggedInHeader: FunctionComponent<Props> = (props) => {
-  const { username } = props;
-  const { loading, error, data } = useQuery(GET_USER_FULL_NAME_QUERY, {
-    variables: { username },
-  });
+  const { username, fullName } = props;
 
-  if (loading) return <h1>Loading...</h1>;
-  if (error) return <h1>Error...</h1>;
-
-  // Safe to assume here that data must be good
   return (
     <HeaderContainer>
       <HyperLink href="/">
         <p>Bookshelf</p>
       </HyperLink>
       <User>
-        <Username>{data.user.fullName}</Username>
-        <Profile>{data.user.fullName[0]}</Profile>
+        <Username>{fullName}</Username>
+        <Profile>{fullName[0]}</Profile>
       </User>
     </HeaderContainer>
   );

@@ -10,15 +10,15 @@ import UserService from "../services/user";
 import BookService from "../services/book";
 import BookshelfService from "../services/bookshelf";
 
-const UserFullshelfType = new GraphQLObjectType({
-  name: "UserFullshelf",
+const UserType = new GraphQLObjectType({
+  name: "User",
   fields: () => ({
     email: { type: GraphQLString },
     fullName: { type: GraphQLString },
     username: { type: GraphQLString },
     profilePhoto: { type: GraphQLString },
     bookshelf: {
-      type: FullBookshelfType,
+      type: BookshelfType,
       resolve: async (parent, args) => {
         return await BookshelfService.getBookshelf(parent.username);
       },
@@ -26,66 +26,95 @@ const UserFullshelfType = new GraphQLObjectType({
   }),
 });
 
-const FullBookshelfType = new GraphQLObjectType({
-  name: "FullBookshelf",
+const BookshelfType = new GraphQLObjectType({
+  name: "Bookshelf",
   fields: () => ({
     email: { type: GraphQLString },
     username: { type: GraphQLString },
     currentBooks: {
-      type: ShelfInfoAndBookshelfBooks,
-      args: { page: { type: GraphQLInt }, pageSize: { type: GraphQLInt } },
+      type: ShelfType,
+      args: {
+        page: { type: GraphQLInt },
+        pageSize: { type: GraphQLInt },
+        display: { type: GraphQLBoolean },
+      },
       resolve: (parent, args) => {
-        const shelfInfo = BookshelfService.extractShelfInfo(
+        let shelfInfo = BookshelfService.extractShelfInfo(
           parent.currentBooksCount,
           args.page,
           args.pageSize
         );
-        const bookshelfBooks = BookshelfService.paginateBookshelfBooks(
-          parent.currentBooks,
-          parent.currentBooksCount,
-          args.page,
-          args.pageSize
-        );
+        let bookshelfBooks;
+        if (args.display) {
+          bookshelfBooks = BookshelfService.getDisplayBooks(
+            parent.currentBooks
+          );
+        } else {
+          bookshelfBooks = BookshelfService.paginateBookshelfBooks(
+            parent.currentBooks,
+            parent.currentBooksCount,
+            args.page,
+            args.pageSize
+          );
+        }
         return { shelfInfo, bookshelfBooks };
       },
     },
     currentBooksCount: { type: GraphQLInt },
     currentBooksDisplayCount: { type: GraphQLInt },
     pastBooks: {
-      type: ShelfInfoAndBookshelfBooks,
-      args: { page: { type: GraphQLInt }, pageSize: { type: GraphQLInt } },
+      type: ShelfType,
+      args: {
+        page: { type: GraphQLInt },
+        pageSize: { type: GraphQLInt },
+        display: { type: GraphQLBoolean },
+      },
       resolve: (parent, args) => {
-        const shelfInfo = BookshelfService.extractShelfInfo(
+        let shelfInfo = BookshelfService.extractShelfInfo(
           parent.pastBooksCount,
           args.page,
           args.pageSize
         );
-        const bookshelfBooks = BookshelfService.paginateBookshelfBooks(
-          parent.pastBooks,
-          parent.pastBooksCount,
-          args.page,
-          args.pageSize
-        );
+        let bookshelfBooks;
+        if (args.display) {
+          bookshelfBooks = BookshelfService.getDisplayBooks(parent.pastBooks);
+        } else {
+          bookshelfBooks = BookshelfService.paginateBookshelfBooks(
+            parent.pastBooks,
+            parent.pastBooksCount,
+            args.page,
+            args.pageSize
+          );
+        }
         return { shelfInfo, bookshelfBooks };
       },
     },
     pastBooksCount: { type: GraphQLInt },
     pastBooksDisplayCount: { type: GraphQLInt },
     futureBooks: {
-      type: ShelfInfoAndBookshelfBooks,
-      args: { page: { type: GraphQLInt }, pageSize: { type: GraphQLInt } },
+      type: ShelfType,
+      args: {
+        page: { type: GraphQLInt },
+        pageSize: { type: GraphQLInt },
+        display: { type: GraphQLBoolean },
+      },
       resolve: (parent, args) => {
-        const shelfInfo = BookshelfService.extractShelfInfo(
+        let shelfInfo = BookshelfService.extractShelfInfo(
           parent.futureBooksCount,
           args.page,
           args.pageSize
         );
-        const bookshelfBooks = BookshelfService.paginateBookshelfBooks(
-          parent.futureBooks,
-          parent.futureBooksCount,
-          args.page,
-          args.pageSize
-        );
+        let bookshelfBooks;
+        if (args.display) {
+          bookshelfBooks = BookshelfService.getDisplayBooks(parent.futureBooks);
+        } else {
+          bookshelfBooks = BookshelfService.paginateBookshelfBooks(
+            parent.futureBooks,
+            parent.futureBooksCount,
+            args.page,
+            args.pageSize
+          );
+        }
         return { shelfInfo, bookshelfBooks };
       },
     },
@@ -94,8 +123,8 @@ const FullBookshelfType = new GraphQLObjectType({
   }),
 });
 
-const ShelfInfoAndBookshelfBooks = new GraphQLObjectType({
-  name: "ShelfInfoAndBookshelfBooks",
+const ShelfType = new GraphQLObjectType({
+  name: "Shelf",
   fields: () => ({
     shelfInfo: {
       type: ShelfInfoType,
@@ -118,39 +147,6 @@ const ShelfInfoType = new GraphQLObjectType({
     totalPages: { type: GraphQLInt },
     hasNextPage: { type: GraphQLBoolean },
     hasPreviousPage: { type: GraphQLBoolean },
-  }),
-});
-
-const UserType = new GraphQLObjectType({
-  name: "User",
-  fields: () => ({
-    email: { type: GraphQLString },
-    fullName: { type: GraphQLString },
-    username: { type: GraphQLString },
-    profilePhoto: { type: GraphQLString },
-    bookshelf: {
-      type: BookshelfType,
-      resolve: async (parent, args) => {
-        return await BookshelfService.getBookshelf(parent.username);
-      },
-    },
-  }),
-});
-
-const BookshelfType = new GraphQLObjectType({
-  name: "Bookshelf",
-  fields: () => ({
-    email: { type: GraphQLString },
-    username: { type: GraphQLString },
-    currentBooks: { type: new GraphQLList(BookshelfBookType) },
-    currentBooksCount: { type: GraphQLInt },
-    currentBooksDisplayCount: { type: GraphQLInt },
-    pastBooks: { type: new GraphQLList(BookshelfBookType) },
-    pastBooksCount: { type: GraphQLInt },
-    pastBooksDisplayCount: { type: GraphQLInt },
-    futureBooks: { type: new GraphQLList(BookshelfBookType) },
-    futureBooksCount: { type: GraphQLInt },
-    futureBooksDisplayCount: { type: GraphQLInt },
   }),
 });
 
@@ -182,50 +178,28 @@ const BookType = new GraphQLObjectType({
 const RootQuery = new GraphQLObjectType({
   name: "RootQueryType",
   fields: {
-    user: {
-      type: UserType,
-      args: { username: { type: GraphQLString } },
-      resolve: async (parent, args) => {
-        return await UserService.getUser(args.username);
-      },
-    },
-    userExists: {
-      type: GraphQLBoolean,
-      args: { username: { type: GraphQLString } },
-      resolve: async (parent, args) => {
-        const user = await UserService.getUser(args.username);
-        if (user) return true;
-        else return false;
-      },
-    },
-    book: {
-      type: BookType,
-      args: { isbn: { type: GraphQLString } },
-      resolve: async (parent, args) => {
-        return await BookService.getBook(parent.isbn);
-      },
-    },
-    bookshelf: {
-      type: BookshelfType,
-      args: { username: { type: GraphQLString } },
-      resolve: async (parent, args) => {
-        return await BookshelfService.getBookshelf(parent.username);
-      },
-    },
     homepage: {
       type: UserType,
-      args: { username: { type: GraphQLString } },
+      args: {
+        username: { type: GraphQLString },
+        page: { type: GraphQLInt },
+        pageSize: { type: GraphQLInt },
+        display: { type: GraphQLBoolean },
+      },
       resolve: async (parent, args) => {
         return await UserService.getUser(args.username);
       },
     },
     fullshelf: {
-      type: UserFullshelfType,
+      type: UserType,
       args: {
         username: { type: GraphQLString },
         currentBooks: { type: GraphQLBoolean },
         pastBooks: { type: GraphQLBoolean },
         futureBooks: { type: GraphQLBoolean },
+        page: { type: GraphQLInt },
+        pageSize: { type: GraphQLInt },
+        display: { type: GraphQLBoolean },
       },
       resolve: async (parent, args) => {
         return await UserService.getUser(args.username);

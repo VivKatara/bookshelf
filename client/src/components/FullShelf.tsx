@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useReducer,
-  useEffect,
-  useRef,
-  FunctionComponent,
-} from "react";
+import React, { useState, useEffect, useRef, FunctionComponent } from "react";
 import { connect } from "react-redux";
 import styled from "@emotion/styled";
 import Shelf from "./Shelf";
@@ -79,7 +73,12 @@ const FullShelf: FunctionComponent<Props> = (props) => {
     } else {
       return (
         <>
-          {!user.isLoggedIn && <NotLoggedInHeader username={username} />}
+          {!user.isLoggedIn && (
+            <NotLoggedInHeader
+              username={username}
+              fullName={data.fullshelf.fullName}
+            />
+          )}
           <MainContainer>
             <PageCount
               show={
@@ -154,23 +153,6 @@ const mapStateToProps = (
 });
 
 export default connect(mapStateToProps, null)(FullShelf);
-
-const paginate = (
-  array: any,
-  length: number,
-  pageNumber: number,
-  pageSize: number
-): any => {
-  if ((pageNumber - 1) * pageSize + pageSize <= length) {
-    // Check to make sure that it isn't a problem that this returns a shallow copy
-    return array.slice((pageNumber - 1) * pageSize, pageNumber * pageSize);
-  } else if ((pageNumber - 1) * pageSize < length) {
-    return array.slice((pageNumber - 1) * pageSize);
-  } else {
-    // Here the pageNumber must be too high, so we're out of range
-    return [];
-  }
-};
 
 export const MainContainer = styled.div`
   width: 100vw;

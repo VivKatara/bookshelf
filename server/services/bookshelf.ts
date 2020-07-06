@@ -234,6 +234,14 @@ export default class BookshelfService {
     return await BookshelfCollection.findOne({ username });
   };
 
+  public static getDisplayBooks = (bookshelfBooks: any) => {
+    return bookshelfBooks.filter((book: any) => {
+      if (book.display) {
+        return book;
+      }
+    });
+  };
+
   public static paginateBookshelfBooks = (
     bookshelfBooks: any,
     length: any,

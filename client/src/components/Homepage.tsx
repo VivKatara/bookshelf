@@ -14,8 +14,8 @@ import { useBookModalUpdates } from "../hooks/useBookModalUpdates";
 import { AppState } from "../store/configureStore";
 import { User } from "../types/User";
 import { RouteComponentProps } from "react-router-dom";
-import { useQuery, useLazyQuery } from "@apollo/react-hooks";
-import { GET_USER_BOOKSHELF_AND_BOOK_QUERY } from "../graphql/queries";
+import { useQuery } from "@apollo/react-hooks";
+import { HOMEPAGE_QUERY } from "../graphql/queries";
 
 interface RouteParams {
   username: string;
@@ -27,12 +27,9 @@ type Props = HomepageProps & LinkStateProps & RouteComponentProps<RouteParams>;
 const Homepage: FunctionComponent<Props> = (props) => {
   const username = props.match.params.username;
 
-  const { loading, error, data, refetch } = useQuery(
-    GET_USER_BOOKSHELF_AND_BOOK_QUERY,
-    {
-      variables: { username },
-    }
-  );
+  const { loading, error, data, refetch } = useQuery(HOMEPAGE_QUERY, {
+    variables: { username },
+  });
 
   const [showModal, toggleModal] = useModal();
   const buttonRef = useRef(null);
@@ -40,29 +37,22 @@ const Homepage: FunctionComponent<Props> = (props) => {
   const [bookModalUpdates, setBookModalUpdates] = useState(0);
   // const [bookModalUpdates, triggerBookModalUpdate] = useBookModalUpdates();
 
-  const getDisplayBooks = (books: any) => {
-    const displayBooks = books.filter((book: any) => {
-      if (book.display) return book;
-    });
-    return displayBooks;
-  };
-
   const handleShelfUpdate = (shelf: string) => {
     setShelfUpdates((prev) => prev + 1);
-    refetch({ username }); //TODO: This seems like an anti-pattern. My hypo is that it is needed because apollo isn't sensing the mutation update. So, it is likely rather that once the mutations are in place, we won't need this
   };
 
   const triggerBookModalUpdate = () => {
     setBookModalUpdates((prev) => prev + 1);
-    refetch({ username });
   };
 
-  // useEffect(() => {
-  //   if (data) {
-  //     refetch({ username });
-  //     console.log("Refetching");
-  //   }
-  // }, [shelfUpdates, bookModalUpdates]);
+  //TODO: This seems like an anti-pattern.
+  //My hypo is that it is needed because apollo isn't sensing the mutation update. So, it is likely rather that once the mutations are in place, we won't need this
+  useEffect(() => {
+    if (data) {
+      refetch({ username });
+      console.log("Refetching");
+    }
+  }, [shelfUpdates, bookModalUpdates]);
 
   // Get user from Redux
   const { user } = props;
@@ -79,11 +69,14 @@ const Homepage: FunctionComponent<Props> = (props) => {
     if (!data || !data.homepage) {
       return <NotFound />;
     } else {
-      // username is valid since we got a response
-      // TODO: Homepage logic now based on your data
       return (
         <>
-          {!user.isLoggedIn && <NotLoggedInHeader username={username} />}
+          {!user.isLoggedIn && (
+            <NotLoggedInHeader
+              username={username}
+              fullName={data.homepage.fullName}
+            />
+          )}
           <MainContainer>
             {showModal && (
               <AddBookModal
@@ -100,9 +93,7 @@ const Homepage: FunctionComponent<Props> = (props) => {
             <CentralDiv>
               <Title>Currently Reading</Title>
               <Shelf
-                shelfBooks={getDisplayBooks(
-                  data.homepage.bookshelf.currentBooks
-                )}
+                shelfBooks={data.homepage.bookshelf.currentBooks.bookshelfBooks}
                 shelf="currentBooks"
                 handleModalUpdate={triggerBookModalUpdate}
               >
@@ -110,7 +101,7 @@ const Homepage: FunctionComponent<Props> = (props) => {
               </Shelf>
               <Title>Have Read</Title>
               <Shelf
-                shelfBooks={getDisplayBooks(data.homepage.bookshelf.pastBooks)}
+                shelfBooks={data.homepage.bookshelf.pastBooks.bookshelfBooks}
                 shelf="pastBooks"
                 handleModalUpdate={triggerBookModalUpdate}
               >
@@ -118,9 +109,7 @@ const Homepage: FunctionComponent<Props> = (props) => {
               </Shelf>
               <Title>Want to Read</Title>
               <Shelf
-                shelfBooks={getDisplayBooks(
-                  data.homepage.bookshelf.futureBooks
-                )}
+                shelfBooks={data.homepage.bookshelf.futureBooks.bookshelfBooks}
                 shelf="futureBooks"
                 handleModalUpdate={triggerBookModalUpdate}
               >
