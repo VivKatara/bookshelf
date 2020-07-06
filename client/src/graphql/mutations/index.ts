@@ -15,6 +15,8 @@ export const ADD_BOOK_MUTATION = gql`
     $author: String
     $shelf: String
   ) {
-    addBook(email: $email, title: $title, author: $author, shelf: $shelf)
+    addBook(email: $email, title: $title, author: $author, shelf: $shelf) {
+      title
+    }
   }
 `;

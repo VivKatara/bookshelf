@@ -16,6 +16,7 @@ const Shelf: FunctionComponent<Props> = (props) => {
   const books = shelfBooks.map((shelfBook: any) => (
     <Book
       key={shelfBook.details.isbn}
+      display={shelfBook.display}
       title={shelfBook.details.title}
       authors={shelfBook.details.authors}
       isbn={shelfBook.details.isbn}

@@ -33,6 +33,7 @@ const initialValues: BookModalFormState = {
 };
 
 type BookModalProps = {
+  display: boolean;
   title: string;
   authors: string;
   description: string;
@@ -46,6 +47,7 @@ type Props = BookModalProps & LinkStateProps & LinkDispatchProps;
 
 const BookModal: FunctionComponent<Props> = (props) => {
   const {
+    display,
     title,
     authors,
     description,
@@ -57,7 +59,8 @@ const BookModal: FunctionComponent<Props> = (props) => {
     startLogOffUser,
   } = props;
 
-  const [initialDisplayState, setInitialDisplayState] = useState(false);
+  const [initialDisplayState, setInitialDisplayState] = useState(display);
+
   const modalRef = useRef(null);
   const formikRef: any = useRef(null);
   useOutsideClick(modalRef, buttonRef, handleClose);
@@ -67,55 +70,8 @@ const BookModal: FunctionComponent<Props> = (props) => {
   const shelf = useContext(ShelfContext);
 
   useEffect(() => {
-    async function getDisplay(): Promise<void> {
-      try {
-        const method: string = "GET";
-        const url: string = "http://localhost:5000/book/getBookDisplay";
-        const data: any = {};
-        const config: any = {
-          params: { isbn, shelf },
-          withCredentials: true,
-          validateStatus: false,
-        };
-        const error: string =
-          "Your session has expired. Please log back in if you'd like to edit the display settings of this book.";
-        const response = await checkAccessAndRefreshToken(
-          method,
-          url,
-          data,
-          config,
-          error
-        );
-        if (response.status === 200) {
-          const responseDisplay = response.data.display;
-          if (responseDisplay !== initialDisplayState) {
-            setInitialDisplayState(responseDisplay);
-            if (formikRef.current) {
-              formikRef.current.setFieldValue("display", responseDisplay);
-            }
-          }
-          const action: ErrorMessageHookActionTypes = {
-            type: SUCCESS,
-          };
-          dispatchDisplayError(action);
-        } else {
-          // Server error
-          const action: ErrorMessageHookActionTypes = {
-            type: FAIL,
-            payload: { errorMsg: response.data.msg },
-          };
-          dispatchDisplayError(action);
-        }
-      } catch (error) {
-        alert(error.message);
-        await startLogOffUser();
-        return;
-      }
-    }
-    if (user.isLoggedIn) {
-      getDisplay();
-    }
     if (formikRef.current) {
+      formikRef.current.setFieldValue("display", display);
       formikRef.current.setFieldValue("shelf", shelf);
     }
   }, []);

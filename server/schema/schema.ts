@@ -228,7 +228,7 @@ const Mutation = new GraphQLObjectType({
       },
     },
     addBook: {
-      type: GraphQLBoolean,
+      type: BookType,
       args: {
         email: { type: GraphQLString },
         title: { type: GraphQLString },
@@ -236,14 +236,14 @@ const Mutation = new GraphQLObjectType({
         shelf: { type: GraphQLString },
       },
       resolve: async (parent, args) => {
-        const isbn = await BookService.addBook(args.title, args.author);
+        const book = await BookService.addBook(args.title, args.author);
         await BookshelfService.addBookToShelf(
           args.email,
-          isbn,
+          book.isbn,
           args.shelf,
           true
         );
-        return true;
+        return book;
       },
     },
     // checkUser: { // This isn't that easy because we would need to figure out authentication

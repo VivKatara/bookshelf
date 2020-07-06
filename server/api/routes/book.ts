@@ -109,25 +109,25 @@ router.post(
 // );
 
 // Get whether a given book is on display or not
-router.get(
-  "/getBookDisplay",
-  authenticateToken,
-  async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const user: any = req.user;
-      const email: any = user.email;
-      const { shelf, isbn } = req.query;
-      const display = await BookshelfService.getDisplayOfBook(
-        email as string,
-        shelf as string,
-        isbn as string
-      );
-      return res.status(200).json({ display });
-    } catch (err) {
-      next(err);
-    }
-  }
-);
+// router.get(
+//   "/getBookDisplay",
+//   authenticateToken,
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     try {
+//       const user: any = req.user;
+//       const email: any = user.email;
+//       const { shelf, isbn } = req.query;
+//       const display = await BookshelfService.getDisplayOfBook(
+//         email as string,
+//         shelf as string,
+//         isbn as string
+//       );
+//       return res.status(200).json({ display });
+//     } catch (err) {
+//       next(err);
+//     }
+//   }
+// );
 
 // Change the display of a given book
 router.post(

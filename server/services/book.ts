@@ -12,10 +12,10 @@ export default class BookService {
   public static addBook = async (
     title: string,
     author: string
-  ): Promise<string> => {
+  ): Promise<any> => {
     // search Book Collection for the book
     const book: any = await BookCollection.findOne({ title });
-    if (book) return book.isbn;
+    if (book) return book;
 
     // search Google Books API
     const matches = await BookService.searchGoogleBooksAPI(title, author);
@@ -40,7 +40,7 @@ export default class BookService {
       coverImage: finalImageLink,
     });
     await newBook.save();
-    return finalIsbn;
+    return newBook;
   };
 
   public static getBooks = async (args: any) => {
