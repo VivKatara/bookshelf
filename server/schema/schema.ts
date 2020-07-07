@@ -246,6 +246,48 @@ const Mutation = new GraphQLObjectType({
         return book;
       },
     },
+    changeBook: {
+      type: GraphQLBoolean,
+      args: {
+        email: { type: GraphQLString },
+        isbn: { type: GraphQLString },
+        initialDisplay: { type: GraphQLBoolean },
+        desiredDisplay: { type: GraphQLBoolean },
+        initialShelf: { type: GraphQLString },
+        desiredShelf: { type: GraphQLString },
+      },
+      resolve: async (parent, args) => {
+        let change = false;
+        if (
+          args.desiredShelf === args.initialShelf &&
+          args.desiredDisplay !== args.initialDisplay
+        ) {
+          change = true;
+          await BookshelfService.changeDisplayOfBook(
+            args.email,
+            args.isbn,
+            args.initialShelf,
+            args.desiredDisplay
+          );
+        } else if (args.desiredShelf !== args.initialShelf) {
+          change = true;
+          await BookshelfService.deleteBookFromShelf(
+            args.email,
+            args.isbn,
+            args.initialShelf
+          );
+          if (args.desiredShelf !== "delete") {
+            await BookshelfService.addBookToShelf(
+              args.email,
+              args.isbn,
+              args.desiredShelf,
+              args.desiredDisplay
+            );
+          }
+        }
+        return change;
+      },
+    },
     // checkUser: { // This isn't that easy because we would need to figure out authentication
     //   type: GraphQLBoolean,
     //   args: {

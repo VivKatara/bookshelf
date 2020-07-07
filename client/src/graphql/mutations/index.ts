@@ -20,3 +20,23 @@ export const ADD_BOOK_MUTATION = gql`
     }
   }
 `;
+
+export const CHANGE_BOOK_MUTATION = gql`
+  mutation changeBook(
+    $email: String = "vivek.r.katara@gmail.com"
+    $isbn: String
+    $initialDisplay: Boolean
+    $desiredDisplay: Boolean
+    $initialShelf: String
+    $desiredShelf: String
+  ) {
+    changeBook(
+      email: $email
+      isbn: $isbn
+      initialDisplay: $initialDisplay
+      desiredDisplay: $desiredDisplay
+      initialShelf: $initialShelf
+      desiredShelf: $desiredShelf
+    )
+  }
+`;

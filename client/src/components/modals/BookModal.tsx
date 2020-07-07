@@ -26,6 +26,8 @@ import { AppState } from "../../store/configureStore";
 import { User } from "../../types/User";
 import { ThunkDispatch } from "redux-thunk";
 import { bindActionCreators } from "redux";
+import { useMutation } from "@apollo/react-hooks";
+import { CHANGE_BOOK_MUTATION } from "../../graphql/mutations";
 
 const initialValues: BookModalFormState = {
   shelf: "",
@@ -59,8 +61,6 @@ const BookModal: FunctionComponent<Props> = (props) => {
     startLogOffUser,
   } = props;
 
-  const [initialDisplayState, setInitialDisplayState] = useState(display);
-
   const modalRef = useRef(null);
   const formikRef: any = useRef(null);
   useOutsideClick(modalRef, buttonRef, handleClose);
@@ -68,6 +68,8 @@ const BookModal: FunctionComponent<Props> = (props) => {
   const [displayError, dispatchDisplayError] = useErrorMessage();
 
   const shelf = useContext(ShelfContext);
+
+  const [changeBook] = useMutation(CHANGE_BOOK_MUTATION);
 
   useEffect(() => {
     if (formikRef.current) {
@@ -78,109 +80,25 @@ const BookModal: FunctionComponent<Props> = (props) => {
 
   const onSubmit = async (values: BookModalFormState): Promise<void> => {
     let change = false;
-    if (values.display !== initialDisplayState) {
-      change = true;
-      const desiredDisplay = values.display;
-      try {
-        const method: string = "POST";
-        const url: string = "http://localhost:5000/book/changeBookDisplay";
-        const data: any = { isbn, shelf, desiredDisplay };
-        const config: any = { withCredentials: true, validateStatus: false };
-        const error: string =
-          "Unable to make changes because your session has expired. Please try logging back in";
-        const response = await checkAccessAndRefreshToken(
-          method,
-          url,
-          data,
-          config,
-          error
-        );
-        if (response.status === 200) {
-          setInitialDisplayState(values.display);
-          const action: ErrorMessageHookActionTypes = {
-            type: SUCCESS,
-          };
-          dispatchDisplayError(action);
-        } else {
-          // Server error
-          // If statement because there isn't going to be a shelf change, so this error is true
-          if (values.shelf === shelf) {
-            alert(response.data.msg);
-          }
-        }
-      } catch (error) {
-        alert(error.message);
-        await startLogOffUser();
-        return;
+    try {
+      const { data } = await changeBook({
+        variables: {
+          isbn,
+          initialDisplay: display,
+          desiredDisplay: values.display,
+          initialShelf: shelf,
+          desiredShelf: values.shelf,
+        },
+      });
+      change = data.changeBook;
+    } catch (e) {
+      console.log(e);
+    } finally {
+      if (change) {
+        handleModalUpdate();
       }
+      handleClose();
     }
-
-    // If there's a shelf change, delete the book from its current shelf
-    if (values.shelf !== shelf) {
-      change = true;
-      try {
-        const method: string = "DELETE";
-        const url: string = "http://localhost:5000/book/deleteFromShelf";
-        const data: any = {};
-        const config: any = {
-          params: { isbn, shelf },
-          withCredentials: true,
-          validateStatus: false,
-        };
-        const error: string =
-          "Unable to make changes because your session has expired. Please try logging back in.";
-        const response = await checkAccessAndRefreshToken(
-          method,
-          url,
-          data,
-          config,
-          error
-        );
-        if (response.status !== 200) {
-          alert(response.data.msg);
-        }
-      } catch (error) {
-        alert(error.message);
-        await startLogOffUser();
-        return;
-      }
-
-      // There's been a shelf change, and it's not a delete, so add the book to the new shelf
-      if (values.shelf !== "delete") {
-        try {
-          const method: string = "POST";
-          const url: string = "http://localhost:5000/book/addBookToNewShelf";
-          const data: any = {
-            isbn,
-            shelf: values.shelf,
-            displayState: values.display,
-          };
-          const config: any = { withCredentials: true, validateStatus: false };
-          const error: string =
-            "Unable to make changes because your session has expired. Please try logging back in.";
-          const response = await checkAccessAndRefreshToken(
-            method,
-            url,
-            data,
-            config,
-            error
-          );
-          if (response.status !== 200) {
-            alert(response.data.msg);
-          }
-        } catch (error) {
-          alert(error.message);
-          await startLogOffUser();
-          return;
-        }
-      }
-    }
-
-    if (change) {
-      handleModalUpdate();
-    }
-
-    handleClose();
   };
 
   return (

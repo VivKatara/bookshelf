@@ -1,4 +1,5 @@
 import BookshelfCollection from "../models/BookshelfCollection";
+import { errorNames } from "../errors";
 
 export default class BookshelfService {
   public static addBookToShelf = async (
@@ -9,7 +10,7 @@ export default class BookshelfService {
   ): Promise<void> => {
     const bookshelf = await BookshelfCollection.findOne({ email });
     if (!bookshelf) {
-      throw { status: 500, message: "Something unexpected occurred." };
+      throw new Error(errorNames.SOMETHING_UNEXPECTED_OCCURRED);
     }
     const desiredShelf = bookshelf.get(shelf);
     const countLabel = `${shelf}Count`;
@@ -92,44 +93,44 @@ export default class BookshelfService {
     return desiredIsbns;
   };
 
-  public static getTotalPages = async (
-    username: string,
-    pageSize: string,
-    shelf: string
-  ): Promise<number> => {
-    const bookshelf = await BookshelfCollection.findOne({ username });
-    if (!bookshelf) {
-      throw { status: 500, message: "Something unexpected occurred." };
-    }
-    const desiredShelf = bookshelf.get(shelf);
-    const countLabel = `${shelf}Count`;
-    const desiredShelfCount = bookshelf.get(countLabel);
-    const totalPages = Math.ceil(desiredShelfCount / parseInt(pageSize));
-    return totalPages;
-  };
+  // public static getTotalPages = async (
+  //   username: string,
+  //   pageSize: string,
+  //   shelf: string
+  // ): Promise<number> => {
+  //   const bookshelf = await BookshelfCollection.findOne({ username });
+  //   if (!bookshelf) {
+  //     throw { status: 500, message: "Something unexpected occurred." };
+  //   }
+  //   const desiredShelf = bookshelf.get(shelf);
+  //   const countLabel = `${shelf}Count`;
+  //   const desiredShelfCount = bookshelf.get(countLabel);
+  //   const totalPages = Math.ceil(desiredShelfCount / parseInt(pageSize));
+  //   return totalPages;
+  // };
 
-  public static getDisplayOfBook = async (
-    email: string,
-    shelf: string,
-    isbn: string
-  ): Promise<boolean> => {
-    const bookshelf = await BookshelfCollection.findOne({ email });
-    if (!bookshelf) {
-      throw { status: 500, message: "Something unexpected occurred." };
-    }
-    const desiredShelf = bookshelf.get(shelf);
-    const desiredBooks = desiredShelf.filter((book: any) => book.isbn === isbn);
-    if (!desiredBooks.length) {
-      throw {
-        status: 400,
-        message:
-          "Something unexpected occurred. Cannot show display state of book",
-      };
-    }
-    // There should only be one item in the desiredBooks array
-    const desiredBook = desiredBooks[0];
-    return desiredBook.display;
-  };
+  // public static getDisplayOfBook = async (
+  //   email: string,
+  //   shelf: string,
+  //   isbn: string
+  // ): Promise<boolean> => {
+  //   const bookshelf = await BookshelfCollection.findOne({ email });
+  //   if (!bookshelf) {
+  //     throw { status: 500, message: "Something unexpected occurred." };
+  //   }
+  //   const desiredShelf = bookshelf.get(shelf);
+  //   const desiredBooks = desiredShelf.filter((book: any) => book.isbn === isbn);
+  //   if (!desiredBooks.length) {
+  //     throw {
+  //       status: 400,
+  //       message:
+  //         "Something unexpected occurred. Cannot show display state of book",
+  //     };
+  //   }
+  //   // There should only be one item in the desiredBooks array
+  //   const desiredBook = desiredBooks[0];
+  //   return desiredBook.display;
+  // };
 
   public static changeDisplayOfBook = async (
     email: string,
@@ -139,25 +140,18 @@ export default class BookshelfService {
   ): Promise<void> => {
     const bookshelf = await BookshelfCollection.findOne({ email });
     if (!bookshelf) {
-      throw { status: 500, message: "Something unexpected occurred." };
+      throw new Error(errorNames.SOMETHING_UNEXPECTED_OCCURRED);
     }
+
     const displayCountLabel = `${shelf}DisplayCount`;
     const desiredShelf = bookshelf.get(shelf);
     const displayCount = bookshelf.get(displayCountLabel);
 
     if (desiredDisplay && displayCount >= 6) {
-      throw {
-        status: 400,
-        message:
-          "Your main display is full. Please take one book off before placing this on the main display.",
-      };
+      throw new Error(errorNames.MAIN_DISPLAY_FULL);
     } else if (!desiredDisplay && displayCount <= 0) {
       // This case should enver occur. If it does, it is an error.
-      throw {
-        status: 400,
-        message:
-          "There are no books to take away from the main shelf! This won't work.",
-      };
+      throw new Error(errorNames.NO_BOOKS_TO_TAKE_AWAY);
     } else {
       const incrementCount = desiredDisplay ? 1 : -1;
       // Must be a valid display change request
@@ -187,7 +181,7 @@ export default class BookshelfService {
   ): Promise<void> => {
     const bookshelf = await BookshelfCollection.findOne({ email });
     if (!bookshelf) {
-      throw { status: 500, message: "Something unexpected occurred." };
+      throw new Error(errorNames.SOMETHING_UNEXPECTED_OCCURRED);
     }
 
     const desiredShelf = bookshelf.get(shelf);
@@ -210,11 +204,7 @@ export default class BookshelfService {
 
     // This essentially means that we could not find the book to be deleted
     if (newShelf.length === desiredShelf.length) {
-      throw {
-        status: 404,
-        message:
-          "Could not find book to remove from original shelf. Request unsuccessful.",
-      };
+      throw new Error(errorNames.COULD_NOT_DELETE_BOOK);
     }
 
     // Update the db
