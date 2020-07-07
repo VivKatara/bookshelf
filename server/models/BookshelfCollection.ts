@@ -2,10 +2,6 @@ import { Schema, model } from "mongoose";
 import BookshelfDocument from "../interfaces/BookshelfDocument";
 
 const BookshelfSchema: Schema = new Schema({
-  email: {
-    type: String,
-    required: true,
-  },
   username: {
     type: String,
     required: true,

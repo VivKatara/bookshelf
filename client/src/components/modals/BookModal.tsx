@@ -35,6 +35,7 @@ const initialValues: BookModalFormState = {
 };
 
 type BookModalProps = {
+  username: string;
   display: boolean;
   title: string;
   authors: string;
@@ -49,6 +50,7 @@ type Props = BookModalProps & LinkStateProps & LinkDispatchProps;
 
 const BookModal: FunctionComponent<Props> = (props) => {
   const {
+    username,
     display,
     title,
     authors,
@@ -83,6 +85,7 @@ const BookModal: FunctionComponent<Props> = (props) => {
     try {
       const { data } = await changeBook({
         variables: {
+          username,
           isbn,
           initialDisplay: display,
           desiredDisplay: values.display,

@@ -91,6 +91,7 @@ const FullShelf: FunctionComponent<Props> = (props) => {
             />
             {showModal && (
               <AddBookModal
+                username={username}
                 buttonRef={buttonRef}
                 handleClose={toggleModal}
                 shelfUpdate={handleShelfUpdate}
@@ -105,6 +106,7 @@ const FullShelf: FunctionComponent<Props> = (props) => {
             <CentralDiv>
               <Title>{shelfTitle}</Title>
               <Shelf
+                username={username}
                 shelfBooks={data.fullshelf.bookshelf[
                   shelf
                 ].bookshelfBooks.slice(0, pageSize / 3)}
@@ -113,6 +115,7 @@ const FullShelf: FunctionComponent<Props> = (props) => {
               />
               <Space />
               <Shelf
+                username={username}
                 shelfBooks={data.fullshelf.bookshelf[
                   shelf
                 ].bookshelfBooks.slice(pageSize / 3, (pageSize * 2) / 3)}
@@ -121,6 +124,7 @@ const FullShelf: FunctionComponent<Props> = (props) => {
               />
               <Space />
               <Shelf
+                username={username}
                 shelfBooks={data.fullshelf.bookshelf[
                   shelf
                 ].bookshelfBooks.slice((pageSize * 2) / 3)}

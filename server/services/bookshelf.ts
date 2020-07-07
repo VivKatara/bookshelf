@@ -3,12 +3,12 @@ import { errorNames } from "../errors";
 
 export default class BookshelfService {
   public static addBookToShelf = async (
-    email: string,
+    username: string,
     isbn: string,
     shelf: string,
     display: boolean
   ): Promise<void> => {
-    const bookshelf = await BookshelfCollection.findOne({ email });
+    const bookshelf = await BookshelfCollection.findOne({ username });
     if (!bookshelf) {
       throw new Error(errorNames.SOMETHING_UNEXPECTED_OCCURRED);
     }
@@ -28,7 +28,7 @@ export default class BookshelfService {
     // Set display to true on update
     if (display && desiredDisplayCount < 6) {
       await BookshelfCollection.updateOne(
-        { email },
+        { username },
         {
           $push: { [shelf]: { isbn: isbn, display: true } },
           $inc: { [countLabel]: 1, [displayCountLabel]: 1 },
@@ -37,7 +37,7 @@ export default class BookshelfService {
     } else {
       // Set display to false on update
       await BookshelfCollection.updateOne(
-        { email },
+        { username },
         {
           $push: { [shelf]: { isbn: isbn, display: false } },
           $inc: { [countLabel]: 1 },
@@ -133,12 +133,12 @@ export default class BookshelfService {
   // };
 
   public static changeDisplayOfBook = async (
-    email: string,
+    username: string,
     isbn: string,
     shelf: string,
     desiredDisplay: boolean
   ): Promise<void> => {
-    const bookshelf = await BookshelfCollection.findOne({ email });
+    const bookshelf = await BookshelfCollection.findOne({ username });
     if (!bookshelf) {
       throw new Error(errorNames.SOMETHING_UNEXPECTED_OCCURRED);
     }
@@ -165,7 +165,7 @@ export default class BookshelfService {
       );
 
       await BookshelfCollection.updateOne(
-        { email },
+        { username },
         {
           $set: { [shelf]: newBookShelf },
           $inc: { [displayCountLabel]: incrementCount },
@@ -175,11 +175,11 @@ export default class BookshelfService {
   };
 
   public static deleteBookFromShelf = async (
-    email: string,
+    username: string,
     isbn: string,
     shelf: string
   ): Promise<void> => {
-    const bookshelf = await BookshelfCollection.findOne({ email });
+    const bookshelf = await BookshelfCollection.findOne({ username });
     if (!bookshelf) {
       throw new Error(errorNames.SOMETHING_UNEXPECTED_OCCURRED);
     }
@@ -209,7 +209,7 @@ export default class BookshelfService {
 
     // Update the db
     await BookshelfCollection.updateOne(
-      { email },
+      { username },
       {
         $set: { [shelf]: newShelf },
         $inc: {

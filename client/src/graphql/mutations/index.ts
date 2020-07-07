@@ -10,12 +10,17 @@ export const REGISTER_MUTATION = gql`
 
 export const ADD_BOOK_MUTATION = gql`
   mutation addBook(
-    $email: String = "vivek.r.katara@gmail.com"
-    $title: String
-    $author: String
-    $shelf: String
+    $username: String!
+    $title: String!
+    $author: String!
+    $shelf: String!
   ) {
-    addBook(email: $email, title: $title, author: $author, shelf: $shelf) {
+    addBook(
+      username: $username
+      title: $title
+      author: $author
+      shelf: $shelf
+    ) {
       title
     }
   }
@@ -23,15 +28,15 @@ export const ADD_BOOK_MUTATION = gql`
 
 export const CHANGE_BOOK_MUTATION = gql`
   mutation changeBook(
-    $email: String = "vivek.r.katara@gmail.com"
-    $isbn: String
-    $initialDisplay: Boolean
-    $desiredDisplay: Boolean
-    $initialShelf: String
-    $desiredShelf: String
+    $username: String!
+    $isbn: String!
+    $initialDisplay: Boolean!
+    $desiredDisplay: Boolean!
+    $initialShelf: String!
+    $desiredShelf: String!
   ) {
     changeBook(
-      email: $email
+      username: $username
       isbn: $isbn
       initialDisplay: $initialDisplay
       desiredDisplay: $desiredDisplay

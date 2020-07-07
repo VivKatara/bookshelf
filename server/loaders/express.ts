@@ -3,7 +3,6 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import graphqlHTTP from "express-graphql";
-// import schema from "../schema/schema";
 import routes from "../api/routes";
 import schema from "../graphql";
 

@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 
-export default interface UserDocument extends mongoose.Document {
+interface MongoResult {
+  _doc: any;
+}
+
+export default interface UserDocument extends mongoose.Document, MongoResult {
   email: string;
   fullName: string;
   username: string;

@@ -4,6 +4,7 @@ import BookModal from "./modals/BookModal";
 import { useModal } from "../hooks/useModal";
 
 type Props = {
+  username: string;
   display: boolean;
   title: string;
   authors: Array<string>;
@@ -15,6 +16,7 @@ type Props = {
 
 const Book: FunctionComponent<Props> = (props) => {
   const {
+    username,
     display,
     title,
     authors,
@@ -35,6 +37,7 @@ const Book: FunctionComponent<Props> = (props) => {
       </BookContainer>
       {showModal && (
         <BookModal
+          username={username}
           display={display}
           isbn={isbn}
           title={title}

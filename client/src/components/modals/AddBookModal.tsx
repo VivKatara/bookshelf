@@ -34,6 +34,7 @@ const initialValues: AddBookModalFormState = {
 };
 
 type AddBookModalProps = {
+  username: string;
   buttonRef: React.MutableRefObject<HTMLElement | null>; // TODO: Not sure if this type is correct for buttonRef
   handleClose: () => void;
   shelfUpdate: (shelf: string) => void;
@@ -43,7 +44,7 @@ type AddBookModalProps = {
 type Props = AddBookModalProps & LinkDispatchProps;
 
 const AddBookModal: FunctionComponent<Props> = (props) => {
-  const { buttonRef, handleClose, shelfUpdate, shelf } = props;
+  const { username, buttonRef, handleClose, shelfUpdate, shelf } = props;
 
   const modalRef = useRef(null);
   useOutsideClick(modalRef, buttonRef, handleClose);
@@ -69,7 +70,7 @@ const AddBookModal: FunctionComponent<Props> = (props) => {
   const onSubmit = async (values: AddBookModalFormState): Promise<void> => {
     const { title, author, shelf } = values;
     try {
-      await addBook({ variables: { title, author, shelf } });
+      await addBook({ variables: { username, title, author, shelf } });
       shelfUpdate(shelf);
       handleClose();
     } catch (e) {

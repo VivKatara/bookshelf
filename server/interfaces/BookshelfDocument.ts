@@ -6,7 +6,6 @@ interface BookObject {
 }
 
 export default interface BookshelfDocument extends mongoose.Document {
-  email: string;
   username: string;
   currentBooks: Array<BookObject>;
   currentBooksCount: number;

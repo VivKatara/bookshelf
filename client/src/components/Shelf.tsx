@@ -5,6 +5,7 @@ import Book from "./Book";
 export const ShelfContext = React.createContext("");
 
 type Props = {
+  username: string;
   shelfBooks: any;
   shelf: string;
   children?: React.ReactNode;
@@ -12,10 +13,11 @@ type Props = {
 };
 
 const Shelf: FunctionComponent<Props> = (props) => {
-  const { shelfBooks, shelf, children, handleModalUpdate } = props;
+  const { username, shelfBooks, shelf, children, handleModalUpdate } = props;
   const books = shelfBooks.map((shelfBook: any) => (
     <Book
       key={shelfBook.details.isbn}
+      username={username}
       display={shelfBook.display}
       title={shelfBook.details.title}
       authors={shelfBook.details.authors}

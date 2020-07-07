@@ -80,6 +80,7 @@ const Homepage: FunctionComponent<Props> = (props) => {
           <MainContainer>
             {showModal && (
               <AddBookModal
+                username={username}
                 buttonRef={buttonRef}
                 handleClose={toggleModal}
                 shelfUpdate={handleShelfUpdate}
@@ -93,6 +94,7 @@ const Homepage: FunctionComponent<Props> = (props) => {
             <CentralDiv>
               <Title>Currently Reading</Title>
               <Shelf
+                username={username}
                 shelfBooks={data.homepage.bookshelf.currentBooks.bookshelfBooks}
                 shelf="currentBooks"
                 handleModalUpdate={triggerBookModalUpdate}
@@ -101,6 +103,7 @@ const Homepage: FunctionComponent<Props> = (props) => {
               </Shelf>
               <Title>Have Read</Title>
               <Shelf
+                username={username}
                 shelfBooks={data.homepage.bookshelf.pastBooks.bookshelfBooks}
                 shelf="pastBooks"
                 handleModalUpdate={triggerBookModalUpdate}
@@ -109,6 +112,7 @@ const Homepage: FunctionComponent<Props> = (props) => {
               </Shelf>
               <Title>Want to Read</Title>
               <Shelf
+                username={username}
                 shelfBooks={data.homepage.bookshelf.futureBooks.bookshelfBooks}
                 shelf="futureBooks"
                 handleModalUpdate={triggerBookModalUpdate}

@@ -21,7 +21,6 @@ export default class AuthService {
     const newUser = new UserCollection({ email, fullName, username, password });
 
     const newBookshelf = new BookshelfCollection({
-      email,
       username,
       currentBooks: [],
       currentBooksCount: 0,
