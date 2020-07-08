@@ -51,6 +51,7 @@ const typeDefs = `
     type Query {
         homepage(username: String!, page: Int! = 1, pageSize: Int! = 1, display: Boolean! = true): User
         fullshelf(username: String!, currentBooks: Boolean! = false, pastBooks: Boolean! = false, futureBooks: Boolean! = false, page: Int! = 1, pageSize: Int! = 1, display: Boolean! = false): User
+        login(email: String!, password: String!): Boolean!
     }
 
     type Mutation {

@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import graphqlHTTP from "express-graphql";
 import routes from "../api/routes";
 import schema from "../graphql";
+import { cookieToHeader, isAuth } from "../middleware/auth";
 
 export default ({ app }: { app: express.Application }) => {
   app.use(bodyParser.urlencoded({ extended: true }));
@@ -18,13 +19,16 @@ export default ({ app }: { app: express.Application }) => {
   };
   app.use(cors(corsOptions));
 
+  app.use(cookieToHeader);
+  app.use(isAuth);
   // GraphQL;
   app.use(
     "/graphql",
-    graphqlHTTP({
+    graphqlHTTP((request, response, graphQLParams) => ({
       schema,
+      context: { req: request, res: response },
       graphiql: true,
-    })
+    }))
   );
 
   // REST Routes

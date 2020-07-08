@@ -4,7 +4,7 @@ import BookService from "../../services/book";
 
 const MutationResolvers = {
   Mutation: {
-    addUser: async (parent: any, args: any) => {
+    addUser: async (parent: any, args: any, ctx: any) => {
       const newUser = await AuthService.SignUp(
         args.email,
         args.fullName,
@@ -12,7 +12,10 @@ const MutationResolvers = {
       );
       return { ...newUser._doc, password: null };
     },
-    addBook: async (parent: any, args: any) => {
+    addBook: async (parent: any, args: any, ctx: any) => {
+      if (!ctx.req.isAuth) {
+        throw new Error("Unauthenticated!");
+      }
       const book = await BookService.addBook(args.title, args.author);
       await BookshelfService.addBookToShelf(
         args.username,
@@ -22,7 +25,10 @@ const MutationResolvers = {
       );
       return book;
     },
-    changeBook: async (parent: any, args: any) => {
+    changeBook: async (parent: any, args: any, ctx: any) => {
+      if (!ctx.req.isAuth) {
+        throw new Error("Unauthenticated!");
+      }
       let change = false;
       if (
         args.desiredShelf === args.initialShelf &&

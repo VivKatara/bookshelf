@@ -14,7 +14,6 @@ export default class AuthService {
     password: string
   ): Promise<any> => {
     const user = await UserCollection.findOne({ email });
-    // if (user) throw { status: 409, message: "This email already exists" };
     if (user) throw new Error(errorNames.USER_ALREADY_EXISTS);
 
     const username = await AuthService.createUsername(fullName);
@@ -52,56 +51,35 @@ export default class AuthService {
     if (!user) throw { status: 401, message: "Incorrect username" };
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) throw { status: 401, message: "Incorrect password" };
-    const payload = {
-      id: user.id,
-      email: user.email,
-      fullName: user.fullName,
-      username: user.username,
-    };
 
-    const accessToken = AuthService.generateAccessToken(
-      payload,
-      config.accessTokenSecret,
-      "1d"
-    );
-    const refreshToken = AuthService.generateAccessToken(
-      payload,
-      config.refreshTokenSecret,
-      "7d"
-    );
+    const accessToken = AuthService.createAccessToken(user);
+    const refreshToken = AuthService.createRefreshToken(user);
 
     const newRefreshToken = new TokenCollection({ refreshToken });
-    await newRefreshToken.save();
+    await newRefreshToken.save(); // TODO: Refresh token should be stored with userid so that you know who owns the refresh token
 
+    console.log("ASSIGNED REFRESH");
+    console.log(refreshToken);
     return [accessToken, refreshToken];
   };
 
   public static RefreshAccessToken = async (
     refreshToken: any
-  ): Promise<string> => {
-    if (refreshToken === null) {
-      throw { status: 401, message: "Invalid. Please try logging in again" };
-    }
+  ): Promise<any> => {
+    if (!refreshToken || refreshToken === "") return null;
+
     const foundToken = await TokenCollection.findOne({ refreshToken });
-    if (!foundToken) {
-      console.log("Provided refresh token not in database");
-      throw { status: 403, message: "Invalid. Please try logging in again" };
+    if (!foundToken) return null;
+
+    let user;
+
+    try {
+      user = jwt.verify(refreshToken, config.refreshTokenSecret);
+    } catch (err) {
+      return null;
     }
-    const user: any = await jwt.verify(refreshToken, config.refreshTokenSecret);
 
-    const payload = {
-      id: user.id,
-      email: user.email,
-      fullName: user.fullName,
-      username: user.username,
-    };
-
-    const accessToken = AuthService.generateAccessToken(
-      payload,
-      config.accessTokenSecret,
-      "1d"
-    );
-
+    const accessToken = AuthService.createAccessToken(user);
     return accessToken;
   };
 
@@ -110,12 +88,24 @@ export default class AuthService {
     return;
   };
 
-  private static generateAccessToken = (
-    payload: any,
-    secret: any,
-    expires: any
-  ): string => {
-    return jwt.sign(payload, secret, { expiresIn: expires });
+  private static createAccessToken = (user: any) => {
+    const payload = {
+      id: user.id, //TODO: I think we only need ID in payload
+      email: user.email,
+      fullName: user.fullName,
+      username: user.username,
+    };
+    return jwt.sign(payload, config.accessTokenSecret, { expiresIn: "5s" });
+  };
+
+  private static createRefreshToken = (user: any) => {
+    const payload = {
+      id: user.id,
+      email: user.email,
+      fullName: user.fullName,
+      username: user.username,
+    };
+    return jwt.sign(payload, config.refreshTokenSecret, { expiresIn: "5s" });
   };
 
   private static createUsername = async (fullName: string): Promise<string> => {
